@@ -1,6 +1,14 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
+@import "@radix-ui/colors/slate.css";
+@import "@radix-ui/colors/slate-dark.css";
+@import "@radix-ui/colors/indigo.css";
+@import "@radix-ui/colors/indigo-dark.css";
+@import "@radix-ui/colors/amber.css";
+@import "@radix-ui/colors/amber-dark.css";
+@import "@radix-ui/colors/red.css";
+@import "@radix-ui/colors/red-dark.css";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -46,75 +54,87 @@
   --radius-2xl: calc(var(--radius) * 1.8);
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
+  --color-slate-1: var(--slate-1);
+  --color-slate-2: var(--slate-2);
+  --color-slate-3: var(--slate-3);
+  --color-slate-4: var(--slate-4);
+  --color-slate-5: var(--slate-5);
+  --color-slate-6: var(--slate-6);
+  --color-slate-7: var(--slate-7);
+  --color-slate-8: var(--slate-8);
+  --color-slate-9: var(--slate-9);
+  --color-slate-10: var(--slate-10);
+  --color-slate-11: var(--slate-11);
+  --color-slate-12: var(--slate-12);
+  --color-indigo-1: var(--indigo-1);
+  --color-indigo-2: var(--indigo-2);
+  --color-indigo-3: var(--indigo-3);
+  --color-indigo-4: var(--indigo-4);
+  --color-indigo-5: var(--indigo-5);
+  --color-indigo-6: var(--indigo-6);
+  --color-indigo-7: var(--indigo-7);
+  --color-indigo-8: var(--indigo-8);
+  --color-indigo-9: var(--indigo-9);
+  --color-indigo-10: var(--indigo-10);
+  --color-indigo-11: var(--indigo-11);
+  --color-indigo-12: var(--indigo-12);
+  --color-amber-1: var(--amber-1);
+  --color-amber-2: var(--amber-2);
+  --color-amber-3: var(--amber-3);
+  --color-amber-4: var(--amber-4);
+  --color-amber-5: var(--amber-5);
+  --color-amber-6: var(--amber-6);
+  --color-amber-7: var(--amber-7);
+  --color-amber-8: var(--amber-8);
+  --color-amber-9: var(--amber-9);
+  --color-amber-10: var(--amber-10);
+  --color-amber-11: var(--amber-11);
+  --color-amber-12: var(--amber-12);
 }
 
+/* Semantic tokens mapped to Radix scales. var() resolves at use time, so the
+   slate/indigo/red dark scales swap in automatically under .dark — only
+   surfaces that need a different step are overridden there. */
 :root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
+  --background: var(--slate-1);
+  --foreground: var(--slate-12);
+  --card: #ffffff;
+  --card-foreground: var(--slate-12);
+  --popover: #ffffff;
+  --popover-foreground: var(--slate-12);
+  --primary: var(--indigo-9);
+  --primary-foreground: #ffffff;
+  --secondary: var(--slate-3);
+  --secondary-foreground: var(--slate-12);
+  --muted: var(--slate-3);
+  --muted-foreground: var(--slate-11);
+  --accent: var(--slate-3);
+  --accent-foreground: var(--slate-12);
+  --destructive: var(--red-9);
+  --border: var(--slate-6);
+  --input: var(--slate-7);
+  --ring: var(--indigo-8);
+  --chart-1: var(--indigo-9);
+  --chart-2: var(--slate-8);
+  --chart-3: var(--slate-10);
+  --chart-4: var(--slate-11);
+  --chart-5: var(--slate-12);
   --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  --sidebar: var(--slate-2);
+  --sidebar-foreground: var(--slate-12);
+  --sidebar-primary: var(--indigo-9);
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: var(--slate-4);
+  --sidebar-accent-foreground: var(--slate-12);
+  --sidebar-border: var(--slate-6);
+  --sidebar-ring: var(--indigo-8);
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  --card: var(--slate-2);
+  --card-foreground: var(--slate-12);
+  --popover: var(--slate-2);
+  --popover-foreground: var(--slate-12);
 }
 
 @layer base {
