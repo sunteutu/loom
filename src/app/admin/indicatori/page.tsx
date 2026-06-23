@@ -3,13 +3,10 @@
 import {
   Suspense,
   useCallback,
-  useEffect,
   useMemo,
-  useRef,
   useState,
   type ReactNode,
 } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
 import { Check, Ruler, Search, SlidersHorizontal, X } from "lucide-react";
 import { Dialog, Popover } from "radix-ui";
 import {
@@ -63,8 +60,6 @@ function Highlight({ text, terms }: { text: string; terms: string[] }) {
   );
 }
 
-const CATEGORY_SET = new Set<string>(INDICATOR_CATEGORIES);
-
 export default function IndicatoriPage() {
   return (
     <Suspense>
@@ -74,80 +69,29 @@ export default function IndicatoriPage() {
 }
 
 function IndicatoriContent() {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-
-  // Filter state lives in the URL so it survives refresh and is shareable.
-  // The text input keeps local state and syncs to the URL debounced, so
-  // typing stays instant.
-  const urlQuery = searchParams.get("q") ?? "";
-  const [query, setQueryState] = useState(urlQuery);
-  const lastSyncedQuery = useRef(urlQuery);
+  // Filter state is plain client-side React state (this Next fork's
+  // router/useSearchParams round-trip didn't reliably drive re-filtering).
+  const [query, setQuery] = useState("");
   const [selected, setSelected] = useState<Indicator | null>(null);
-  const selectedCats = useMemo(() => {
-    const cats = (searchParams.get("cat") ?? "")
-      .split("|")
-      .filter((c) => CATEGORY_SET.has(c));
-    return new Set(cats as IndicatorCategory[]);
-  }, [searchParams]);
-
-  const updateParams = useCallback(
-    (next: { q?: string; cats?: Set<IndicatorCategory> }) => {
-      const params = new URLSearchParams(searchParams);
-      if (next.q !== undefined) {
-        if (next.q) params.set("q", next.q);
-        else params.delete("q");
-      }
-      if (next.cats !== undefined) {
-        if (next.cats.size > 0) {
-          params.set(
-            "cat",
-            INDICATOR_CATEGORIES.filter((c) => next.cats!.has(c)).join("|"),
-          );
-        } else {
-          params.delete("cat");
-        }
-      }
-      const qs = params.toString();
-      router.replace(qs ? `?${qs}` : "?", { scroll: false });
-    },
-    [router, searchParams],
+  const [selectedCats, setSelectedCats] = useState<Set<IndicatorCategory>>(
+    () => new Set(),
   );
 
-  const setQuery = useCallback((q: string) => setQueryState(q), []);
-
-  // Debounced local query → URL.
-  useEffect(() => {
-    if (query === lastSyncedQuery.current) return;
-    const t = setTimeout(() => {
-      lastSyncedQuery.current = query;
-      updateParams({ q: query });
-    }, 250);
-    return () => clearTimeout(t);
-  }, [query, updateParams]);
-
-  // URL → local query (back/forward navigation, external links).
-  useEffect(() => {
-    if (urlQuery !== lastSyncedQuery.current) {
-      lastSyncedQuery.current = urlQuery;
-      setQueryState(urlQuery);
-    }
-  }, [urlQuery]);
-
-  const toggleCategory = useCallback(
-    (cat: IndicatorCategory) => {
-      const next = new Set(selectedCats);
+  const toggleCategory = useCallback((cat: IndicatorCategory) => {
+    setSelectedCats((prev) => {
+      const next = new Set(prev);
       if (next.has(cat)) next.delete(cat);
       else next.add(cat);
-      updateParams({ cats: next });
-    },
-    [selectedCats, updateParams],
-  );
+      return next;
+    });
+  }, []);
 
-  const clearAll = useCallback(
-    () => updateParams({ q: "", cats: new Set() }),
-    [updateParams],
-  );
+  const clearCats = useCallback(() => setSelectedCats(new Set()), []);
+
+  const clearAll = useCallback(() => {
+    setQuery("");
+    setSelectedCats(new Set());
+  }, []);
 
   const terms = useMemo(() => queryTerms(query), [query]);
 
@@ -240,7 +184,7 @@ function IndicatoriContent() {
                   </span>
                   {selectedCats.size > 0 && (
                     <button
-                      onClick={() => updateParams({ cats: new Set() })}
+                      onClick={clearCats}
                       className="text-xs font-medium text-indigo-9 transition-colors hover:text-indigo-10"
                     >
                       Reset
