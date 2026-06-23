@@ -349,12 +349,30 @@ const BASE_INDICATORS: Indicator[] = [
   {
     id: "needs-motivations",
     name: "Needs & Motivations",
-    aliases: ["drivers of choice", "need states", "jobs to be done", "JTBD"],
+    aliases: ["drivers of choice", "need states", "motivations"],
     category: "Usage & Attitudes (U&A)",
     description:
       "The underlying functional and emotional needs the category serves — what consumers are really ‘hiring’ the product to do.",
     measurement:
       "Importance ratings or MaxDiff on need statements; qualitative laddering for depth.",
+  },
+  {
+    id: "jobs-to-be-done",
+    name: "Jobs to Be Done (JTBD)",
+    aliases: [
+      "JTBD",
+      "jobs to be done",
+      "outcome-driven innovation",
+      "ODI",
+      "desired outcomes",
+      "switch interview",
+      "four forces",
+    ],
+    category: "Usage & Attitudes (U&A)",
+    description:
+      "The progress a customer is trying to make in a given circumstance — the functional, emotional and social ‘job’ they hire a product to do. Reframes demand around outcomes and situations, not products or demographics.",
+    measurement:
+      "Outcome-Driven Innovation: rate desired-outcome statements on Importance × Satisfaction; Opportunity score = Importance + max(Importance − Satisfaction, 0). Underserved jobs = high importance, low satisfaction.",
   },
   {
     id: "path-to-purchase",

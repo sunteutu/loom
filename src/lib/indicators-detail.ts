@@ -339,6 +339,19 @@ export const INDICATOR_DETAIL: Record<string, IndicatorDetail> = {
       "If this category could solve one frustration in your life completely, what would you want it to fix?",
     ],
   },
+  "jobs-to-be-done": {
+    qualIntent:
+      "Uncover the real progress the customer is trying to make and the circumstances that trigger it — the functional, emotional and social job they hire the product to do — by reconstructing a real recent switch and the four forces around it.",
+    qualQuestions: [
+      "Take me back to the moment you first realised you needed something like this. What was happening in your life or your day right then?",
+      "What were you using or doing to get this done before — and what started to feel broken about it?",
+      "When you started looking, what was the progress you were really trying to make? What would 'better' have looked like?",
+      "Beyond getting the task done, how did you want to feel about it — and how did you want others to see you? (the emotional and social side of the job)",
+      "What made you hesitate about switching to it? What nearly held you back, or pulled you to stick with what you already had?",
+      "When you finally chose it, what was the one thing that tipped you over — and how did you know it would do the job?",
+      "Now that you've lived with it a while, where does it still fall short of the job you hired it for?",
+    ],
+  },
   "path-to-purchase": {
     qualIntent:
       "Reconstruct one recent real purchase end-to-end to capture the trigger, sources consulted, influencers/deciders, and decisive criteria.",
