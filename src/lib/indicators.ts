@@ -265,6 +265,40 @@ const BASE_INDICATORS: Indicator[] = [
       "Share of category media spend or claimed ad awareness share in trackers.",
   },
 
+  {
+    id: "distinctive-brand-assets",
+    name: "Distinctive Brand Assets (DBA)",
+    aliases: [
+      "DBA",
+      "distinctive assets",
+      "brand codes",
+      "fame and uniqueness",
+      "Ehrenberg-Bass assets",
+    ],
+    category: "Brand Health & Equity",
+    description:
+      "How strongly the brand's non-name codes — logo, colour, character, jingle, slogan, pack shape — trigger the brand from memory. Scored on fame (how many link it to the brand) and uniqueness (whether they link it only to this brand); the basis of mental availability and attention.",
+    measurement:
+      "Show each asset with the brand name removed: 'Which brand, if any, is this?' Fame = % attributing to the brand; Uniqueness = % attributing only to this brand (vs competitors/none). Plot assets on a Fame × Uniqueness grid to find investable vs risky assets.",
+  },
+  {
+    id: "sustainability-perception",
+    name: "Sustainability & Ethical Perception",
+    aliases: [
+      "sustainability",
+      "ESG perception",
+      "green credentials",
+      "ethical brand",
+      "purpose",
+      "green premium",
+    ],
+    category: "Brand Health & Equity",
+    description:
+      "How sustainable, ethical and responsible the brand is perceived to be (environmental, social, governance), how credible its claims are, and whether consumers would pay a premium — separating genuine equity from greenwashing risk and the say-do gap.",
+    measurement:
+      "Agreement battery on environmental/social/ethical attributes (5-pt, % T2B) vs competitors; claim believability; and a green-premium WTP (stated extra % willing to pay). Always caveat the say-do gap vs actual behaviour.",
+  },
+
   // ── Usage & Attitudes (U&A) ──────────────────────────────────────────────
   {
     id: "category-penetration",
@@ -516,6 +550,24 @@ const BASE_INDICATORS: Indicator[] = [
       "Claimed promo behaviour battery; or conjoint with promo conditions.",
   },
 
+  {
+    id: "conjoint-analysis",
+    name: "Conjoint / Discrete Choice (Trade-off)",
+    aliases: [
+      "conjoint",
+      "CBC",
+      "choice-based conjoint",
+      "discrete choice",
+      "trade-off analysis",
+      "part-worth utilities",
+    ],
+    category: "Purchase Behaviour & Pricing",
+    description:
+      "Derives the relative value (part-worth utilities) consumers place on product attributes and price by observing choices among realistic configured alternatives, rather than asking importance directly. The rigorous basis for feature prioritization, pricing, and share simulation.",
+    measurement:
+      "Choice-Based Conjoint (CBC): respondents choose among 3–4 product profiles (attribute bundles incl. price) across ~8–12 tasks; estimate part-worth utilities (Hierarchical Bayes), attribute importance, WTP, and run a market simulator for share/revenue under scenarios.",
+  },
+
   // ── Concept & Product Testing ────────────────────────────────────────────
   {
     id: "overall-liking",
@@ -617,6 +669,48 @@ const BASE_INDICATORS: Indicator[] = [
       "Priced concept: value-for-money scale; unpriced: expected-price open question vs. intended price.",
   },
 
+  {
+    id: "kano-model",
+    name: "Kano Model",
+    aliases: [
+      "Kano",
+      "must-be",
+      "delighters",
+      "feature classification",
+      "attractive quality",
+    ],
+    category: "Concept & Product Testing",
+    description:
+      "Classifies product features by how they drive satisfaction: must-be (basic, only dissatisfy if absent), performance (more is better), attractive (delighters that excite but aren't missed), indifferent, and reverse. Decides which features earn their place.",
+    measurement:
+      "Paired functional/dysfunctional question per feature (how you'd feel if it WERE present vs if it were NOT); cross-tab via the Kano evaluation table into Must-be/Performance/Attractive/Indifferent/Reverse; report category per feature, often with Better (CS) and Worse (DS) coefficients.",
+  },
+  {
+    id: "maxdiff",
+    name: "MaxDiff (Best-Worst Scaling)",
+    aliases: ["MaxDiff", "best-worst scaling", "BWS", "priority ranking"],
+    category: "Concept & Product Testing",
+    description:
+      "Forces respondents to pick the most and least important (or appealing) item from small subsets, yielding a discriminating, ratio-scaled priority ranking of needs, features, messages or claims — free of the scale-use bias and ceiling effects of rating batteries.",
+    measurement:
+      "Show subsets of 4–5 items across ~10–15 sets; respondent marks best and worst each set; estimate item scores (counting or Hierarchical Bayes) on a 0–100 scale summing to 100; rank items by preference share.",
+  },
+  {
+    id: "turf",
+    name: "TURF Analysis",
+    aliases: [
+      "TURF",
+      "total unduplicated reach and frequency",
+      "line optimization",
+      "portfolio reach",
+    ],
+    category: "Concept & Product Testing",
+    description:
+      "Finds the combination of a limited number of items (flavours, variants, SKUs, messages, features) that together reach the largest number of people at least once — the range that maximizes unduplicated reach, not just average appeal.",
+    measurement:
+      "From interest/appeal/purchase-intent data per item, compute the unduplicated reach of every candidate combination of size N; identify the optimal line-up and the incremental reach each added item contributes (diminishing-returns curve).",
+  },
+
   // ── Customer Experience & Satisfaction ───────────────────────────────────
   {
     id: "nps",
@@ -676,6 +770,17 @@ const BASE_INDICATORS: Indicator[] = [
       "Which experience attributes drive overall satisfaction/NPS — directs improvement investment to what moves the needle.",
     measurement:
       "Derived importance (regression/Shapley of attributes on OSAT/NPS) plotted against performance (quadrant map).",
+  },
+
+  {
+    id: "servqual",
+    name: "Service Quality (SERVQUAL / RATER)",
+    aliases: ["SERVQUAL", "RATER", "service quality", "SERVPERF", "gap model"],
+    category: "Customer Experience & Satisfaction",
+    description:
+      "Decomposes service quality into five dimensions — Reliability, Assurance, Tangibles, Empathy, Responsiveness (RATER) — measured as the gap between what customers expect and what they perceive they received. The diagnostic layer beneath NPS/CSAT that points to which operational lever is failing.",
+    measurement:
+      "22-item battery across the 5 RATER dimensions on a 7-pt scale. Classic SERVQUAL asks Expectations and Perceptions (gap = P − E); modern SERVPERF asks Perceptions only and derives importance via regression. Weight dimensions via a 100-point allocation; report per-dimension gap/score and the largest shortfall.",
   },
 
   // ── Advertising & Communications ─────────────────────────────────────────

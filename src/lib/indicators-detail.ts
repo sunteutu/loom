@@ -1365,4 +1365,84 @@ export const INDICATOR_DETAIL: Record<string, IndicatorDetail> = {
       "When you don't ask anyone, what's usually behind that?",
     ],
   },
+
+  // ── Added in final audit (Kano, Conjoint, MaxDiff, TURF, DBA, Sustainability, SERVQUAL) ──
+  "kano-model": {
+    qualIntent:
+      "Surface, for each candidate feature, whether it's an expected baseline, a 'more-is-better' lever, or a genuine delighter — by exploring how people react to its presence and its absence.",
+    qualQuestions: [
+      "Imagine [feature] is there and working perfectly. How would that make you feel about the product?",
+      "Now imagine it's completely absent. How would you feel then?",
+      "Is this something you'd simply expect to be there, or something that would genuinely surprise and delight you?",
+      "Tell me about a product that had a little extra you didn't expect — what was it, and how did it change how you felt?",
+      "Which of these features would you barely notice either way? Be honest.",
+    ],
+  },
+  "maxdiff": {
+    qualIntent:
+      "Surface the real hierarchy among the items and the reasoning behind the top and bottom — the why a forced best-worst choice can't give you on its own.",
+    qualQuestions: [
+      "Of all these, which one matters most to you — and what makes it rise above the rest?",
+      "And which matters least? Why does that one not move you at all?",
+      "When two of these compete head to head, how do you break the tie?",
+      "Is there one here that everyone says matters but honestly doesn't to you?",
+      "If you could only keep the top three, which would you fight for?",
+    ],
+  },
+  "turf": {
+    qualIntent:
+      "Understand why people pick into a range, where variety genuinely matters, and which options are redundant versus reach a different person.",
+    qualQuestions: [
+      "Looking at this range, which ones would you actually buy or use — and which would you never touch?",
+      "If your favourite weren't available, which would you reach for instead?",
+      "Does having more variety here matter to you, or would two or three be enough?",
+      "Which of these feels like it's 'for someone else', not for you?",
+      "Tell me about a time a range was missing the one option you wanted — what happened?",
+    ],
+  },
+  "distinctive-brand-assets": {
+    qualIntent:
+      "Surface which brand cues people genuinely encode in memory and whether they confuse them with competitors — fame and uniqueness, felt rather than measured.",
+    qualQuestions: [
+      "I'm going to show you something with the brand name removed — what brand comes to mind, if any?",
+      "What made you say that — what about it feels like [brand]?",
+      "Could this just as easily be a competitor? Which one?",
+      "When you picture [brand] in your head, what's the first visual or sound that comes up?",
+      "If [brand] dropped its name and logo entirely, what would still tell you it was them?",
+    ],
+  },
+  "sustainability-perception": {
+    qualIntent:
+      "Explore what sustainability means to them in this category, how much it really drives choice, and whether they believe the brand's claims — getting past the socially-desirable answer to the say-do gap.",
+    qualQuestions: [
+      "When you think about [category], does how sustainable or ethical a brand is come into your choice at all? Walk me through that.",
+      "Tell me about a brand you trust to do the right thing — and one you're sceptical about. What's the difference?",
+      "When a brand makes a 'green' or 'ethical' claim, what makes you believe it versus roll your eyes?",
+      "Would you pay more for a more sustainable option here? Be honest — and where's your limit?",
+      "Some people say they care about sustainability but don't change what they buy. Where do you sit, really?",
+    ],
+  },
+  "servqual": {
+    qualIntent:
+      "Explore the five service dimensions (RATER) through best and worst service moments, and surface where the promise — in ads, app, or at the desk — diverged from what was delivered.",
+    qualQuestions: [
+      "Tell me about the best and the worst service experience you've had with [provider]. What happened in each?",
+      "Can you count on them to get it right first time? Tell me about a time they did, and one they didn't. (reliability)",
+      "How do the people make you feel — confident and looked after, or like a number? (assurance & empathy)",
+      "When you needed help, how quickly and willingly did they respond? (responsiveness)",
+      "Did what they promised — in ads, in the app, at the desk — match what you actually got? Where did it diverge?",
+      "If you ran the place, which one thing about the service would you fix first?",
+    ],
+  },
+  "conjoint-analysis": {
+    qualIntent:
+      "Conjoint is quant by design; the qual companion surfaces which attributes genuinely matter and the real trade-offs people make — input for choosing the attributes and levels to model.",
+    qualQuestions: [
+      "When you choose a [product], walk me through the things you weigh against each other — what trades off against what?",
+      "Tell me about a time you wanted [one attribute] but had to give up [another] to get it. How did you decide?",
+      "If you could only keep three things about [product] and drop the rest, what would you keep?",
+      "Where does price sit in that — first filter, tiebreaker, or something you'll stretch for the right product?",
+      "Are there features that are simply non-negotiable — deal-breakers if they're missing?",
+    ],
+  },
 };
