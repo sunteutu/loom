@@ -8,6 +8,43 @@
  * UX metrics).
  */
 
+import { INDICATOR_DETAIL } from "./indicators-detail";
+import { INDICATOR_SURVEY } from "./indicators-survey";
+
+export interface SurveyItem {
+  type:
+    | "single"
+    | "multi"
+    | "scale"
+    | "jar"
+    | "price_psm"
+    | "ranking"
+    | "constant_sum"
+    | "grid"
+    | "open_numeric"
+    | "open_text";
+  /** The question text shown to the respondent (with [placeholders]). */
+  stem: string;
+  /** Ordered scale-point labels (for scale / single). */
+  scalePoints?: string[];
+  /** Answer options (for single / multi — e.g. a brand list). */
+  options?: string[];
+  /** Battery rows (JAR attributes, grid rows). */
+  attributes?: string[];
+  /** Sub-questions for multi-question techniques (e.g. Van Westendorp). */
+  subStems?: string[];
+  /** Who is asked (routing / skip logic). */
+  base: string;
+  /** Randomize option / row order. */
+  randomize?: boolean;
+  /** How it is reported / scored. */
+  analysis: string;
+  /** Where it sits in the questionnaire flow. */
+  placement: string;
+  /** Gold-standard tips / pitfalls. */
+  notes?: string;
+}
+
 export interface Indicator {
   id: string;
   name: string;
@@ -17,6 +54,12 @@ export interface Indicator {
   description: string;
   /** How the indicator is classically measured (scale, question type, formula). */
   measurement: string;
+  /** What you're really trying to surface in a qualitative interview. */
+  qualIntent?: string;
+  /** Gold-standard qualitative interview questions. */
+  qualQuestions?: string[];
+  /** Structured quantitative survey items. */
+  surveyItems?: SurveyItem[];
 }
 
 export type IndicatorCategory =
@@ -42,7 +85,7 @@ export const INDICATOR_CATEGORIES: IndicatorCategory[] = [
   "Financial Needs & Wellbeing",
 ];
 
-export const INDICATORS: Indicator[] = [
+const BASE_INDICATORS: Indicator[] = [
   // ── Brand Health & Equity ────────────────────────────────────────────────
   {
     id: "tom-awareness",
@@ -1125,3 +1168,15 @@ export const INDICATORS: Indicator[] = [
       "Source pick-any per decision type + trust rating per source.",
   },
 ];
+
+/** Indicators with their qualitative & quantitative detail merged in. */
+export const INDICATORS: Indicator[] = BASE_INDICATORS.map((indicator) => {
+  const detail = INDICATOR_DETAIL[indicator.id];
+  return {
+    ...indicator,
+    ...detail,
+    // The 5 originally-validated items live in INDICATOR_DETAIL and win;
+    // every other indicator's items come from INDICATOR_SURVEY.
+    surveyItems: detail?.surveyItems ?? INDICATOR_SURVEY[indicator.id],
+  };
+});
