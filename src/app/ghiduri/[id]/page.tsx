@@ -27,6 +27,7 @@ import {
   downloadDocx,
   downloadMarkdown,
   groupItems,
+  type GuideLanguage,
 } from "@/lib/guide-export";
 
 const VARIABLE_FIELDS = [
@@ -61,6 +62,7 @@ export default function GhidPage() {
 
 function GuideEditor({ guide, isActive }: { guide: Guide; isActive: boolean }) {
   const [newQuestion, setNewQuestion] = useState("");
+  const [lang, setLang] = useState<GuideLanguage>("en");
   const groups = groupItems(guide.items);
 
   // Continuous numbering across groups, same as the export.
@@ -85,8 +87,35 @@ function GuideEditor({ guide, isActive }: { guide: Guide; isActive: boolean }) {
               Setează activ
             </button>
           )}
+          <div
+            role="radiogroup"
+            aria-label="Limba exportului"
+            className="flex items-center gap-0.5 rounded-md border border-border p-0.5"
+          >
+            {(
+              [
+                { value: "en", label: "EN", title: "Exportă în engleză" },
+                { value: "ro", label: "RO", title: "Exportă în română" },
+              ] as const
+            ).map((opt) => (
+              <button
+                key={opt.value}
+                role="radio"
+                aria-checked={lang === opt.value}
+                title={opt.title}
+                onClick={() => setLang(opt.value)}
+                className={`rounded px-2 py-1 text-xs font-semibold transition-colors ${
+                  lang === opt.value
+                    ? "bg-indigo-9 text-white"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                {opt.label}
+              </button>
+            ))}
+          </div>
           <button
-            onClick={() => downloadMarkdown(guide)}
+            onClick={() => downloadMarkdown(guide, lang)}
             disabled={guide.items.length === 0}
             className="inline-flex items-center gap-1.5 rounded-md border border-border px-2.5 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:border-ring hover:text-foreground disabled:cursor-not-allowed disabled:opacity-40"
           >
@@ -94,7 +123,7 @@ function GuideEditor({ guide, isActive }: { guide: Guide; isActive: boolean }) {
             Markdown
           </button>
           <button
-            onClick={() => void downloadDocx(guide)}
+            onClick={() => void downloadDocx(guide, lang)}
             disabled={guide.items.length === 0}
             className="inline-flex items-center gap-1.5 rounded-md bg-indigo-9 px-3 py-1.5 text-sm font-medium text-white shadow-sm transition-colors hover:bg-indigo-10 disabled:cursor-not-allowed disabled:opacity-40"
           >

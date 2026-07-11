@@ -27,6 +27,7 @@ import {
 import {
   addQuestionsToActiveGuide,
   getActiveGuide,
+  removeIndicatorFromActiveGuide,
   removeQuestionFromActiveGuide,
   useGuideStore,
 } from "@/lib/guides";
@@ -402,28 +403,37 @@ function QualSection({ indicator }: { indicator: Indicator }) {
     }
   };
 
-  const addAll = () =>
-    addQuestionsToActiveGuide(
-      questions.map((text, index) => ({
-        text,
-        indicatorId: indicator.id,
-        sourceIndex: index,
-      })),
-    );
+  const toggleAll = () => {
+    if (allAdded) {
+      removeIndicatorFromActiveGuide(indicator.id);
+    } else {
+      addQuestionsToActiveGuide(
+        questions.map((text, index) => ({
+          text,
+          indicatorId: indicator.id,
+          sourceIndex: index,
+        })),
+      );
+    }
+  };
 
   return (
     <section className="mt-7">
       <div className="flex items-center justify-between gap-2">
         <SectionLabel>Qualitative — interview guide</SectionLabel>
         <button
-          onClick={addAll}
-          disabled={allAdded}
-          className="inline-flex items-center gap-1 rounded-md border border-border px-2 py-1 text-xs font-medium text-muted-foreground transition-colors hover:border-ring hover:text-foreground disabled:cursor-default disabled:border-transparent disabled:text-indigo-11 disabled:opacity-100"
+          onClick={toggleAll}
+          aria-pressed={allAdded}
+          className={`inline-flex items-center gap-1 rounded-md border px-2 py-1 text-xs font-medium transition-colors ${
+            allAdded
+              ? "border-indigo-6 bg-indigo-3 text-indigo-11 hover:border-red-9/40 hover:bg-red-3 hover:text-red-11"
+              : "border-border text-muted-foreground hover:border-ring hover:text-foreground"
+          }`}
         >
           {allAdded ? (
             <>
-              <Check aria-hidden className="h-3.5 w-3.5" />
-              Toate în ghid
+              <X aria-hidden className="h-3.5 w-3.5" />
+              Scoate toate din ghid
             </>
           ) : (
             <>

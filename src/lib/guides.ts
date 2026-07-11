@@ -163,6 +163,17 @@ export function addQuestionsToActiveGuide(entries: QuestionRef[]) {
   updateGuide(active.id, (g) => ({ ...g, items: [...g.items, ...added] }));
 }
 
+/** Remove every question of an indicator from the active guide. */
+export function removeIndicatorFromActiveGuide(indicatorId: string) {
+  const store = read();
+  const active = getActiveGuide(store);
+  if (!active) return;
+  updateGuide(active.id, (g) => ({
+    ...g,
+    items: g.items.filter((it) => it.indicatorId !== indicatorId),
+  }));
+}
+
 /** Remove a catalog question from the active guide by provenance. */
 export function removeQuestionFromActiveGuide(
   indicatorId: string,

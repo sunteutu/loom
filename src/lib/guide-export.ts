@@ -6,6 +6,7 @@
 
 import {
   AlignmentType,
+  BorderStyle,
   Document,
   HeadingLevel,
   LevelFormat,
@@ -14,7 +15,10 @@ import {
   TextRun,
 } from "docx";
 import { INDICATORS, type Indicator } from "./indicators";
+import { INDICATOR_QUAL_RO } from "./indicators-ro";
 import type { Guide, GuideItem, GuideVariables } from "./guides";
+
+export type GuideLanguage = "en" | "ro";
 
 /** Replace [category] / [product] / [brand] with the study variables. */
 export function applyVariables(text: string, vars: GuideVariables): string {
@@ -29,6 +33,33 @@ export function applyVariables(text: string, vars: GuideVariables): string {
 }
 
 const INDICATOR_BY_ID = new Map(INDICATORS.map((ind) => [ind.id, ind]));
+
+/**
+ * Resolve an item's text for the export language. Romanian applies only to
+ * untouched catalog questions (resolved via provenance); user-edited and
+ * custom questions always export exactly as typed.
+ */
+function resolveItemText(item: GuideItem, lang: GuideLanguage): string {
+  if (lang === "ro" && item.indicatorId && item.sourceIndex !== undefined) {
+    const original = INDICATOR_BY_ID.get(item.indicatorId)?.qualQuestions?.[
+      item.sourceIndex
+    ];
+    const translated =
+      INDICATOR_QUAL_RO[item.indicatorId]?.qualQuestions[item.sourceIndex];
+    if (translated && item.text === original) return translated;
+  }
+  return item.text;
+}
+
+function resolveIntent(
+  indicator: Indicator,
+  lang: GuideLanguage,
+): string | undefined {
+  if (lang === "ro") {
+    return INDICATOR_QUAL_RO[indicator.id]?.qualIntent ?? indicator.qualIntent;
+  }
+  return indicator.qualIntent;
+}
 
 export interface GuideGroup {
   indicator: Indicator | null;
@@ -86,7 +117,7 @@ function slugify(title: string): string {
 
 // ── Markdown ───────────────────────────────────────────────────────────────
 
-export function guideToMarkdown(guide: Guide): string {
+export function guideToMarkdown(guide: Guide, lang: GuideLanguage = "en"): string {
   const vars = guide.variables;
   const lines: string[] = [
     `# ${guide.title}`,
@@ -98,11 +129,9 @@ export function guideToMarkdown(guide: Guide): string {
     lines.push("");
     if (group.indicator) {
       lines.push(`## ${group.indicator.name}`);
-      if (group.indicator.qualIntent) {
-        lines.push(
-          "",
-          `> **Intent:** ${applyVariables(group.indicator.qualIntent, vars)}`,
-        );
+      const intent = resolveIntent(group.indicator, lang);
+      if (intent) {
+        lines.push("", `> **Intent:** ${applyVariables(intent, vars)}`);
       }
     } else {
       lines.push("## Întrebări proprii");
@@ -110,38 +139,63 @@ export function guideToMarkdown(guide: Guide): string {
     lines.push("");
     for (const item of group.items) {
       n += 1;
-      lines.push(`${n}. ${applyVariables(item.text, vars)}`);
+      lines.push(`${n}. ${applyVariables(resolveItemText(item, lang), vars)}`);
     }
   }
   return lines.join("\n") + "\n";
 }
 
-export function downloadMarkdown(guide: Guide) {
+export function downloadMarkdown(guide: Guide, lang: GuideLanguage = "en") {
   download(
-    new Blob([guideToMarkdown(guide)], { type: "text/markdown" }),
+    new Blob([guideToMarkdown(guide, lang)], { type: "text/markdown" }),
     `${slugify(guide.title)}.md`,
   );
 }
 
 // ── Word (.docx) ───────────────────────────────────────────────────────────
 
-const FONT = "Arial"; // present on both platforms → renders identically in Word & Pages
+const FONT = "DM Sans";
 
-export function buildGuideDocument(guide: Guide): Document {
+// Editorial palette — near-black body, muted meta, one indigo accent.
+const INK = "0F172A";
+const BODY = "1E293B";
+const MUTED = "64748B";
+const ACCENT = "3E63DD";
+const HAIRLINE = "CBD5E1";
+const ACCENT_SOFT = "C7D2FE";
+
+/**
+ * Build the Word document. No italics anywhere (per user preference) —
+ * hierarchy comes from weight, caps, spacing and one accent colour.
+ * Standard OOXML only, so it renders identically in Word and Pages.
+ */
+export function buildGuideDocument(
+  guide: Guide,
+  fontData?: Uint8Array,
+  lang: GuideLanguage = "en",
+): Document {
   const vars = guide.variables;
   const children: Paragraph[] = [
     new Paragraph({
       heading: HeadingLevel.TITLE,
       alignment: AlignmentType.LEFT,
+      spacing: { after: 120 },
       children: [new TextRun({ text: guide.title })],
     }),
+    // Meta line: bold small caps instead of italics, closed by a hairline.
     new Paragraph({
-      spacing: { after: 360 },
+      spacing: { after: 480 },
+      border: {
+        bottom: { style: BorderStyle.SINGLE, size: 6, color: HAIRLINE, space: 12 },
+      },
       children: [
         new TextRun({
-          text: `Ghid de interviu · ${formatDate(guide.updatedAt)} · ${guide.items.length} întrebări`,
-          italics: true,
-          color: "666666",
+          text: `Ghid de interviu  ·  ${formatDate(guide.updatedAt)}  ·  ${guide.items.length} întrebări`,
+          bold: true,
+          allCaps: true,
+          characterSpacing: 20,
+          size: 18, // 9pt
+          color: MUTED,
         }),
       ],
     }),
@@ -151,7 +205,7 @@ export function buildGuideDocument(guide: Guide): Document {
     children.push(
       new Paragraph({
         heading: HeadingLevel.HEADING_2,
-        spacing: { before: 320, after: 120 },
+        spacing: { before: 440, after: 160 },
         children: [
           new TextRun({
             text: group.indicator?.name ?? "Întrebări proprii",
@@ -159,17 +213,25 @@ export function buildGuideDocument(guide: Guide): Document {
         ],
       }),
     );
-    if (group.indicator?.qualIntent) {
+    const intent = group.indicator
+      ? resolveIntent(group.indicator, lang)
+      : undefined;
+    if (intent) {
       children.push(
         new Paragraph({
-          spacing: { after: 160 },
+          spacing: { after: 240 },
+          indent: { left: 240 },
+          border: {
+            left: {
+              style: BorderStyle.SINGLE,
+              size: 18,
+              color: ACCENT_SOFT,
+              space: 10,
+            },
+          },
           children: [
-            new TextRun({ text: "Intent: ", bold: true, color: "666666" }),
-            new TextRun({
-              text: applyVariables(group.indicator.qualIntent, vars),
-              italics: true,
-              color: "666666",
-            }),
+            new TextRun({ text: "Intent: ", bold: true, color: MUTED }),
+            new TextRun({ text: applyVariables(intent, vars), color: MUTED }),
           ],
         }),
       );
@@ -178,9 +240,11 @@ export function buildGuideDocument(guide: Guide): Document {
       children.push(
         new Paragraph({
           numbering: { reference: "questions", level: 0 },
-          spacing: { after: 160 },
+          spacing: { after: 220, line: 300 },
           children: [
-            new TextRun({ text: applyVariables(item.text, vars) }),
+            new TextRun({
+              text: applyVariables(resolveItemText(item, lang), vars),
+            }),
           ],
         }),
       );
@@ -188,14 +252,27 @@ export function buildGuideDocument(guide: Guide): Document {
   }
 
   return new Document({
+    // Embed DM Sans so the document renders identically on machines
+    // without the font installed (bold is synthesized by Word/Pages).
+    ...(fontData
+      ? { fonts: [{ name: FONT, data: fontData as unknown as Buffer }] }
+      : {}),
     styles: {
       default: {
-        document: { run: { font: FONT, size: 22 } }, // 11pt body
+        document: { run: { font: FONT, size: 22, color: BODY } }, // 11pt body
         title: {
-          run: { font: FONT, size: 52, bold: true, color: "1A1A1A" },
+          run: { font: FONT, size: 56, bold: true, color: INK },
         },
+        // Section label: bold caps + letter-spacing in the accent colour.
         heading2: {
-          run: { font: FONT, size: 28, bold: true, color: "333333" },
+          run: {
+            font: FONT,
+            size: 20, // 10pt
+            bold: true,
+            allCaps: true,
+            characterSpacing: 20,
+            color: ACCENT,
+          },
         },
       },
     },
@@ -210,6 +287,7 @@ export function buildGuideDocument(guide: Guide): Document {
               text: "%1.",
               alignment: AlignmentType.START,
               style: {
+                run: { bold: true, color: MUTED },
                 paragraph: {
                   indent: { left: 480, hanging: 480 },
                 },
@@ -223,7 +301,19 @@ export function buildGuideDocument(guide: Guide): Document {
   });
 }
 
-export async function downloadDocx(guide: Guide) {
-  const blob = await Packer.toBlob(buildGuideDocument(guide));
+/** Fetch the bundled DM Sans TTF for embedding; export still works without. */
+async function loadFont(): Promise<Uint8Array | undefined> {
+  try {
+    const res = await fetch("/fonts/DMSans-Regular.ttf");
+    if (!res.ok) return undefined;
+    return new Uint8Array(await res.arrayBuffer());
+  } catch {
+    return undefined;
+  }
+}
+
+export async function downloadDocx(guide: Guide, lang: GuideLanguage = "en") {
+  const fontData = await loadFont();
+  const blob = await Packer.toBlob(buildGuideDocument(guide, fontData, lang));
   download(blob, `${slugify(guide.title)}.docx`);
 }
