@@ -35,11 +35,12 @@ export function applyVariables(text: string, vars: GuideVariables): string {
 const INDICATOR_BY_ID = new Map(INDICATORS.map((ind) => [ind.id, ind]));
 
 /**
- * Resolve an item's text for the export language. Romanian applies only to
+ * Resolve an item's text for the given language. Romanian applies only to
  * untouched catalog questions (resolved via provenance); user-edited and
- * custom questions always export exactly as typed.
+ * custom questions always resolve exactly as typed. Used by both the export
+ * and the in-app preview so they can never diverge.
  */
-function resolveItemText(item: GuideItem, lang: GuideLanguage): string {
+export function resolveItemText(item: GuideItem, lang: GuideLanguage): string {
   if (lang === "ro" && item.indicatorId && item.sourceIndex !== undefined) {
     const original = INDICATOR_BY_ID.get(item.indicatorId)?.qualQuestions?.[
       item.sourceIndex
@@ -51,7 +52,7 @@ function resolveItemText(item: GuideItem, lang: GuideLanguage): string {
   return item.text;
 }
 
-function resolveIntent(
+export function resolveIntent(
   indicator: Indicator,
   lang: GuideLanguage,
 ): string | undefined {

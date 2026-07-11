@@ -27,6 +27,8 @@ import {
   downloadDocx,
   downloadMarkdown,
   groupItems,
+  resolveIntent,
+  resolveItemText,
   type GuideLanguage,
 } from "@/lib/guide-export";
 
@@ -89,13 +91,13 @@ function GuideEditor({ guide, isActive }: { guide: Guide; isActive: boolean }) {
           )}
           <div
             role="radiogroup"
-            aria-label="Limba exportului"
+            aria-label="Limba ghidului"
             className="flex items-center gap-0.5 rounded-md border border-border p-0.5"
           >
             {(
               [
-                { value: "en", label: "EN", title: "Exportă în engleză" },
-                { value: "ro", label: "RO", title: "Exportă în română" },
+                { value: "en", label: "EN", title: "Afișează și exportă în engleză" },
+                { value: "ro", label: "RO", title: "Afișează și exportă în română" },
               ] as const
             ).map((opt) => (
               <button
@@ -198,9 +200,21 @@ function GuideEditor({ guide, isActive }: { guide: Guide; isActive: boolean }) {
         <div className="mt-8 flex flex-col gap-6">
           {groups.map((group, gi) => (
             <section key={gi}>
-              <h2 className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-10">
+              {/* Mirrors the exported document: dark-gray section label,
+                  gray intent block with a left rule, bold gray numbering. */}
+              <h2 className="mb-1.5 text-xs font-bold uppercase tracking-wide text-slate-11">
                 {group.indicator?.name ?? "Întrebări proprii"}
               </h2>
+              {group.indicator &&
+                (() => {
+                  const intent = resolveIntent(group.indicator, lang);
+                  return intent ? (
+                    <p className="mb-2.5 border-l-2 border-slate-6 pl-3 text-sm leading-relaxed text-slate-11">
+                      <span className="font-semibold">Intent: </span>
+                      {intent}
+                    </p>
+                  ) : null;
+                })()}
               <ol className="flex flex-col gap-2">
                 {group.items.map((item) => {
                   questionNumber += 1;
@@ -215,13 +229,13 @@ function GuideEditor({ guide, isActive }: { guide: Guide; isActive: boolean }) {
                     >
                       <span
                         aria-hidden
-                        className="mt-1.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-slate-3 text-xs font-semibold tabular-nums text-slate-11"
+                        className="mt-1.5 w-6 shrink-0 text-right text-sm font-semibold tabular-nums text-slate-10"
                       >
-                        {n}
+                        {n}.
                       </span>
                       <textarea
                         aria-label={`Întrebarea ${n}`}
-                        value={item.text}
+                        value={resolveItemText(item, lang)}
                         onChange={(e) =>
                           updateItemText(guide.id, item.id, e.target.value)
                         }
