@@ -955,6 +955,18 @@ export const INDICATOR_DETAIL: Record<string, IndicatorDetail> = {
       "If this were your tool for this job, what's the one capability or the one bit of friction you'd flag first?",
     ],
   },
+  umux: {
+    qualIntent:
+      "UMUX adds frustration and wasted correction time to the capability + ease pair; in qual you chase the lived moments behind each item — what it couldn't do, when it grated, and where time went to fixing rather than doing.",
+    qualQuestions: [
+      "Thinking about what you actually came here to get done — did it do it? Where did it fall short of what you needed?",
+      "Tell me about the most frustrating moment you've had with it recently — what happened, and what did it cost you?",
+      "How much of your time in it feels like doing the thing versus fixing, redoing or undoing things? Give me a recent example.",
+      "Walk me through the last time it did something you didn't expect — how long did it take you to get back on track?",
+      "Setting the annoyances aside — when it works, how does using it feel? Effortless, tolerable, or a slog?",
+      "If you could hand the team one recurring irritation to fix, which would it be — and what does it keep interrupting for you?",
+    ],
+  },
   "first-click": {
     qualIntent:
       "First click reveals information scent; in qual you don't just log where they clicked, you draw out the reasoning and the label/visual cues that pulled them there before they act.",
@@ -1060,6 +1072,32 @@ export const INDICATOR_DETAIL: Record<string, IndicatorDetail> = {
       "(Retention) What's kept this in your routine when other tools have dropped out of it?",
       "(Task success) Think of the last thing you came here specifically to get done — did you get it done, and how did that go?",
       "Across all of that, where does this most live up to what you want from it, and where does it most let you down?",
+    ],
+  },
+  accessibility: {
+    qualIntent:
+      "An audit tells you where the product breaks the rules; in qual you surface where it breaks the person — the workarounds, abandoned tasks and quiet exclusions that assistive-technology users have stopped even mentioning.",
+    qualQuestions: [
+      "Before we look at anything — walk me through how you normally set up a new app or site to work for you. What do you adjust or switch on before you can use it comfortably?",
+      "Talk me through the last time you used [product] with your usual setup — where did you slow down, stall, or have to improvise?",
+      "Tell me about a moment here where you got properly stuck — what was happening, and what did you do next?",
+      "What workarounds have you built up over time to get things done in [product]? Which ones have become so routine you barely notice them anymore?",
+      "Has there been anything you simply gave up on, or handed over to someone else to do for you? Walk me through that.",
+      "Compared with other products you use, where does this one feel most built for you — and where does it feel like you weren't in the room when they designed it?",
+      "If the team could fix one thing tomorrow that would change how independently you can use this, what would it be?",
+    ],
+  },
+  "digital-literacy": {
+    qualIntent:
+      "Self-rated tech confidence flatters; in qual you surface the real coping repertoire — what they do when technology misbehaves, what they quietly avoid or hand off, and how they judge what's safe to click.",
+    qualQuestions: [
+      "Walk me through the devices and apps that are part of your normal day — what do you actually do on each?",
+      "Tell me about the last time you had to do something new online — set up an app, fill in an official form, pay somewhere unfamiliar. How did that go?",
+      "When something goes wrong — an error message, a frozen screen, a login that won't work — what do you do first?",
+      "Is there anything you avoid doing online — payments, official paperwork, banking — even though you technically could? What's behind that?",
+      "Who do you turn to when technology defeats you, and what was the last thing you asked them to help with?",
+      "How do you decide whether a website, app or message is safe to trust? Tell me about one recently that you didn't.",
+      "Think of something digital you now do easily but once found hard — what got you over the hump?",
     ],
   },
 

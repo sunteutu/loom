@@ -916,12 +916,22 @@ const BASE_INDICATORS: Indicator[] = [
   {
     id: "umux-lite",
     name: "UMUX-Lite",
-    aliases: ["UMUX", "usability metric for user experience"],
+    aliases: ["UMUX lite", "two-item usability", "lite usability metric"],
     category: "UX Research",
     description:
       "Two-item perceived usability/usefulness measure (capability + ease) that correlates strongly with SUS — ideal for in-product surveys.",
     measurement:
       "2 items, 5- or 7-point agreement; regression-adjusted to the SUS scale.",
+  },
+  {
+    id: "umux",
+    name: "UMUX (Usability Metric for User Experience)",
+    aliases: ["usability metric for user experience", "UMUX score", "4-item UMUX", "Finstad"],
+    category: "UX Research",
+    description:
+      "Four-item perceived usability measure (capability, frustration, ease, correction time) scored 0–100 — SUS-level reliability at less than half the length.",
+    measurement:
+      "4 items (2 positive, 2 negative), 7-point agreement; odd items score −1, even items 7 − score; sum × 100/24 → 0–100.",
   },
   {
     id: "first-click",
@@ -1012,6 +1022,39 @@ const BASE_INDICATORS: Indicator[] = [
       "Google’s framework organizing UX metrics into Happiness, Engagement, Adoption, Retention and Task success — the standard for choosing product UX KPIs.",
     measurement:
       "Goals–Signals–Metrics mapping per HEART dimension; mix of survey and behavioural metrics.",
+  },
+  {
+    id: "accessibility",
+    name: "Accessibility",
+    aliases: [
+      "a11y",
+      "WCAG conformance",
+      "assistive technology usability",
+      "accessible usability scale",
+      "AUS",
+      "inclusive design",
+    ],
+    category: "UX Research",
+    description:
+      "Whether people with disabilities can perceive, operate and understand the product — combining standards conformance with real usability for assistive-technology users.",
+    measurement:
+      "WCAG 2.2 AA audit (issues by severity / % criteria passed) + usability testing with assistive-technology users (task success, AT-specific errors); perceived accessibility via the Accessible Usability Scale (AUS, 10 items, 0–100).",
+  },
+  {
+    id: "digital-literacy",
+    name: "Digital Literacy",
+    aliases: [
+      "digital skills",
+      "DigComp",
+      "internet skills",
+      "digital confidence",
+      "tech savviness",
+    ],
+    category: "UX Research",
+    description:
+      "A person's ability to use digital devices and services effectively and safely — a key moderator of digital adoption and a segmentation staple in digital-channel research.",
+    measurement:
+      "Activity-based skills battery (Eurostat/DigComp areas: information, communication, content creation, safety, problem solving) → basic / above-basic classification; plus digital self-efficacy scale.",
   },
 
   // ── Banking & Payments ───────────────────────────────────────────────────
