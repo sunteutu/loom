@@ -31,24 +31,44 @@ export interface Guide {
   title: string;
   variables: GuideVariables;
   items: GuideItem[];
-  /** Interview pace: minutes per question incl. probing (default 4). */
+  /** Interview pace: minutes per question incl. probing (default 2). */
   minutesPerQuestion?: number;
   /** Target interview duration in minutes (default 60). */
   targetMinutes?: number;
+  /** Moderator intro script; unset = language-specific default at render. */
+  intro?: string;
+  /** Closing script; unset = language-specific default at render. */
+  outro?: string;
   createdAt: number;
   updatedAt: number;
 }
 
-/** IDI heuristic: one main question ≈ 4 minutes including probes. */
-export const DEFAULT_MINUTES_PER_QUESTION = 4;
+/** One main question ≈ 2 minutes including probes (user-calibrated). */
+export const DEFAULT_MINUTES_PER_QUESTION = 2;
 export const DEFAULT_TARGET_MINUTES = 60;
+/** Standard warm-up (welcome, consent, recording) and wrap-up allowances. */
+export const INTRO_MINUTES = 5;
+export const OUTRO_MINUTES = 3;
 
+/** Pace is capped at 2 min/question (user-calibrated ceiling); also
+ *  migrates guides saved under the old 3/4/5 scale. */
 export function guidePace(guide: Guide): number {
-  return guide.minutesPerQuestion ?? DEFAULT_MINUTES_PER_QUESTION;
+  return Math.min(
+    guide.minutesPerQuestion ?? DEFAULT_MINUTES_PER_QUESTION,
+    2,
+  );
 }
 
 export function guideTarget(guide: Guide): number {
   return guide.targetMinutes ?? DEFAULT_TARGET_MINUTES;
+}
+
+/** Full interview length: intro + questions at pace + closing. */
+export function guideTotalMinutes(guide: Guide): number {
+  if (guide.items.length === 0) return 0;
+  return Math.round(
+    INTRO_MINUTES + guide.items.length * guidePace(guide) + OUTRO_MINUTES,
+  );
 }
 
 interface GuideStore {
@@ -160,6 +180,14 @@ export function setMinutesPerQuestion(id: string, minutes: number) {
 
 export function setTargetMinutes(id: string, minutes: number) {
   updateGuide(id, (g) => ({ ...g, targetMinutes: minutes }));
+}
+
+export function setIntro(id: string, intro: string) {
+  updateGuide(id, (g) => ({ ...g, intro }));
+}
+
+export function setOutro(id: string, outro: string) {
+  updateGuide(id, (g) => ({ ...g, outro }));
 }
 
 export interface QuestionRef {

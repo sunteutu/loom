@@ -16,7 +16,16 @@ import {
 } from "docx";
 import { INDICATORS, type Indicator } from "./indicators";
 import { INDICATOR_QUAL_RO } from "./indicators-ro";
-import { guidePace, type Guide, type GuideItem, type GuideVariables } from "./guides";
+import {
+  guidePace,
+  guideTarget,
+  guideTotalMinutes,
+  INTRO_MINUTES,
+  OUTRO_MINUTES,
+  type Guide,
+  type GuideItem,
+  type GuideVariables,
+} from "./guides";
 
 export type GuideLanguage = "en" | "ro";
 
@@ -60,6 +69,30 @@ export function resolveIntent(
     return INDICATOR_QUAL_RO[indicator.id]?.qualIntent ?? indicator.qualIntent;
   }
   return indicator.qualIntent;
+}
+
+// ── Intro / closing scripts ────────────────────────────────────────────────
+
+const DEFAULT_INTRO: Record<GuideLanguage, (minutes: number) => string> = {
+  en: (m) =>
+    `Hello, and thank you for taking the time to talk with me today. My name is [moderator] and we'll be talking about [category]. There are no right or wrong answers — I'm interested in your honest experiences and opinions. The conversation will take about ${m} minutes and, with your permission, will be recorded; the recording stays confidential and is used for analysis only. Do you have any questions before we begin?`,
+  ro: (m) =>
+    `Bună ziua și mulțumesc că ați acceptat să stăm de vorbă. Mă numesc [moderator] și astăzi vom discuta despre [category]. Nu există răspunsuri corecte sau greșite — mă interesează experiențele și părerile dumneavoastră sincere. Discuția durează aproximativ ${m} de minute și, cu acordul dumneavoastră, va fi înregistrată; înregistrarea rămâne confidențială și este folosită doar pentru analiză. Aveți întrebări înainte să începem?`,
+};
+
+const DEFAULT_OUTRO: Record<GuideLanguage, string> = {
+  en: "We've reached the end. Before we wrap up: is there anything I haven't asked about that you'd like to share? And if you had to sum up your experience with [category] in one sentence, what would it be? Thank you so much for your time and openness — this conversation has been very valuable.",
+  ro: "Am ajuns la final. Înainte să încheiem: există ceva ce nu v-am întrebat și ați fi vrut să-mi spuneți? Și dacă ar fi să rezumați într-o singură frază experiența dumneavoastră cu [category], care ar fi aceea? Vă mulțumesc mult pentru timp și pentru deschidere — discuția a fost foarte valoroasă.",
+};
+
+/** The moderator intro: the user's edited text, or the language default. */
+export function resolveIntro(guide: Guide, lang: GuideLanguage): string {
+  return guide.intro ?? DEFAULT_INTRO[lang](guideTarget(guide));
+}
+
+/** The closing script: the user's edited text, or the language default. */
+export function resolveOutro(guide: Guide, lang: GuideLanguage): string {
+  return guide.outro ?? DEFAULT_OUTRO[lang];
 }
 
 export interface GuideGroup {
@@ -132,7 +165,11 @@ export function guideToMarkdown(guide: Guide, lang: GuideLanguage = "en"): strin
   const lines: string[] = [
     `# ${guide.title}`,
     "",
-    `_Ghid de interviu · ${formatDate(guide.updatedAt)} · ${guide.items.length} întrebări · ${formatMinutes(guide.items.length * pace)}_`,
+    `_Ghid de interviu · ${formatDate(guide.updatedAt)} · ${guide.items.length} întrebări · ${formatMinutes(guideTotalMinutes(guide))}_`,
+    "",
+    `## Introducere (${formatMinutes(INTRO_MINUTES)})`,
+    "",
+    applyVariables(resolveIntro(guide, lang), vars),
   ];
   let n = 0;
   for (const group of groupItems(guide.items)) {
@@ -153,6 +190,12 @@ export function guideToMarkdown(guide: Guide, lang: GuideLanguage = "en"): strin
       lines.push(`${n}. ${applyVariables(resolveItemText(item, lang), vars)}`);
     }
   }
+  lines.push(
+    "",
+    `## Închidere (${formatMinutes(OUTRO_MINUTES)})`,
+    "",
+    applyVariables(resolveOutro(guide, lang), vars),
+  );
   return lines.join("\n") + "\n";
 }
 
@@ -201,7 +244,7 @@ export function buildGuideDocument(
       },
       children: [
         new TextRun({
-          text: `Ghid de interviu  ·  ${formatDate(guide.updatedAt)}  ·  ${guide.items.length} întrebări  ·  ${formatMinutes(guide.items.length * pace)}`,
+          text: `Ghid de interviu  ·  ${formatDate(guide.updatedAt)}  ·  ${guide.items.length} întrebări  ·  ${formatMinutes(guideTotalMinutes(guide))}`,
           font: FONT,
           bold: true,
           allCaps: true,
@@ -212,6 +255,38 @@ export function buildGuideDocument(
       ],
     }),
   ];
+
+  const scriptSection = (title: string, minutes: number, text: string) => {
+    children.push(
+      new Paragraph({
+        heading: HeadingLevel.HEADING_2,
+        spacing: { before: 440, after: 160 },
+        children: [
+          new TextRun({ text: title, font: FONT, color: HEADING }),
+          new TextRun({
+            text: `  ·  ${formatMinutes(minutes)}`,
+            font: FONT,
+            bold: true,
+            size: 20,
+            color: MUTED,
+          }),
+        ],
+      }),
+      new Paragraph({
+        spacing: { after: 220, line: 300 },
+        children: [
+          new TextRun({
+            text: applyVariables(text, vars),
+            font: FONT,
+            size: 22,
+            color: BODY,
+          }),
+        ],
+      }),
+    );
+  };
+
+  scriptSection("Introducere", INTRO_MINUTES, resolveIntro(guide, lang));
 
   for (const group of groupItems(guide.items)) {
     children.push(
@@ -283,6 +358,8 @@ export function buildGuideDocument(
       );
     }
   }
+
+  scriptSection("Închidere", OUTRO_MINUTES, resolveOutro(guide, lang));
 
   return new Document({
     // Embed DM Sans so the document renders identically on machines

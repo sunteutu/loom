@@ -20,11 +20,16 @@ import {
   addCustomItem,
   guidePace,
   guideTarget,
+  guideTotalMinutes,
+  INTRO_MINUTES,
   moveItem,
+  OUTRO_MINUTES,
   removeItem,
   renameGuide,
   setActiveGuide,
+  setIntro,
   setMinutesPerQuestion,
+  setOutro,
   setTargetMinutes,
   setVariables,
   updateItemText,
@@ -38,7 +43,9 @@ import {
   formatMinutes,
   groupItems,
   resolveIntent,
+  resolveIntro,
   resolveItemText,
+  resolveOutro,
   type GuideLanguage,
 } from "@/lib/guide-export";
 
@@ -53,6 +60,43 @@ const SEVERITY_UI = {
   warning: { icon: TriangleAlert, className: "text-amber-11" },
   suggestion: { icon: Lightbulb, className: "text-slate-11" },
 } as const;
+
+/**
+ * Editable moderator script (intro / closing). Added automatically to every
+ * guide with a language-specific default; editing materializes the text as
+ * the guide's own, same as with questions.
+ */
+function ScriptSection({
+  title,
+  minutes,
+  value,
+  onChange,
+}: {
+  title: string;
+  minutes: number;
+  value: string;
+  onChange: (text: string) => void;
+}) {
+  return (
+    <section>
+      <h2 className="mb-1.5 flex items-baseline gap-2 text-xs font-bold uppercase tracking-wide text-slate-11">
+        {title}
+        <span className="font-semibold normal-case tracking-normal text-slate-10">
+          · {formatMinutes(minutes)}
+        </span>
+      </h2>
+      <div className="rounded-lg border border-border bg-card p-3">
+        <textarea
+          aria-label={title}
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          rows={4}
+          className="w-full resize-y rounded-md border border-transparent bg-transparent px-1.5 py-1 text-base leading-relaxed outline-none transition-colors hover:border-border focus:border-ring"
+        />
+      </div>
+    </section>
+  );
+}
 
 /** The research-linter panel: methodological checks on the current guide. */
 function LintPanel({ issues }: { issues: LintIssue[] }) {
@@ -125,7 +169,7 @@ function GuideEditor({ guide, isActive }: { guide: Guide; isActive: boolean }) {
   const groups = groupItems(guide.items);
   const pace = guidePace(guide);
   const target = guideTarget(guide);
-  const totalMinutes = guide.items.length * pace;
+  const totalMinutes = guideTotalMinutes(guide);
   const issues = lintGuide(guide, lang);
 
   /** Re-check before export; errors require an explicit override. */
@@ -239,9 +283,9 @@ function GuideEditor({ guide, isActive }: { guide: Guide; isActive: boolean }) {
             aria-label="Minute pe întrebare"
             className="h-7 rounded-md border border-input bg-background px-1.5 text-xs outline-none transition-colors focus:border-ring"
           >
-            <option value={3}>3 min/întrebare — alert</option>
-            <option value={4}>4 min/întrebare — standard</option>
-            <option value={5}>5 min/întrebare — în profunzime</option>
+            <option value={1}>1 min/întrebare — alert</option>
+            <option value={1.5}>1,5 min/întrebare — standard</option>
+            <option value={2}>2 min/întrebare — în profunzime</option>
           </select>
         </label>
         <label className="inline-flex items-center gap-1.5">
@@ -311,6 +355,12 @@ function GuideEditor({ guide, isActive }: { guide: Guide; isActive: boolean }) {
         </div>
       ) : (
         <div className="mt-8 flex flex-col gap-6">
+          <ScriptSection
+            title="Introducere"
+            minutes={INTRO_MINUTES}
+            value={resolveIntro(guide, lang)}
+            onChange={(text) => setIntro(guide.id, text)}
+          />
           {groups.map((group, gi) => (
             <section key={gi}>
               {/* Mirrors the exported document: dark-gray section label,
@@ -389,6 +439,12 @@ function GuideEditor({ guide, isActive }: { guide: Guide; isActive: boolean }) {
               </ol>
             </section>
           ))}
+          <ScriptSection
+            title="Închidere"
+            minutes={OUTRO_MINUTES}
+            value={resolveOutro(guide, lang)}
+            onChange={(text) => setOutro(guide.id, text)}
+          />
         </div>
       )}
 

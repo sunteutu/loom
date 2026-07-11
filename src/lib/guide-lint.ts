@@ -11,11 +11,18 @@
  */
 
 import { INDICATORS } from "./indicators";
-import { guidePace, guideTarget, type Guide } from "./guides";
+import {
+  guidePace,
+  guideTarget,
+  guideTotalMinutes,
+  type Guide,
+} from "./guides";
 import {
   formatMinutes,
   resolveIntent,
+  resolveIntro,
   resolveItemText,
+  resolveOutro,
   groupItems,
   type GuideLanguage,
 } from "./guide-export";
@@ -52,7 +59,7 @@ export function lintGuide(guide: Guide, lang: GuideLanguage): LintIssue[] {
 
   const pace = guidePace(guide);
   const target = guideTarget(guide);
-  const total = items.length * pace;
+  const total = guideTotalMinutes(guide);
   const texts = items.map((it) => resolveItemText(it, lang));
 
   // ── 1. Time budget ────────────────────────────────────────────────────────
@@ -133,7 +140,12 @@ export function lintGuide(guide: Guide, lang: GuideLanguage): LintIssue[] {
   const intentTexts = groupItems(items)
     .map((g) => (g.indicator ? (resolveIntent(g.indicator, lang) ?? "") : ""))
     .join(" ");
-  const allText = texts.join(" ") + " " + intentTexts;
+  const allText = [
+    texts.join(" "),
+    intentTexts,
+    resolveIntro(guide, lang),
+    resolveOutro(guide, lang),
+  ].join(" ");
   const tokens = new Set(allText.match(/\[[^\]]+\]/g) ?? []);
 
   const unfilledStandard = STANDARD_VARS.filter(
