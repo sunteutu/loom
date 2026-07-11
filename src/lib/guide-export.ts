@@ -156,13 +156,12 @@ export function downloadMarkdown(guide: Guide, lang: GuideLanguage = "en") {
 
 const FONT = "DM Sans";
 
-// Editorial palette — near-black body, muted meta, one indigo accent.
+// Editorial palette — grayscale per user preference (no color accents).
 const INK = "0F172A";
 const BODY = "1E293B";
 const MUTED = "64748B";
-const HEADING = "334155"; // dark gray section labels (user preference)
+const HEADING = "334155"; // dark gray section labels + intent block
 const HAIRLINE = "CBD5E1";
-const ACCENT_SOFT = "C7D2FE";
 
 /**
  * Build the Word document. No italics anywhere (per user preference) —
@@ -228,7 +227,7 @@ export function buildGuideDocument(
             left: {
               style: BorderStyle.SINGLE,
               size: 18,
-              color: ACCENT_SOFT,
+              color: HAIRLINE,
               space: 10,
             },
           },
@@ -237,12 +236,12 @@ export function buildGuideDocument(
               text: "Intent: ",
               font: FONT,
               bold: true,
-              color: MUTED,
+              color: HEADING,
             }),
             new TextRun({
               text: applyVariables(intent, vars),
               font: FONT,
-              color: MUTED,
+              color: HEADING,
             }),
           ],
         }),
