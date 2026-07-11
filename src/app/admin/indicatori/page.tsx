@@ -31,6 +31,13 @@ import {
   removeQuestionFromActiveGuide,
   useGuideStore,
 } from "@/lib/guides";
+import {
+  addItemsToActiveSurvey,
+  getActiveSurvey,
+  removeIndicatorFromActiveSurvey,
+  removeItemFromActiveSurvey,
+  useSurveyStore,
+} from "@/lib/surveys";
 
 function queryTerms(query: string) {
   return query.trim().toLowerCase().split(/\s+/).filter(Boolean);
@@ -513,12 +520,42 @@ function DetailRow({ label, children }: { label: string; children: ReactNode }) 
   );
 }
 
-function SurveyItemView({ item }: { item: SurveyItem }) {
+function SurveyItemView({
+  item,
+  added,
+  onToggle,
+}: {
+  item: SurveyItem;
+  added: boolean;
+  onToggle: () => void;
+}) {
   return (
     <div className="rounded-lg border border-border bg-card p-3.5">
-      <span className="inline-block rounded bg-indigo-3 px-1.5 py-0.5 text-xs font-semibold uppercase tracking-wide text-indigo-11">
-        {item.type}
-      </span>
+      <div className="flex items-center justify-between gap-2">
+        <span className="inline-block rounded bg-indigo-3 px-1.5 py-0.5 text-xs font-semibold uppercase tracking-wide text-indigo-11">
+          {item.type}
+        </span>
+        <button
+          onClick={onToggle}
+          aria-pressed={added}
+          aria-label={
+            added
+              ? "Scoate itemul din chestionar"
+              : "Adaugă itemul în chestionar"
+          }
+          className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-md border transition-colors ${
+            added
+              ? "border-indigo-9 bg-indigo-9 text-white hover:bg-indigo-10"
+              : "border-border text-muted-foreground hover:border-ring hover:text-foreground"
+          }`}
+        >
+          {added ? (
+            <Check aria-hidden className="h-3.5 w-3.5" strokeWidth={3} />
+          ) : (
+            <Plus aria-hidden className="h-3.5 w-3.5" />
+          )}
+        </button>
+      </div>
       <p className="mt-2 text-base font-medium leading-snug">{item.stem}</p>
 
       {item.subStems && (
@@ -589,6 +626,125 @@ function SurveyItemView({ item }: { item: SurveyItem }) {
   );
 }
 
+/**
+ * The quant survey section inside the drawer, with puzzle-style
+ * add-to-questionnaire: per-item toggle + add-all, targeting the
+ * active questionnaire.
+ */
+function QuantSection({ indicator }: { indicator: Indicator }) {
+  const store = useSurveyStore();
+  const activeSurvey = getActiveSurvey(store);
+  const items = indicator.surveyItems ?? [];
+
+  const inSurvey = (index: number) =>
+    activeSurvey?.items.some(
+      (it) => it.indicatorId === indicator.id && it.sourceIndex === index,
+    ) ?? false;
+  const addedCount = items.filter((_, i) => inSurvey(i)).length;
+  const allAdded = items.length > 0 && addedCount === items.length;
+
+  const toggle = (index: number) => {
+    if (inSurvey(index)) {
+      removeItemFromActiveSurvey(indicator.id, index);
+    } else {
+      addItemsToActiveSurvey([
+        {
+          stem: items[index].stem,
+          indicatorId: indicator.id,
+          sourceIndex: index,
+        },
+      ]);
+    }
+  };
+
+  const toggleAll = () => {
+    if (allAdded) {
+      removeIndicatorFromActiveSurvey(indicator.id);
+    } else {
+      addItemsToActiveSurvey(
+        items.map((item, index) => ({
+          stem: item.stem,
+          indicatorId: indicator.id,
+          sourceIndex: index,
+        })),
+      );
+    }
+  };
+
+  return (
+    <section className="mt-7">
+      <div className="flex items-center justify-between gap-2">
+        <SectionLabel>Quantitative — survey</SectionLabel>
+        {items.length > 0 && (
+          <button
+            onClick={toggleAll}
+            aria-pressed={allAdded}
+            className={`inline-flex items-center gap-1 rounded-md border px-2 py-1 text-xs font-medium transition-colors ${
+              allAdded
+                ? "border-indigo-6 bg-indigo-3 text-indigo-11 hover:border-red-9/40 hover:bg-red-3 hover:text-red-11"
+                : "border-border text-muted-foreground hover:border-ring hover:text-foreground"
+            }`}
+          >
+            {allAdded ? (
+              <>
+                <X aria-hidden className="h-3.5 w-3.5" />
+                Scoate toate din chestionar
+              </>
+            ) : (
+              <>
+                <Plus aria-hidden className="h-3.5 w-3.5" />
+                Adaugă toate în chestionar
+              </>
+            )}
+          </button>
+        )}
+      </div>
+      <div className="mt-2 flex gap-2 rounded-lg bg-slate-2 px-3 py-2">
+        <Ruler
+          aria-hidden
+          className="mt-0.5 h-3.5 w-3.5 shrink-0 text-slate-9"
+        />
+        <p className="text-sm leading-relaxed text-slate-11">
+          <span className="font-medium text-foreground/70">Measurement: </span>
+          {indicator.measurement}
+        </p>
+      </div>
+      {items.length > 0 ? (
+        <div className="mt-3 flex flex-col gap-3">
+          {items.map((item, i) => (
+            <SurveyItemView
+              key={i}
+              item={item}
+              added={inSurvey(i)}
+              onToggle={() => toggle(i)}
+            />
+          ))}
+        </div>
+      ) : (
+        <p className="mt-3 text-sm italic text-slate-10">
+          Structured survey item not authored yet — the measurement note above
+          is the spec.
+        </p>
+      )}
+      {addedCount > 0 && activeSurvey && (
+        <p className="mt-3 text-sm text-muted-foreground">
+          {addedCount} din {items.length} în chestionarul{" "}
+          <span className="font-medium text-foreground">
+            „{activeSurvey.title}”
+          </span>{" "}
+          ·{" "}
+          <Link
+            href={`/chestionare/${activeSurvey.id}`}
+            className="font-medium text-indigo-11 underline-offset-2 hover:underline"
+          >
+            Deschide chestionarul →
+          </Link>
+        </p>
+      )}
+    </section>
+  );
+}
+
 function IndicatorDrawer({
   indicator,
   onClose,
@@ -642,33 +798,7 @@ function IndicatorDrawer({
                     <QualSection indicator={indicator} />
                   )}
 
-                <section className="mt-7">
-                  <SectionLabel>Quantitative — survey</SectionLabel>
-                  <div className="mt-2 flex gap-2 rounded-lg bg-slate-2 px-3 py-2">
-                    <Ruler
-                      aria-hidden
-                      className="mt-0.5 h-3.5 w-3.5 shrink-0 text-slate-9"
-                    />
-                    <p className="text-sm leading-relaxed text-slate-11">
-                      <span className="font-medium text-foreground/70">
-                        Measurement:{" "}
-                      </span>
-                      {indicator.measurement}
-                    </p>
-                  </div>
-                  {indicator.surveyItems && indicator.surveyItems.length > 0 ? (
-                    <div className="mt-3 flex flex-col gap-3">
-                      {indicator.surveyItems.map((item, i) => (
-                        <SurveyItemView key={i} item={item} />
-                      ))}
-                    </div>
-                  ) : (
-                    <p className="mt-3 text-sm italic text-slate-10">
-                      Structured survey item not authored yet — the measurement
-                      note above is the spec.
-                    </p>
-                  )}
-                </section>
+                <QuantSection indicator={indicator} />
               </div>
             </>
           )}

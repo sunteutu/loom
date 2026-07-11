@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTheme } from "next-themes";
 import {
+  ClipboardList,
   FlaskConical,
   Gauge,
   Home,
@@ -14,6 +15,7 @@ import {
   Sun,
 } from "lucide-react";
 import { getActiveGuide, useGuideStore } from "@/lib/guides";
+import { getActiveSurvey, useSurveyStore } from "@/lib/surveys";
 
 const sections: {
   label: string | null;
@@ -25,7 +27,10 @@ const sections: {
   },
   {
     label: "Research",
-    items: [{ href: "/ghiduri", label: "Ghiduri", icon: NotebookPen }],
+    items: [
+      { href: "/ghiduri", label: "Ghiduri", icon: NotebookPen },
+      { href: "/chestionare", label: "Chestionare", icon: ClipboardList },
+    ],
   },
   {
     label: "Admin",
@@ -81,14 +86,18 @@ function ThemeToggle() {
 
 export function Sidebar() {
   const pathname = usePathname();
-  const store = useGuideStore();
-  // localStorage only exists client-side; render the count after mount to
+  const guideStore = useGuideStore();
+  const surveyStore = useSurveyStore();
+  // localStorage only exists client-side; render the counts after mount to
   // avoid a hydration mismatch (same pattern as ThemeToggle).
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
-  const activeGuideCount = mounted
-    ? (getActiveGuide(store)?.items.length ?? 0)
-    : 0;
+  const badgeCounts: Record<string, number> = mounted
+    ? {
+        "/ghiduri": getActiveGuide(guideStore)?.items.length ?? 0,
+        "/chestionare": getActiveSurvey(surveyStore)?.items.length ?? 0,
+      }
+    : {};
 
   if (HIDDEN_PREFIXES.some((p) => pathname.startsWith(p))) {
     return null;
@@ -130,9 +139,9 @@ export function Sidebar() {
                 >
                   <item.icon className="h-4 w-4" aria-hidden />
                   {item.label}
-                  {item.href === "/ghiduri" && activeGuideCount > 0 && (
+                  {(badgeCounts[item.href] ?? 0) > 0 && (
                     <span className="ml-auto flex h-5 min-w-5 items-center justify-center rounded-full bg-indigo-9 px-1.5 text-xs font-semibold tabular-nums text-white">
-                      {activeGuideCount}
+                      {badgeCounts[item.href]}
                     </span>
                   )}
                 </Link>
