@@ -16,7 +16,7 @@ import {
 } from "docx";
 import { INDICATORS, type Indicator } from "./indicators";
 import { INDICATOR_QUAL_RO } from "./indicators-ro";
-import type { Guide, GuideItem, GuideVariables } from "./guides";
+import { guidePace, type Guide, type GuideItem, type GuideVariables } from "./guides";
 
 export type GuideLanguage = "en" | "ro";
 
@@ -88,6 +88,14 @@ export function groupItems(items: GuideItem[]): GuideGroup[] {
   return groups;
 }
 
+/** "~25 min" or "~1 h 30 min" — section/total interview time at the guide's pace. */
+export function formatMinutes(minutes: number): string {
+  if (minutes < 60) return `~${minutes} min`;
+  const h = Math.floor(minutes / 60);
+  const m = minutes % 60;
+  return m === 0 ? `~${h} h` : `~${h} h ${m} min`;
+}
+
 function formatDate(timestamp: number): string {
   return new Date(timestamp).toLocaleDateString("ro-RO", {
     day: "numeric",
@@ -120,22 +128,24 @@ function slugify(title: string): string {
 
 export function guideToMarkdown(guide: Guide, lang: GuideLanguage = "en"): string {
   const vars = guide.variables;
+  const pace = guidePace(guide);
   const lines: string[] = [
     `# ${guide.title}`,
     "",
-    `_Ghid de interviu · ${formatDate(guide.updatedAt)} · ${guide.items.length} întrebări_`,
+    `_Ghid de interviu · ${formatDate(guide.updatedAt)} · ${guide.items.length} întrebări · ${formatMinutes(guide.items.length * pace)}_`,
   ];
   let n = 0;
   for (const group of groupItems(guide.items)) {
+    const sectionTime = formatMinutes(group.items.length * pace);
     lines.push("");
     if (group.indicator) {
-      lines.push(`## ${group.indicator.name}`);
+      lines.push(`## ${group.indicator.name} (${sectionTime})`);
       const intent = resolveIntent(group.indicator, lang);
       if (intent) {
         lines.push("", `> **Intent:** ${applyVariables(intent, vars)}`);
       }
     } else {
-      lines.push("## Întrebări proprii");
+      lines.push(`## Întrebări proprii (${sectionTime})`);
     }
     lines.push("");
     for (const item of group.items) {
@@ -175,6 +185,7 @@ export function buildGuideDocument(
   lang: GuideLanguage = "en",
 ): Document {
   const vars = guide.variables;
+  const pace = guidePace(guide);
   const children: Paragraph[] = [
     new Paragraph({
       heading: HeadingLevel.TITLE,
@@ -190,7 +201,7 @@ export function buildGuideDocument(
       },
       children: [
         new TextRun({
-          text: `Ghid de interviu  ·  ${formatDate(guide.updatedAt)}  ·  ${guide.items.length} întrebări`,
+          text: `Ghid de interviu  ·  ${formatDate(guide.updatedAt)}  ·  ${guide.items.length} întrebări  ·  ${formatMinutes(guide.items.length * pace)}`,
           font: FONT,
           bold: true,
           allCaps: true,
@@ -212,6 +223,13 @@ export function buildGuideDocument(
             text: group.indicator?.name ?? "Întrebări proprii",
             font: FONT,
             color: HEADING,
+          }),
+          new TextRun({
+            text: `  ·  ${formatMinutes(group.items.length * pace)}`,
+            font: FONT,
+            bold: true,
+            size: 20,
+            color: MUTED,
           }),
         ],
       }),

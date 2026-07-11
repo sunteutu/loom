@@ -14,10 +14,12 @@ import {
 } from "lucide-react";
 import {
   addCustomItem,
+  guidePace,
   moveItem,
   removeItem,
   renameGuide,
   setActiveGuide,
+  setMinutesPerQuestion,
   setVariables,
   updateItemText,
   useGuideStore,
@@ -26,6 +28,7 @@ import {
 import {
   downloadDocx,
   downloadMarkdown,
+  formatMinutes,
   groupItems,
   resolveIntent,
   resolveItemText,
@@ -66,6 +69,8 @@ function GuideEditor({ guide, isActive }: { guide: Guide; isActive: boolean }) {
   const [newQuestion, setNewQuestion] = useState("");
   const [lang, setLang] = useState<GuideLanguage>("en");
   const groups = groupItems(guide.items);
+  const pace = guidePace(guide);
+  const totalMinutes = guide.items.length * pace;
 
   // Continuous numbering across groups, same as the export.
   let questionNumber = 0;
@@ -141,18 +146,35 @@ function GuideEditor({ guide, isActive }: { guide: Guide; isActive: boolean }) {
         onChange={(e) => renameGuide(guide.id, e.target.value)}
         className="mt-3 w-full rounded-md border border-transparent bg-transparent text-2xl font-semibold tracking-tight outline-none transition-colors hover:border-border focus:border-ring"
       />
-      <p className="mt-1 text-sm text-muted-foreground">
-        {guide.items.length} întrebări
+      <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-muted-foreground">
+        <span>
+          {guide.items.length} întrebări ·{" "}
+          <span className="font-medium text-foreground">
+            {formatMinutes(totalMinutes)}
+          </span>{" "}
+          interviu
+        </span>
+        <label className="inline-flex items-center gap-1.5">
+          <span className="text-xs">Ritm:</span>
+          <select
+            value={pace}
+            onChange={(e) =>
+              setMinutesPerQuestion(guide.id, Number(e.target.value))
+            }
+            aria-label="Minute pe întrebare"
+            className="h-7 rounded-md border border-input bg-background px-1.5 text-xs outline-none transition-colors focus:border-ring"
+          >
+            <option value={3}>3 min/întrebare — alert</option>
+            <option value={4}>4 min/întrebare — standard</option>
+            <option value={5}>5 min/întrebare — în profunzime</option>
+          </select>
+        </label>
         {isActive && (
-          <>
-            {" "}
-            ·{" "}
-            <span className="font-medium text-indigo-11">
-              ghid activ — aici ajung întrebările adăugate din Indicatori
-            </span>
-          </>
+          <span className="font-medium text-indigo-11">
+            ghid activ — aici ajung întrebările adăugate din Indicatori
+          </span>
         )}
-      </p>
+      </div>
 
       <section className="mt-5 rounded-xl border border-border bg-card p-4">
         <h2 className="text-xs font-semibold uppercase tracking-wide text-slate-10">
@@ -202,8 +224,11 @@ function GuideEditor({ guide, isActive }: { guide: Guide; isActive: boolean }) {
             <section key={gi}>
               {/* Mirrors the exported document: dark-gray section label,
                   gray intent block with a left rule, bold gray numbering. */}
-              <h2 className="mb-1.5 text-xs font-bold uppercase tracking-wide text-slate-11">
+              <h2 className="mb-1.5 flex items-baseline gap-2 text-xs font-bold uppercase tracking-wide text-slate-11">
                 {group.indicator?.name ?? "Întrebări proprii"}
+                <span className="font-semibold normal-case tracking-normal text-slate-10">
+                  · {formatMinutes(group.items.length * pace)}
+                </span>
               </h2>
               {group.indicator &&
                 (() => {
