@@ -160,7 +160,7 @@ const FONT = "DM Sans";
 const INK = "0F172A";
 const BODY = "1E293B";
 const MUTED = "64748B";
-const ACCENT = "3E63DD";
+const HEADING = "334155"; // dark gray section labels (user preference)
 const HAIRLINE = "CBD5E1";
 const ACCENT_SOFT = "C7D2FE";
 
@@ -211,6 +211,7 @@ export function buildGuideDocument(
           new TextRun({
             text: group.indicator?.name ?? "Întrebări proprii",
             font: FONT,
+            color: HEADING,
           }),
         ],
       }),
@@ -285,7 +286,7 @@ export function buildGuideDocument(
             bold: true,
             allCaps: true,
             characterSpacing: 20,
-            color: ACCENT,
+            color: HEADING,
           },
         },
       },
