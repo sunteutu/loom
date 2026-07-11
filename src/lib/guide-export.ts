@@ -180,7 +180,7 @@ export function buildGuideDocument(
       heading: HeadingLevel.TITLE,
       alignment: AlignmentType.LEFT,
       spacing: { after: 120 },
-      children: [new TextRun({ text: guide.title })],
+      children: [new TextRun({ text: guide.title, font: FONT })],
     }),
     // Meta line: bold small caps instead of italics, closed by a hairline.
     new Paragraph({
@@ -191,6 +191,7 @@ export function buildGuideDocument(
       children: [
         new TextRun({
           text: `Ghid de interviu  ·  ${formatDate(guide.updatedAt)}  ·  ${guide.items.length} întrebări`,
+          font: FONT,
           bold: true,
           allCaps: true,
           characterSpacing: 20,
@@ -209,6 +210,7 @@ export function buildGuideDocument(
         children: [
           new TextRun({
             text: group.indicator?.name ?? "Întrebări proprii",
+            font: FONT,
           }),
         ],
       }),
@@ -230,8 +232,17 @@ export function buildGuideDocument(
             },
           },
           children: [
-            new TextRun({ text: "Intent: ", bold: true, color: MUTED }),
-            new TextRun({ text: applyVariables(intent, vars), color: MUTED }),
+            new TextRun({
+              text: "Intent: ",
+              font: FONT,
+              bold: true,
+              color: MUTED,
+            }),
+            new TextRun({
+              text: applyVariables(intent, vars),
+              font: FONT,
+              color: MUTED,
+            }),
           ],
         }),
       );
@@ -244,6 +255,9 @@ export function buildGuideDocument(
           children: [
             new TextRun({
               text: applyVariables(resolveItemText(item, lang), vars),
+              font: FONT,
+              size: 22, // 11pt — explicit: Pages doesn't reliably apply doc defaults
+              color: BODY,
             }),
           ],
         }),
@@ -287,7 +301,7 @@ export function buildGuideDocument(
               text: "%1.",
               alignment: AlignmentType.START,
               style: {
-                run: { bold: true, color: MUTED },
+                run: { font: FONT, bold: true, color: MUTED },
                 paragraph: {
                   indent: { left: 480, hanging: 480 },
                 },
