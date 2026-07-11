@@ -33,15 +33,22 @@ export interface Guide {
   items: GuideItem[];
   /** Interview pace: minutes per question incl. probing (default 4). */
   minutesPerQuestion?: number;
+  /** Target interview duration in minutes (default 60). */
+  targetMinutes?: number;
   createdAt: number;
   updatedAt: number;
 }
 
 /** IDI heuristic: one main question ≈ 4 minutes including probes. */
 export const DEFAULT_MINUTES_PER_QUESTION = 4;
+export const DEFAULT_TARGET_MINUTES = 60;
 
 export function guidePace(guide: Guide): number {
   return guide.minutesPerQuestion ?? DEFAULT_MINUTES_PER_QUESTION;
+}
+
+export function guideTarget(guide: Guide): number {
+  return guide.targetMinutes ?? DEFAULT_TARGET_MINUTES;
 }
 
 interface GuideStore {
@@ -149,6 +156,10 @@ export function setVariables(id: string, variables: GuideVariables) {
 
 export function setMinutesPerQuestion(id: string, minutes: number) {
   updateGuide(id, (g) => ({ ...g, minutesPerQuestion: minutes }));
+}
+
+export function setTargetMinutes(id: string, minutes: number) {
+  updateGuide(id, (g) => ({ ...g, targetMinutes: minutes }));
 }
 
 export interface QuestionRef {

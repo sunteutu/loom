@@ -7,24 +7,31 @@ import {
   ArrowDown,
   ArrowLeft,
   ArrowUp,
+  CircleCheck,
   Download,
   FileText,
+  Lightbulb,
+  OctagonAlert,
   Plus,
   Trash2,
+  TriangleAlert,
 } from "lucide-react";
 import {
   addCustomItem,
   guidePace,
+  guideTarget,
   moveItem,
   removeItem,
   renameGuide,
   setActiveGuide,
   setMinutesPerQuestion,
+  setTargetMinutes,
   setVariables,
   updateItemText,
   useGuideStore,
   type Guide,
 } from "@/lib/guides";
+import { lintGuide, type LintIssue } from "@/lib/guide-lint";
 import {
   downloadDocx,
   downloadMarkdown,
@@ -40,6 +47,53 @@ const VARIABLE_FIELDS = [
   { key: "product", label: "[product]", hint: "ex. George" },
   { key: "brand", label: "[brand]", hint: "ex. BCR" },
 ] as const;
+
+const SEVERITY_UI = {
+  error: { icon: OctagonAlert, className: "text-red-11" },
+  warning: { icon: TriangleAlert, className: "text-amber-11" },
+  suggestion: { icon: Lightbulb, className: "text-slate-11" },
+} as const;
+
+/** The research-linter panel: methodological checks on the current guide. */
+function LintPanel({ issues }: { issues: LintIssue[] }) {
+  return (
+    <section className="mt-4 rounded-xl border border-border bg-card p-4">
+      <h2 className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-slate-10">
+        Verificări
+        {issues.length > 0 && (
+          <span className="rounded-full bg-slate-3 px-2 py-0.5 text-xs font-medium normal-case tracking-normal text-slate-11">
+            {issues.length}
+          </span>
+        )}
+      </h2>
+      {issues.length === 0 ? (
+        <p className="mt-2 flex items-center gap-1.5 text-sm text-muted-foreground">
+          <CircleCheck aria-hidden className="h-4 w-4 text-slate-9" />
+          Nicio problemă metodologică detectată.
+        </p>
+      ) : (
+        <ul className="mt-2 flex flex-col gap-2">
+          {issues.map((issue) => {
+            const ui = SEVERITY_UI[issue.severity];
+            return (
+              <li
+                key={issue.rule}
+                className="flex items-start gap-2 text-sm leading-relaxed"
+              >
+                <ui.icon
+                  aria-hidden
+                  className={`mt-0.5 h-4 w-4 shrink-0 ${ui.className}`}
+                />
+                <span className="sr-only">{issue.severity}: </span>
+                <span className="text-slate-11">{issue.message}</span>
+              </li>
+            );
+          })}
+        </ul>
+      )}
+    </section>
+  );
+}
 
 export default function GhidPage() {
   const { id } = useParams<{ id: string }>();
@@ -70,7 +124,20 @@ function GuideEditor({ guide, isActive }: { guide: Guide; isActive: boolean }) {
   const [lang, setLang] = useState<GuideLanguage>("en");
   const groups = groupItems(guide.items);
   const pace = guidePace(guide);
+  const target = guideTarget(guide);
   const totalMinutes = guide.items.length * pace;
+  const issues = lintGuide(guide, lang);
+
+  /** Re-check before export; errors require an explicit override. */
+  const confirmExport = () => {
+    const errors = issues.filter((i) => i.severity === "error");
+    if (errors.length === 0) return true;
+    return window.confirm(
+      `Verificările au găsit probleme:\n\n${errors
+        .map((e) => `• ${e.message}`)
+        .join("\n\n")}\n\nExporți oricum?`,
+    );
+  };
 
   // Continuous numbering across groups, same as the export.
   let questionNumber = 0;
@@ -122,7 +189,7 @@ function GuideEditor({ guide, isActive }: { guide: Guide; isActive: boolean }) {
             ))}
           </div>
           <button
-            onClick={() => downloadMarkdown(guide, lang)}
+            onClick={() => confirmExport() && downloadMarkdown(guide, lang)}
             disabled={guide.items.length === 0}
             className="inline-flex items-center gap-1.5 rounded-md border border-border px-2.5 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:border-ring hover:text-foreground disabled:cursor-not-allowed disabled:opacity-40"
           >
@@ -130,7 +197,7 @@ function GuideEditor({ guide, isActive }: { guide: Guide; isActive: boolean }) {
             Markdown
           </button>
           <button
-            onClick={() => void downloadDocx(guide, lang)}
+            onClick={() => confirmExport() && void downloadDocx(guide, lang)}
             disabled={guide.items.length === 0}
             className="inline-flex items-center gap-1.5 rounded-md bg-indigo-9 px-3 py-1.5 text-sm font-medium text-white shadow-sm transition-colors hover:bg-indigo-10 disabled:cursor-not-allowed disabled:opacity-40"
           >
@@ -149,10 +216,18 @@ function GuideEditor({ guide, isActive }: { guide: Guide; isActive: boolean }) {
       <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-muted-foreground">
         <span>
           {guide.items.length} întrebări ·{" "}
-          <span className="font-medium text-foreground">
+          <span
+            className={`font-medium ${
+              totalMinutes > 90
+                ? "text-red-11"
+                : totalMinutes > target
+                  ? "text-amber-11"
+                  : "text-foreground"
+            }`}
+          >
             {formatMinutes(totalMinutes)}
           </span>{" "}
-          interviu
+          din ținta de {target} min
         </span>
         <label className="inline-flex items-center gap-1.5">
           <span className="text-xs">Ritm:</span>
@@ -167,6 +242,20 @@ function GuideEditor({ guide, isActive }: { guide: Guide; isActive: boolean }) {
             <option value={3}>3 min/întrebare — alert</option>
             <option value={4}>4 min/întrebare — standard</option>
             <option value={5}>5 min/întrebare — în profunzime</option>
+          </select>
+        </label>
+        <label className="inline-flex items-center gap-1.5">
+          <span className="text-xs">Țintă:</span>
+          <select
+            value={target}
+            onChange={(e) => setTargetMinutes(guide.id, Number(e.target.value))}
+            aria-label="Durata țintă a interviului"
+            className="h-7 rounded-md border border-input bg-background px-1.5 text-xs outline-none transition-colors focus:border-ring"
+          >
+            <option value={30}>30 min</option>
+            <option value={45}>45 min</option>
+            <option value={60}>60 min</option>
+            <option value={90}>90 min</option>
           </select>
         </label>
         {isActive && (
@@ -205,6 +294,8 @@ function GuideEditor({ guide, isActive }: { guide: Guide; isActive: boolean }) {
           ))}
         </div>
       </section>
+
+      {guide.items.length > 0 && <LintPanel issues={issues} />}
 
       {guide.items.length === 0 ? (
         <div className="mt-8 flex flex-col items-center gap-3 rounded-xl border border-dashed border-border py-16 text-center">
