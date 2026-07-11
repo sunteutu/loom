@@ -128,7 +128,7 @@ function IndicatoriContent() {
       <div className="sticky top-0 z-10 -mx-8 border-b border-border bg-background/95 px-8 pb-4 pt-8 backdrop-blur supports-[backdrop-filter]:bg-background/80">
         <header className="mb-4">
           <h1 className="text-2xl font-semibold tracking-tight">Indicatori</h1>
-          <p className="mt-1 text-sm text-muted-foreground">
+          <p className="mt-1 text-base text-muted-foreground">
             Gold-standard market &amp; UX research indicators —{" "}
             {INDICATORS.length} indicators across{" "}
             {INDICATOR_CATEGORIES.length} categories. Click an indicator for its
@@ -138,15 +138,20 @@ function IndicatoriContent() {
 
         <div className="flex gap-2">
           <div className="relative flex-1">
-            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Search
+              aria-hidden
+              className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"
+            />
             <input
+              type="search"
+              aria-label="Search indicators"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               onKeyDown={(e) => {
                 if (e.key === "Escape") setQuery("");
               }}
               placeholder="Search — e.g. awareness, purchase intention, NPS, SUS…"
-              className="h-10 w-full rounded-lg border border-input bg-background pl-9 pr-9 text-sm shadow-sm outline-none transition-colors focus:border-ring focus:ring-2 focus:ring-ring/30"
+              className="h-10 w-full rounded-lg border border-input bg-background pl-9 pr-9 text-base shadow-sm outline-none transition-colors focus:border-ring focus:ring-2 focus:ring-ring/30"
               autoFocus
             />
             {query && (
@@ -163,10 +168,10 @@ function IndicatoriContent() {
           <Popover.Root>
             <Popover.Trigger asChild>
               <button className="inline-flex h-10 shrink-0 items-center gap-2 rounded-lg border border-input bg-background px-3.5 text-sm font-medium shadow-sm transition-colors hover:bg-slate-2 data-[state=open]:bg-slate-2">
-                <SlidersHorizontal className="h-4 w-4 text-slate-10" />
+                <SlidersHorizontal aria-hidden className="h-4 w-4 text-slate-10" />
                 Filters
                 {selectedCats.size > 0 && (
-                  <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-indigo-9 px-1.5 text-[11px] font-semibold tabular-nums text-white">
+                  <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-indigo-9 px-1.5 text-xs font-semibold tabular-nums text-white">
                     {selectedCats.size}
                   </span>
                 )}
@@ -179,13 +184,13 @@ function IndicatoriContent() {
                 className="z-50 w-80 rounded-xl border border-border bg-popover p-1.5 text-popover-foreground shadow-xl outline-none data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2"
               >
                 <div className="flex items-center justify-between px-2.5 pb-1.5 pt-2">
-                  <span className="text-[11px] font-semibold uppercase tracking-wide text-slate-10">
+                  <span className="text-xs font-semibold uppercase tracking-wide text-slate-10">
                     Category
                   </span>
                   {selectedCats.size > 0 && (
                     <button
                       onClick={clearCats}
-                      className="text-xs font-medium text-indigo-9 transition-colors hover:text-indigo-10"
+                      className="text-xs font-medium text-indigo-11 transition-colors hover:text-indigo-12"
                     >
                       Reset
                     </button>
@@ -211,14 +216,14 @@ function IndicatoriContent() {
                       >
                         {active && <Check className="h-3 w-3" strokeWidth={3} />}
                       </span>
-                      <span className="flex-1 text-left text-[13px]">{cat}</span>
+                      <span className="flex-1 text-left text-sm">{cat}</span>
                       <span className="text-xs tabular-nums text-slate-10">
                         {count}
                       </span>
                     </button>
                   );
                 })}
-                <div className="mt-1 border-t border-border px-2.5 py-2 text-xs text-slate-10">
+                <div className="mt-1 border-t border-border px-2.5 py-2 text-sm text-slate-10">
                   Showing {shownCount} of {INDICATORS.length} indicators
                 </div>
               </Popover.Content>
@@ -234,31 +239,40 @@ function IndicatoriContent() {
                   key={cat}
                   onClick={() => toggleCategory(cat)}
                   aria-label={`Remove filter ${cat}`}
-                  className="group inline-flex items-center gap-1 rounded-full bg-indigo-3 py-1 pl-3 pr-2 text-xs font-medium text-indigo-11 transition-colors hover:bg-indigo-4"
+                  className="group inline-flex items-center gap-1 rounded-full bg-indigo-3 py-1 pl-3 pr-2 text-sm font-medium text-indigo-11 transition-colors hover:bg-indigo-4"
                 >
                   {cat}
-                  <X className="h-3 w-3 text-indigo-9 transition-colors group-hover:text-indigo-11" />
+                  <X
+                    aria-hidden
+                    className="h-3 w-3 text-indigo-9 transition-colors group-hover:text-indigo-11"
+                  />
                 </button>
               ),
             )}
             <button
               onClick={clearAll}
-              className="ml-1 text-xs font-medium text-muted-foreground underline-offset-2 transition-colors hover:text-foreground hover:underline"
+              className="ml-1 text-sm font-medium text-muted-foreground underline-offset-2 transition-colors hover:text-foreground hover:underline"
             >
               Clear all
             </button>
           </div>
         )}
+
+        {/* Announce result-count changes to screen readers as the user
+            types or toggles filters. */}
+        <p role="status" className="sr-only">
+          Showing {shownCount} of {INDICATORS.length} indicators
+        </p>
       </div>
 
       {grouped.length === 0 ? (
         <div className="flex flex-col items-center gap-3 py-20 text-center">
-          <p className="text-sm text-muted-foreground">
+          <p className="text-base text-muted-foreground">
             No indicators match{query ? <> “{query}”</> : " these filters"}.
           </p>
           <button
             onClick={clearAll}
-            className="rounded-md border border-border px-3 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:border-ring hover:text-foreground"
+            className="rounded-md border border-border px-3 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:border-ring hover:text-foreground"
           >
             Clear filters
           </button>
@@ -266,17 +280,17 @@ function IndicatoriContent() {
       ) : (
         <div className="flex flex-col gap-10 pt-8">
           {hasActiveFilters && (
-            <p className="-mb-6 text-xs text-muted-foreground">
+            <p className="-mb-6 text-sm text-muted-foreground">
               Showing {shownCount} of {INDICATORS.length} indicators
             </p>
           )}
           {grouped.map((group) => (
             <section key={group.category}>
               <div className="mb-3 flex items-baseline gap-2">
-                <h2 className="text-sm font-semibold tracking-tight">
+                <h2 className="text-base font-semibold tracking-tight">
                   {group.category}
                 </h2>
-                <span className="rounded-full bg-slate-3 px-2 py-0.5 text-[11px] font-medium text-slate-11">
+                <span className="rounded-full bg-slate-3 px-2 py-0.5 text-xs font-medium text-slate-11">
                   {group.indicators.length}
                 </span>
               </div>
@@ -290,7 +304,7 @@ function IndicatoriContent() {
                         onClick={() => setSelected(ind)}
                         className="flex h-full w-full flex-col rounded-xl border border-border bg-card p-4 text-left transition-colors hover:border-ring/60 hover:bg-slate-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40"
                       >
-                        <h3 className="text-[15px] font-semibold leading-snug">
+                        <h3 className="text-base font-semibold leading-snug">
                           <Highlight text={ind.name} terms={terms} />
                         </h3>
                         {ind.aliases.length > 0 && (
@@ -298,25 +312,27 @@ function IndicatoriContent() {
                             {ind.aliases.slice(0, 3).map((alias) => (
                               <span
                                 key={alias}
-                                className="rounded-md bg-slate-3 px-1.5 py-0.5 text-[11px] font-medium text-slate-11"
+                                className="rounded-md bg-slate-3 px-1.5 py-0.5 text-xs font-medium text-slate-11"
                               >
                                 <Highlight text={alias} terms={terms} />
                               </span>
                             ))}
                           </div>
                         )}
-                        <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                        <p className="mt-2 text-[0.9375rem] leading-relaxed text-muted-foreground">
                           <Highlight text={ind.description} terms={terms} />
                         </p>
-                        <div className="mt-3 flex items-center gap-2 border-t border-border pt-2.5 text-[11px] font-medium text-slate-10">
+                        <div className="mt-3 flex items-center gap-2 border-t border-border pt-2.5 text-xs font-medium text-slate-10">
                           <span>{qualCount} qual questions</span>
-                          <span className="text-slate-7">·</span>
+                          <span aria-hidden className="text-slate-7">
+                            ·
+                          </span>
                           <span>
                             {quantCount > 0
                               ? `${quantCount} survey item${quantCount > 1 ? "s" : ""}`
                               : "survey spec"}
                           </span>
-                          <span className="ml-auto font-semibold text-indigo-9">
+                          <span className="ml-auto font-semibold text-indigo-11">
                             View →
                           </span>
                         </div>
@@ -340,7 +356,7 @@ function IndicatoriContent() {
 
 function SectionLabel({ children }: { children: ReactNode }) {
   return (
-    <h3 className="text-[11px] font-semibold uppercase tracking-wide text-slate-10">
+    <h3 className="text-xs font-semibold uppercase tracking-wide text-slate-10">
       {children}
     </h3>
   );
@@ -358,16 +374,18 @@ function DetailRow({ label, children }: { label: string; children: ReactNode }) 
 function SurveyItemView({ item }: { item: SurveyItem }) {
   return (
     <div className="rounded-lg border border-border bg-card p-3.5">
-      <span className="inline-block rounded bg-indigo-3 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-indigo-11">
+      <span className="inline-block rounded bg-indigo-3 px-1.5 py-0.5 text-xs font-semibold uppercase tracking-wide text-indigo-11">
         {item.type}
       </span>
-      <p className="mt-2 text-sm font-medium leading-snug">{item.stem}</p>
+      <p className="mt-2 text-base font-medium leading-snug">{item.stem}</p>
 
       {item.subStems && (
-        <ul className="ml-1 mt-1.5 flex flex-col gap-1 text-[13px] text-muted-foreground">
+        <ul className="ml-1 mt-1.5 flex flex-col gap-1 text-sm text-muted-foreground">
           {item.subStems.map((s, i) => (
             <li key={i} className="flex gap-1.5">
-              <span className="text-slate-9">•</span>
+              <span aria-hidden className="text-slate-9">
+                •
+              </span>
               {s}
             </li>
           ))}
@@ -379,7 +397,7 @@ function SurveyItemView({ item }: { item: SurveyItem }) {
           {item.scalePoints.map((p, i) => (
             <span
               key={i}
-              className="rounded border border-border bg-slate-2 px-1.5 py-0.5 text-[11px] text-slate-11"
+              className="rounded border border-border bg-slate-2 px-1.5 py-0.5 text-xs text-slate-11"
             >
               {p}
             </span>
@@ -392,7 +410,7 @@ function SurveyItemView({ item }: { item: SurveyItem }) {
           {item.options.map((p, i) => (
             <span
               key={i}
-              className="rounded border border-border bg-slate-2 px-1.5 py-0.5 text-[11px] text-slate-11"
+              className="rounded border border-border bg-slate-2 px-1.5 py-0.5 text-xs text-slate-11"
             >
               {p}
             </span>
@@ -402,13 +420,15 @@ function SurveyItemView({ item }: { item: SurveyItem }) {
 
       {item.attributes && (
         <div className="mt-2">
-          <p className="text-[11px] font-medium uppercase tracking-wide text-slate-10">
+          <p className="text-xs font-medium uppercase tracking-wide text-slate-10">
             Battery items
           </p>
-          <ul className="ml-1 mt-1 flex flex-col gap-1 text-[13px] text-muted-foreground">
+          <ul className="ml-1 mt-1 flex flex-col gap-1 text-sm text-muted-foreground">
             {item.attributes.map((a, i) => (
               <li key={i} className="flex gap-1.5">
-                <span className="text-slate-9">•</span>
+                <span aria-hidden className="text-slate-9">
+                  •
+                </span>
                 {a}
               </li>
             ))}
@@ -416,7 +436,7 @@ function SurveyItemView({ item }: { item: SurveyItem }) {
         </div>
       )}
 
-      <dl className="mt-3 grid grid-cols-1 gap-1.5 text-xs">
+      <dl className="mt-3 grid grid-cols-1 gap-1.5 text-sm">
         <DetailRow label="Base">{item.base}</DetailRow>
         {item.randomize && <DetailRow label="Randomize">Yes</DetailRow>}
         <DetailRow label="Analysis">{item.analysis}</DetailRow>
@@ -443,10 +463,10 @@ function IndicatorDrawer({
             <>
               <div className="flex items-start justify-between gap-4 border-b border-border px-6 py-5">
                 <div className="min-w-0">
-                  <p className="text-[11px] font-medium uppercase tracking-wide text-slate-10">
+                  <p className="text-xs font-medium uppercase tracking-wide text-slate-10">
                     {indicator.category}
                   </p>
-                  <Dialog.Title className="mt-1 text-lg font-semibold leading-snug">
+                  <Dialog.Title className="mt-1 text-xl font-semibold leading-snug">
                     {indicator.name}
                   </Dialog.Title>
                   {indicator.aliases.length > 0 && (
@@ -454,7 +474,7 @@ function IndicatorDrawer({
                       {indicator.aliases.map((a) => (
                         <span
                           key={a}
-                          className="rounded-md bg-slate-3 px-1.5 py-0.5 text-[11px] font-medium text-slate-11"
+                          className="rounded-md bg-slate-3 px-1.5 py-0.5 text-xs font-medium text-slate-11"
                         >
                           {a}
                         </span>
@@ -466,12 +486,12 @@ function IndicatorDrawer({
                   aria-label="Close"
                   className="shrink-0 rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
                 >
-                  <X className="h-4 w-4" />
+                  <X aria-hidden className="h-4 w-4" />
                 </Dialog.Close>
               </div>
 
-              <div className="flex-1 overflow-y-auto px-6 py-5">
-                <Dialog.Description className="text-sm leading-relaxed text-muted-foreground">
+              <div tabIndex={0} className="flex-1 overflow-y-auto px-6 py-5">
+                <Dialog.Description className="text-base leading-relaxed text-muted-foreground">
                   {indicator.description}
                 </Dialog.Description>
 
@@ -480,7 +500,7 @@ function IndicatorDrawer({
                     <section className="mt-7">
                       <SectionLabel>Qualitative — interview guide</SectionLabel>
                       {indicator.qualIntent && (
-                        <p className="mt-2 rounded-lg bg-indigo-2 px-3 py-2 text-[13px] leading-relaxed text-indigo-11">
+                        <p className="mt-2 rounded-lg bg-indigo-2 px-3 py-2 text-sm leading-relaxed text-indigo-11">
                           <span className="font-semibold">Intent: </span>
                           {indicator.qualIntent}
                         </p>
@@ -489,9 +509,12 @@ function IndicatorDrawer({
                         {indicator.qualQuestions.map((q, i) => (
                           <li
                             key={i}
-                            className="flex gap-2.5 text-sm leading-relaxed"
+                            className="flex gap-2.5 text-base leading-relaxed"
                           >
-                            <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-slate-3 text-[11px] font-semibold tabular-nums text-slate-11">
+                            <span
+                              aria-hidden
+                              className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-slate-3 text-xs font-semibold tabular-nums text-slate-11"
+                            >
                               {i + 1}
                             </span>
                             <span>{q}</span>
@@ -504,8 +527,11 @@ function IndicatorDrawer({
                 <section className="mt-7">
                   <SectionLabel>Quantitative — survey</SectionLabel>
                   <div className="mt-2 flex gap-2 rounded-lg bg-slate-2 px-3 py-2">
-                    <Ruler className="mt-0.5 h-3.5 w-3.5 shrink-0 text-slate-9" />
-                    <p className="text-xs leading-relaxed text-slate-11">
+                    <Ruler
+                      aria-hidden
+                      className="mt-0.5 h-3.5 w-3.5 shrink-0 text-slate-9"
+                    />
+                    <p className="text-sm leading-relaxed text-slate-11">
                       <span className="font-medium text-foreground/70">
                         Measurement:{" "}
                       </span>
@@ -519,7 +545,7 @@ function IndicatorDrawer({
                       ))}
                     </div>
                   ) : (
-                    <p className="mt-3 text-xs italic text-slate-10">
+                    <p className="mt-3 text-sm italic text-slate-10">
                       Structured survey item not authored yet — the measurement
                       note above is the spec.
                     </p>

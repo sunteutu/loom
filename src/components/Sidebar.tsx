@@ -58,7 +58,7 @@ function ThemeToggle() {
                 : "text-muted-foreground hover:text-sidebar-accent-foreground"
             }`}
           >
-            <opt.icon className="h-3.5 w-3.5" />
+            <opt.icon className="h-4 w-4" aria-hidden />
           </button>
         );
       })}
@@ -76,15 +76,18 @@ export function Sidebar() {
   return (
     <aside className="sticky top-0 flex h-screen w-56 shrink-0 flex-col border-r border-sidebar-border bg-sidebar text-sidebar-foreground">
       <div className="flex items-center gap-2 px-4 py-4">
-        <FlaskConical className="h-5 w-5 text-sidebar-primary" />
-        <span className="text-sm font-semibold tracking-tight">Loom</span>
+        <FlaskConical className="h-5 w-5 text-sidebar-primary" aria-hidden />
+        <span className="text-base font-semibold tracking-tight">Loom</span>
       </div>
 
-      <nav className="flex flex-1 flex-col gap-5 overflow-y-auto px-2 pb-4">
+      <nav
+        aria-label="Main"
+        className="flex flex-1 flex-col gap-5 overflow-y-auto px-2 pb-4"
+      >
         {sections.map((section, i) => (
           <div key={section.label ?? i} className="flex flex-col gap-0.5">
             {section.label && (
-              <div className="px-2 pb-1 text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
+              <div className="px-2 pb-1 text-xs font-medium uppercase tracking-wide text-muted-foreground">
                 {section.label}
               </div>
             )}
@@ -97,13 +100,14 @@ export function Sidebar() {
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`flex items-center gap-2.5 rounded-md px-2 py-1.5 text-sm transition-colors ${
+                  aria-current={active ? "page" : undefined}
+                  className={`flex items-center gap-2.5 rounded-md px-2 py-1.5 text-base transition-colors ${
                     active
                       ? "bg-sidebar-accent font-medium text-sidebar-accent-foreground"
                       : "text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
                   }`}
                 >
-                  <item.icon className="h-4 w-4" />
+                  <item.icon className="h-4 w-4" aria-hidden />
                   {item.label}
                 </Link>
               );

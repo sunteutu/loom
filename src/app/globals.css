@@ -147,4 +147,23 @@
   html {
     @apply font-sans;
   }
+  /* Visible keyboard focus everywhere; components with their own
+     focus-visible ring opt out via focus-visible:outline-none. */
+  :focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+  }
+}
+
+/* Collapse decorative motion (drawer/popover slide & fade) for users who
+   ask for reduced motion. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

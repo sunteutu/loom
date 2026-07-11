@@ -62,6 +62,7 @@ function Tasks() {
         }}
       >
         <input
+          aria-label="New task"
           value={text}
           onChange={(e) => setText(e.target.value)}
           placeholder="New task..."

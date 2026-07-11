@@ -18,8 +18,9 @@ const plexMono = IBM_Plex_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Convex + Clerk App",
-  description: "Next.js app with Convex backend and Clerk auth",
+  title: "Loom",
+  description:
+    "Gold-standard market & UX research indicators and study builder",
 };
 
 export default function RootLayout({
@@ -34,12 +35,24 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col">
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[60] focus:rounded-md focus:bg-background focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:shadow-lg"
+        >
+          Skip to content
+        </a>
         <ThemeProvider>
           <ClerkProvider>
             <ConvexClientProvider>
               <div className="flex min-h-screen">
                 <Sidebar />
-                <div className="flex min-w-0 flex-1 flex-col">{children}</div>
+                <div
+                  id="main-content"
+                  tabIndex={-1}
+                  className="flex min-w-0 flex-1 flex-col"
+                >
+                  {children}
+                </div>
               </div>
             </ConvexClientProvider>
           </ClerkProvider>
