@@ -32,6 +32,8 @@ import {
   SURVEY_TYPE_LABELS,
 } from "@/lib/survey-export";
 import { formatMinutes, type GuideLanguage } from "@/lib/guide-export";
+import { lintSurvey } from "@/lib/survey-lint";
+import { LintPanel } from "@/components/LintPanel";
 
 const VARIABLE_FIELDS = [
   { key: "category", label: "[category]", hint: "ex. aplicații de banking" },
@@ -79,6 +81,18 @@ function SurveyEditor({
   const [lang, setLang] = useState<GuideLanguage>("en");
   const groups = groupSurveyItems(survey.items);
   const loi = surveyLoiMinutes(survey);
+  const issues = lintSurvey(survey, lang);
+
+  /** Re-check before export; errors require an explicit override. */
+  const confirmExport = () => {
+    const errors = issues.filter((i) => i.severity === "error");
+    if (errors.length === 0) return true;
+    return window.confirm(
+      `Verificările au găsit probleme:\n\n${errors
+        .map((e) => `• ${e.message}`)
+        .join("\n\n")}\n\nExporți oricum?`,
+    );
+  };
 
   let questionNumber = 0;
 
@@ -129,7 +143,7 @@ function SurveyEditor({
             ))}
           </div>
           <button
-            onClick={() => downloadSurveyMarkdown(survey, lang)}
+            onClick={() => confirmExport() && downloadSurveyMarkdown(survey, lang)}
             disabled={survey.items.length === 0}
             className="inline-flex items-center gap-1.5 rounded-md border border-border px-2.5 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:border-ring hover:text-foreground disabled:cursor-not-allowed disabled:opacity-40"
           >
@@ -137,7 +151,7 @@ function SurveyEditor({
             Markdown
           </button>
           <button
-            onClick={() => void downloadSurveyDocx(survey, lang)}
+            onClick={() => confirmExport() && void downloadSurveyDocx(survey, lang)}
             disabled={survey.items.length === 0}
             className="inline-flex items-center gap-1.5 rounded-md bg-indigo-9 px-3 py-1.5 text-sm font-medium text-white shadow-sm transition-colors hover:bg-indigo-10 disabled:cursor-not-allowed disabled:opacity-40"
           >
@@ -198,6 +212,8 @@ function SurveyEditor({
           ))}
         </div>
       </section>
+
+      {survey.items.length > 0 && <LintPanel issues={issues} />}
 
       {survey.items.length === 0 ? (
         <div className="mt-8 flex flex-col items-center gap-3 rounded-xl border border-dashed border-border py-16 text-center">
