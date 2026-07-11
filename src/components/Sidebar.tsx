@@ -4,7 +4,16 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTheme } from "next-themes";
-import { FlaskConical, Gauge, Home, Monitor, Moon, Sun } from "lucide-react";
+import {
+  FlaskConical,
+  Gauge,
+  Home,
+  Monitor,
+  Moon,
+  NotebookPen,
+  Sun,
+} from "lucide-react";
+import { getActiveGuide, useGuideStore } from "@/lib/guides";
 
 const sections: {
   label: string | null;
@@ -13,6 +22,10 @@ const sections: {
   {
     label: null,
     items: [{ href: "/", label: "Home", icon: Home }],
+  },
+  {
+    label: "Research",
+    items: [{ href: "/ghiduri", label: "Ghiduri", icon: NotebookPen }],
   },
   {
     label: "Admin",
@@ -68,6 +81,14 @@ function ThemeToggle() {
 
 export function Sidebar() {
   const pathname = usePathname();
+  const store = useGuideStore();
+  // localStorage only exists client-side; render the count after mount to
+  // avoid a hydration mismatch (same pattern as ThemeToggle).
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+  const activeGuideCount = mounted
+    ? (getActiveGuide(store)?.items.length ?? 0)
+    : 0;
 
   if (HIDDEN_PREFIXES.some((p) => pathname.startsWith(p))) {
     return null;
@@ -109,6 +130,11 @@ export function Sidebar() {
                 >
                   <item.icon className="h-4 w-4" aria-hidden />
                   {item.label}
+                  {item.href === "/ghiduri" && activeGuideCount > 0 && (
+                    <span className="ml-auto flex h-5 min-w-5 items-center justify-center rounded-full bg-indigo-9 px-1.5 text-xs font-semibold tabular-nums text-white">
+                      {activeGuideCount}
+                    </span>
+                  )}
                 </Link>
               );
             })}

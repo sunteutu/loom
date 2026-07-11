@@ -7,7 +7,15 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { Check, Ruler, Search, SlidersHorizontal, X } from "lucide-react";
+import Link from "next/link";
+import {
+  Check,
+  Plus,
+  Ruler,
+  Search,
+  SlidersHorizontal,
+  X,
+} from "lucide-react";
 import { Dialog, Popover } from "radix-ui";
 import {
   INDICATOR_CATEGORIES,
@@ -16,6 +24,12 @@ import {
   type IndicatorCategory,
   type SurveyItem,
 } from "@/lib/indicators";
+import {
+  addQuestionsToActiveGuide,
+  getActiveGuide,
+  removeQuestionFromActiveGuide,
+  useGuideStore,
+} from "@/lib/guides";
 
 function queryTerms(query: string) {
   return query.trim().toLowerCase().split(/\s+/).filter(Boolean);
@@ -362,6 +376,124 @@ function SectionLabel({ children }: { children: ReactNode }) {
   );
 }
 
+/**
+ * The qual interview guide inside the drawer, with puzzle-style
+ * add-to-guide: per-question toggle + add-all, targeting the active guide.
+ */
+function QualSection({ indicator }: { indicator: Indicator }) {
+  const store = useGuideStore();
+  const activeGuide = getActiveGuide(store);
+  const questions = indicator.qualQuestions ?? [];
+
+  const inGuide = (index: number) =>
+    activeGuide?.items.some(
+      (it) => it.indicatorId === indicator.id && it.sourceIndex === index,
+    ) ?? false;
+  const addedCount = questions.filter((_, i) => inGuide(i)).length;
+  const allAdded = addedCount === questions.length;
+
+  const toggle = (index: number) => {
+    if (inGuide(index)) {
+      removeQuestionFromActiveGuide(indicator.id, index);
+    } else {
+      addQuestionsToActiveGuide([
+        { text: questions[index], indicatorId: indicator.id, sourceIndex: index },
+      ]);
+    }
+  };
+
+  const addAll = () =>
+    addQuestionsToActiveGuide(
+      questions.map((text, index) => ({
+        text,
+        indicatorId: indicator.id,
+        sourceIndex: index,
+      })),
+    );
+
+  return (
+    <section className="mt-7">
+      <div className="flex items-center justify-between gap-2">
+        <SectionLabel>Qualitative — interview guide</SectionLabel>
+        <button
+          onClick={addAll}
+          disabled={allAdded}
+          className="inline-flex items-center gap-1 rounded-md border border-border px-2 py-1 text-xs font-medium text-muted-foreground transition-colors hover:border-ring hover:text-foreground disabled:cursor-default disabled:border-transparent disabled:text-indigo-11 disabled:opacity-100"
+        >
+          {allAdded ? (
+            <>
+              <Check aria-hidden className="h-3.5 w-3.5" />
+              Toate în ghid
+            </>
+          ) : (
+            <>
+              <Plus aria-hidden className="h-3.5 w-3.5" />
+              Adaugă toate în ghid
+            </>
+          )}
+        </button>
+      </div>
+      {indicator.qualIntent && (
+        <p className="mt-2 rounded-lg bg-indigo-2 px-3 py-2 text-sm leading-relaxed text-indigo-11">
+          <span className="font-semibold">Intent: </span>
+          {indicator.qualIntent}
+        </p>
+      )}
+      <ol className="mt-3 flex flex-col gap-2.5">
+        {questions.map((q, i) => {
+          const added = inGuide(i);
+          return (
+            <li key={i} className="flex gap-2.5 text-base leading-relaxed">
+              <span
+                aria-hidden
+                className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-slate-3 text-xs font-semibold tabular-nums text-slate-11"
+              >
+                {i + 1}
+              </span>
+              <span className="flex-1">{q}</span>
+              <button
+                onClick={() => toggle(i)}
+                aria-pressed={added}
+                aria-label={
+                  added
+                    ? `Scoate întrebarea ${i + 1} din ghid`
+                    : `Adaugă întrebarea ${i + 1} în ghid`
+                }
+                className={`mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-md border transition-colors ${
+                  added
+                    ? "border-indigo-9 bg-indigo-9 text-white hover:bg-indigo-10"
+                    : "border-border text-muted-foreground hover:border-ring hover:text-foreground"
+                }`}
+              >
+                {added ? (
+                  <Check aria-hidden className="h-3.5 w-3.5" strokeWidth={3} />
+                ) : (
+                  <Plus aria-hidden className="h-3.5 w-3.5" />
+                )}
+              </button>
+            </li>
+          );
+        })}
+      </ol>
+      {addedCount > 0 && activeGuide && (
+        <p className="mt-3 text-sm text-muted-foreground">
+          {addedCount} din {questions.length} în ghidul{" "}
+          <span className="font-medium text-foreground">
+            „{activeGuide.title}”
+          </span>{" "}
+          ·{" "}
+          <Link
+            href={`/ghiduri/${activeGuide.id}`}
+            className="font-medium text-indigo-11 underline-offset-2 hover:underline"
+          >
+            Deschide ghidul →
+          </Link>
+        </p>
+      )}
+    </section>
+  );
+}
+
 function DetailRow({ label, children }: { label: string; children: ReactNode }) {
   return (
     <div className="flex gap-2">
@@ -497,31 +629,7 @@ function IndicatorDrawer({
 
                 {indicator.qualQuestions &&
                   indicator.qualQuestions.length > 0 && (
-                    <section className="mt-7">
-                      <SectionLabel>Qualitative — interview guide</SectionLabel>
-                      {indicator.qualIntent && (
-                        <p className="mt-2 rounded-lg bg-indigo-2 px-3 py-2 text-sm leading-relaxed text-indigo-11">
-                          <span className="font-semibold">Intent: </span>
-                          {indicator.qualIntent}
-                        </p>
-                      )}
-                      <ol className="mt-3 flex flex-col gap-2.5">
-                        {indicator.qualQuestions.map((q, i) => (
-                          <li
-                            key={i}
-                            className="flex gap-2.5 text-base leading-relaxed"
-                          >
-                            <span
-                              aria-hidden
-                              className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-slate-3 text-xs font-semibold tabular-nums text-slate-11"
-                            >
-                              {i + 1}
-                            </span>
-                            <span>{q}</span>
-                          </li>
-                        ))}
-                      </ol>
-                    </section>
+                    <QualSection indicator={indicator} />
                   )}
 
                 <section className="mt-7">

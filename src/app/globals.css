@@ -90,6 +90,9 @@
   --color-amber-10: var(--amber-10);
   --color-amber-11: var(--amber-11);
   --color-amber-12: var(--amber-12);
+  --color-red-3: var(--red-3);
+  --color-red-9: var(--red-9);
+  --color-red-11: var(--red-11);
 }
 
 /* Semantic tokens mapped to Radix scales. var() resolves at use time, so the
