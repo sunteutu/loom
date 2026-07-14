@@ -40,6 +40,7 @@ import {
 } from "@/lib/mapping";
 import {
   createLexicalEngine,
+  WEAK_MATCH_THRESHOLD,
   type LexicalEngine,
 } from "@/lib/mapping-lexical";
 import { createGuideFromMapping, type CoverageEntry } from "@/lib/guides";
@@ -74,6 +75,33 @@ const METHOD_UI = {
   quant: { label: "Quant", className: "bg-amber-3 text-amber-11" },
   mixt: { label: "Mixt", className: "bg-slate-3 text-slate-11" },
 } as const;
+
+/** Shared reassign flow: rescore inside the chosen indicator + teach v1. */
+function applyReassign(
+  docId: string,
+  question: { id: string; text: string },
+  indicatorId: string | null,
+  lexical: LexicalEngine,
+) {
+  let matches: { indicatorId: string; sourceIndex: number; score: number }[] = [];
+  if (indicatorId) {
+    matches = lexical
+      .scoreQuestionDetailed(question.text, new Set([indicatorId]))
+      .slice(0, 2);
+    if (matches.length === 0) {
+      matches = [{ indicatorId, sourceIndex: 0, score: 0 }];
+    }
+    learnExample(indicatorId, question.text);
+  }
+  reassignQuestion(docId, question.id, indicatorId, matches);
+}
+
+/** AI suggestion for one weak question (from the targeted v2 check). */
+interface AiSuggestion {
+  indicatorId: string;
+  confidence: number;
+  rationale?: string;
+}
 
 function catalogQuestionText(
   indicatorId: string,
@@ -124,6 +152,10 @@ function MappingWorkspace({ doc }: { doc: MappingDoc }) {
   const [displayLang, setDisplayLang] = useState<"ro" | "en">("ro");
   const [running, setRunning] = useState(false);
   const [apiError, setApiError] = useState<string | null>(null);
+  const [aiChecking, setAiChecking] = useState(false);
+  const [aiSuggestions, setAiSuggestions] = useState<
+    Record<string, AiSuggestion[]>
+  >({});
 
   // One lexical engine per workspace visit; also used for reassign rescoring.
   const lexical = useMemo<LexicalEngine>(
@@ -246,8 +278,54 @@ function MappingWorkspace({ doc }: { doc: MappingDoc }) {
   };
 
   const runMapping = () => {
+    setAiSuggestions({});
     if (engine === "v1") runV1();
     else void runV2();
+  };
+
+  /** Questions the engine is unsure about — the second-opinion targets. */
+  const weakQuestions = useMemo(
+    () =>
+      doc.questions.filter((q) => {
+        const a = assignmentByQuestion.get(q.id);
+        if (!a) return false;
+        return (
+          !a.indicatorId ||
+          (a.matches ?? []).length === 0 ||
+          a.confidence < WEAK_MATCH_THRESHOLD
+        );
+      }),
+    [doc.questions, assignmentByQuestion],
+  );
+
+  /** Targeted v2: send ONLY the weak questions to the LLM, as suggestions. */
+  const checkWeakWithAi = async () => {
+    setAiChecking(true);
+    setApiError(null);
+    try {
+      const res = await fetch("/api/map", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ questions: weakQuestions.map((q) => q.text) }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setApiError(data.error ?? `Eroare ${res.status}`);
+        return;
+      }
+      const next: Record<string, AiSuggestion[]> = {};
+      weakQuestions.forEach((q, i) => {
+        const candidates: AiSuggestion[] = (
+          data.results?.[i]?.candidates ?? []
+        ).slice(0, 2);
+        if (candidates.length > 0) next[q.id] = candidates;
+      });
+      setAiSuggestions(next);
+    } catch {
+      setApiError("Nu am putut contacta serverul — verifică conexiunea.");
+    } finally {
+      setAiChecking(false);
+    }
   };
 
   // ── Generation ───────────────────────────────────────────────────────────
@@ -538,6 +616,35 @@ function MappingWorkspace({ doc }: { doc: MappingDoc }) {
       {/* ── 3. Review board ──────────────────────────────────────────── */}
       {hasRun && (
         <div className="mt-6 flex flex-col gap-4">
+          {weakQuestions.length > 0 && (
+            <div className="flex flex-wrap items-center gap-2 rounded-xl border border-amber-9/40 bg-amber-2 px-4 py-2.5 dark:bg-card">
+              <p className="text-sm text-amber-11">
+                {weakQuestions.length}{" "}
+                {weakQuestions.length === 1
+                  ? "întrebare are potrivire slabă"
+                  : "întrebări au potrivire slabă"}{" "}
+                (&lt;{Math.round(WEAK_MATCH_THRESHOLD * 100)}%) — vezi
+                alternativele propuse sub fiecare.
+              </p>
+              <button
+                onClick={() => void checkWeakWithAi()}
+                disabled={aiChecking}
+                className="ml-auto inline-flex items-center gap-1.5 rounded-md border border-amber-9/40 px-2.5 py-1 text-xs font-medium text-amber-11 transition-colors hover:bg-amber-3 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {aiChecking ? (
+                  <>
+                    <Loader2 aria-hidden className="h-3.5 w-3.5 animate-spin" />
+                    Verific…
+                  </>
+                ) : (
+                  <>
+                    <Sparkles aria-hidden className="h-3.5 w-3.5" />
+                    Verifică cu AI ({weakQuestions.length})
+                  </>
+                )}
+              </button>
+            </div>
+          )}
           {groups.ordered.map((group) => (
             <IndicatorGroupCard
               key={group.indicatorId}
@@ -547,6 +654,7 @@ function MappingWorkspace({ doc }: { doc: MappingDoc }) {
               questionById={questionById}
               assignmentByQuestion={assignmentByQuestion}
               lexical={lexical}
+              aiSuggestions={aiSuggestions}
             />
           ))}
 
@@ -567,6 +675,7 @@ function MappingWorkspace({ doc }: { doc: MappingDoc }) {
                     question={questionById.get(qid)!}
                     assignment={assignmentByQuestion.get(qid)!}
                     lexical={lexical}
+                    aiSuggestions={aiSuggestions[qid]}
                   />
                 ))}
               </ul>
@@ -612,6 +721,7 @@ function IndicatorGroupCard({
   questionById,
   assignmentByQuestion,
   lexical,
+  aiSuggestions,
 }: {
   doc: MappingDoc;
   group: {
@@ -623,6 +733,7 @@ function IndicatorGroupCard({
   questionById: Map<string, { id: string; text: string }>;
   assignmentByQuestion: Map<string, QuestionAssignment>;
   lexical: LexicalEngine;
+  aiSuggestions: Record<string, AiSuggestion[]>;
 }) {
   const [showRest, setShowRest] = useState(false);
   const ind = INDICATOR_BY_ID.get(group.indicatorId);
@@ -771,6 +882,7 @@ function IndicatorGroupCard({
               question={questionById.get(qid)!}
               assignment={assignmentByQuestion.get(qid)!}
               lexical={lexical}
+              aiSuggestions={aiSuggestions[qid]}
             />
           ))}
         </ul>
@@ -786,13 +898,39 @@ function StakeholderQuestionRow({
   question,
   assignment,
   lexical,
+  aiSuggestions,
 }: {
   docId: string;
   question: { id: string; text: string };
   assignment: QuestionAssignment;
   lexical: LexicalEngine;
+  aiSuggestions?: AiSuggestion[];
 }) {
   const confidence = Math.round(assignment.confidence * 100);
+  const isWeak =
+    !assignment.indicatorId ||
+    (assignment.matches ?? []).length === 0 ||
+    assignment.confidence < WEAK_MATCH_THRESHOLD;
+
+  // Second opinion: only computed for weak rows, and only alternatives to
+  // the current theme (cross-searches qual questions + survey stems + context).
+  const alternatives = useMemo(
+    () =>
+      isWeak
+        ? lexical
+            .suggestAlternatives(
+              question.text,
+              assignment.indicatorId ?? undefined,
+            )
+            .filter((s) => s.indicatorId !== assignment.indicatorId)
+        : [],
+    [isWeak, lexical, question.text, assignment.indicatorId],
+  );
+
+  const aiChips = (aiSuggestions ?? []).filter(
+    (s) => s.indicatorId !== assignment.indicatorId,
+  );
+
   return (
     <li className="flex items-start gap-2.5">
       <div className="min-w-0 flex-1">
@@ -801,6 +939,47 @@ function StakeholderQuestionRow({
           <p className="mt-0.5 text-xs text-muted-foreground">
             {assignment.rationale}
           </p>
+        )}
+        {isWeak && (alternatives.length > 0 || aiChips.length > 0) && (
+          <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
+            <span className="text-xs text-muted-foreground">
+              Poate se potrivește mai bine:
+            </span>
+            {aiChips.map((s) => (
+              <button
+                key={`ai-${s.indicatorId}`}
+                onClick={() =>
+                  applyReassign(docId, question, s.indicatorId, lexical)
+                }
+                title={s.rationale ?? "Sugestie AI"}
+                className="inline-flex items-center gap-1 rounded-full bg-indigo-3 px-2 py-0.5 text-xs font-medium text-indigo-11 transition-colors hover:bg-indigo-4"
+              >
+                <Sparkles aria-hidden className="h-3 w-3" />
+                {INDICATOR_BY_ID.get(s.indicatorId)?.name ?? s.indicatorId} ·{" "}
+                {Math.round(s.confidence * 100)}%
+              </button>
+            ))}
+            {alternatives.map((s) => (
+              <button
+                key={s.indicatorId}
+                onClick={() =>
+                  applyReassign(docId, question, s.indicatorId, lexical)
+                }
+                title={
+                  s.via === "survey"
+                    ? "Seamănă cu itemul de chestionar al acestui indicator (temă mai degrabă quant)"
+                    : s.via === "context"
+                      ? "Potrivire pe tema indicatorului"
+                      : "Potrivire pe întrebările de interviu"
+                }
+                className="rounded-full border border-border bg-slate-2 px-2 py-0.5 text-xs font-medium text-slate-11 transition-colors hover:border-ring hover:text-foreground"
+              >
+                {INDICATOR_BY_ID.get(s.indicatorId)?.name ?? s.indicatorId} ·{" "}
+                {Math.round(s.score * 100)}%
+                {s.via === "survey" && " ⧉"}
+              </button>
+            ))}
+          </div>
         )}
       </div>
       {assignment.indicatorId && (
@@ -848,22 +1027,9 @@ function ReassignSelect({
     <select
       aria-label="Mută întrebarea la alt indicator"
       value={assignment.indicatorId ?? ""}
-      onChange={(e) => {
-        const indicatorId = e.target.value || null;
-        let matches: { indicatorId: string; sourceIndex: number; score: number }[] = [];
-        if (indicatorId) {
-          // Rescore the catalog questions WITHIN the chosen indicator.
-          matches = lexical
-            .scoreQuestionDetailed(question.text, new Set([indicatorId]))
-            .slice(0, 2);
-          if (matches.length === 0) {
-            matches = [{ indicatorId, sourceIndex: 0, score: 0 }];
-          }
-          // Manual correction → teach v1 for next time.
-          learnExample(indicatorId, question.text);
-        }
-        reassignQuestion(docId, question.id, indicatorId, matches);
-      }}
+      onChange={(e) =>
+        applyReassign(docId, question, e.target.value || null, lexical)
+      }
       className="mt-0.5 h-7 w-32 shrink-0 rounded-md border border-input bg-background px-1 text-xs outline-none transition-colors focus:border-ring"
     >
       <option value="">— nemapată —</option>

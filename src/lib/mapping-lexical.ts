@@ -35,6 +35,16 @@ export const QUESTION_THRESHOLD = 0.25;
 /** Rescue floor: a clear theme with no strong single question still maps
  *  to that theme's best question (shown with a low, amber percentage). */
 export const FALLBACK_THRESHOLD = 0.15;
+/** Under this, a mapping is "weak" — the UI actively proposes alternatives. */
+export const WEAK_MATCH_THRESHOLD = 0.3;
+
+/** An alternative theme proposal for a weakly-mapped question. */
+export interface AlternativeSuggestion {
+  indicatorId: string;
+  score: number;
+  /** Which signal found it: qual questions, survey stems, or indicator context. */
+  via: "qual" | "survey" | "context";
+}
 export const TOP_CANDIDATES = 5;
 /** Max catalog questions one stakeholder question can pull in. */
 export const MAX_MATCHES_PER_QUESTION = 3;
@@ -205,6 +215,12 @@ export interface LexicalEngine {
     text: string,
     indicatorIds: Set<string>,
   ): QuestionMatch[];
+  /** Second opinion for weak mappings: cross-searches qual questions,
+   *  survey stems AND indicator context for a better / missed theme. */
+  suggestAlternatives(
+    text: string,
+    excludeIndicatorId?: string,
+  ): AlternativeSuggestion[];
 }
 
 /**
@@ -381,6 +397,37 @@ export function createLexicalEngine(
 
     scoreSurveyWithinIndicators(text, indicatorIds) {
       return detailed(text, surveyCorpus, surveyIdf, indicatorIds);
+    },
+
+    suggestAlternatives(text, excludeIndicatorId) {
+      const best = new Map<string, AlternativeSuggestion>();
+      const consider = (
+        indicatorId: string,
+        score: number,
+        via: AlternativeSuggestion["via"],
+      ) => {
+        if (indicatorId === excludeIndicatorId || score < 0.2) return;
+        const existing = best.get(indicatorId);
+        if (!existing || score > existing.score) {
+          best.set(indicatorId, { indicatorId, score, via });
+        }
+      };
+      // Business phrasing often sits closer to survey stems than to the
+      // moderator-voice qual questions — search all three signals.
+      for (const m of detailed(text, questionCorpus, questionIdf)) {
+        consider(m.indicatorId, m.score, "qual");
+      }
+      for (const m of detailed(text, surveyCorpus, surveyIdf)) {
+        consider(m.indicatorId, m.score, "survey");
+      }
+      const contexts = scoreAllIndicators([...new Set(tokenize(text))]);
+      for (const [indicatorId, score] of contexts) {
+        // Context alone is a weaker signal — discount it slightly.
+        consider(indicatorId, score * 0.85, "context");
+      }
+      return [...best.values()]
+        .sort((a, b) => b.score - a.score)
+        .slice(0, 3);
     },
   };
 }
