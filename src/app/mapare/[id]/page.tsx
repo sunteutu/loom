@@ -5,6 +5,8 @@ import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import {
   ArrowLeft,
+  ChevronDown,
+  ChevronRight,
   ClipboardList,
   Loader2,
   NotebookPen,
@@ -16,29 +18,37 @@ import {
   INDICATORS,
   type Indicator,
 } from "@/lib/indicators";
+import { INDICATOR_QUAL_RO } from "@/lib/indicators-ro";
 import {
+  deriveSelections,
   learnExample,
   MAX_QUESTIONS,
   parseQuestions,
   reassignQuestion,
   removeQuestion,
   renameMapping,
+  selectionKey,
   setAssignments,
   setQuestions,
+  setSelectionOverride,
   readLearnedExamples,
   useMappingStore,
   type MappingDoc,
   type MappingEngine,
   type QuestionAssignment,
+  type Selection,
 } from "@/lib/mapping";
 import {
   createLexicalEngine,
-  MAPPING_THRESHOLD,
+  type LexicalEngine,
 } from "@/lib/mapping-lexical";
 import { createGuideFromMapping, type CoverageEntry } from "@/lib/guides";
 import { createSurveyFromMapping } from "@/lib/surveys";
 
 const INDICATOR_BY_ID = new Map(INDICATORS.map((ind) => [ind.id, ind]));
+
+/** Minimum stem match for a survey item to be selected at generation. */
+const SURVEY_SELECT_FLOOR = 0.18;
 
 // ── Method suggestion heuristic ────────────────────────────────────────────
 
@@ -64,6 +74,21 @@ const METHOD_UI = {
   quant: { label: "Quant", className: "bg-amber-3 text-amber-11" },
   mixt: { label: "Mixt", className: "bg-slate-3 text-slate-11" },
 } as const;
+
+function catalogQuestionText(
+  indicatorId: string,
+  sourceIndex: number,
+  lang: "ro" | "en",
+): string {
+  if (lang === "ro") {
+    const ro = INDICATOR_QUAL_RO[indicatorId]?.qualQuestions[sourceIndex];
+    if (ro) return ro;
+  }
+  return (
+    INDICATOR_BY_ID.get(indicatorId)?.qualQuestions?.[sourceIndex] ??
+    `${indicatorId}[${sourceIndex}]`
+  );
+}
 
 // ── Page ───────────────────────────────────────────────────────────────────
 
@@ -96,8 +121,15 @@ function MappingWorkspace({ doc }: { doc: MappingDoc }) {
   const [pasteText, setPasteText] = useState("");
   const [showPaste, setShowPaste] = useState(doc.questions.length === 0);
   const [engine, setEngine] = useState<MappingEngine>("v1");
+  const [displayLang, setDisplayLang] = useState<"ro" | "en">("ro");
   const [running, setRunning] = useState(false);
   const [apiError, setApiError] = useState<string | null>(null);
+
+  // One lexical engine per workspace visit; also used for reassign rescoring.
+  const lexical = useMemo<LexicalEngine>(
+    () => createLexicalEngine(readLearnedExamples()),
+    [],
+  );
 
   const assignmentByQuestion = useMemo(() => {
     const map = new Map<string, QuestionAssignment>();
@@ -105,27 +137,36 @@ function MappingWorkspace({ doc }: { doc: MappingDoc }) {
     return map;
   }, [doc.assignments]);
 
-  /** Groups: indicatorId → questionIds, plus the unmapped bucket. */
+  const selections = useMemo(() => deriveSelections(doc), [doc]);
+
+  /** Groups: indicator → its selections + the stakeholder questions covered. */
   const groups = useMemo(() => {
-    const byIndicator = new Map<string, string[]>();
-    const unmapped: string[] = [];
-    for (const q of doc.questions) {
-      const a = assignmentByQuestion.get(q.id);
-      if (!a) continue; // not yet mapped at all — handled separately
-      if (a.indicatorId) {
-        byIndicator.set(a.indicatorId, [
-          ...(byIndicator.get(a.indicatorId) ?? []),
-          q.id,
-        ]);
-      } else {
-        unmapped.push(q.id);
-      }
+    const byIndicator = new Map<string, Selection[]>();
+    for (const sel of selections) {
+      byIndicator.set(sel.indicatorId, [
+        ...(byIndicator.get(sel.indicatorId) ?? []),
+        sel,
+      ]);
     }
-    const ordered = [...byIndicator.entries()].sort(
-      (a, b) => b[1].length - a[1].length,
-    );
+    const ordered = [...byIndicator.entries()]
+      .map(([indicatorId, sels]) => {
+        const covered = new Set<string>();
+        for (const s of sels) for (const q of s.coveredQuestionIds) covered.add(q);
+        return {
+          indicatorId,
+          selections: sels.sort((a, b) => a.sourceIndex - b.sourceIndex),
+          coveredQuestionIds: covered,
+        };
+      })
+      .sort((a, b) => b.coveredQuestionIds.size - a.coveredQuestionIds.size);
+    const unmapped = doc.questions
+      .filter((q) => {
+        const a = assignmentByQuestion.get(q.id);
+        return a && (!a.indicatorId || (a.matches ?? []).length === 0);
+      })
+      .map((q) => q.id);
     return { ordered, unmapped };
-  }, [doc.questions, assignmentByQuestion]);
+  }, [selections, doc.questions, assignmentByQuestion]);
 
   const hasRun = doc.assignments.length > 0;
   const questionById = new Map(doc.questions.map((q) => [q.id, q]));
@@ -133,22 +174,17 @@ function MappingWorkspace({ doc }: { doc: MappingDoc }) {
   // ── Engines ──────────────────────────────────────────────────────────────
 
   const runV1 = () => {
-    const lexical = createLexicalEngine(readLearnedExamples());
-    const assignments: QuestionAssignment[] = doc.questions.map((q) => {
-      const candidates = lexical.scoreQuestion(q.text);
-      const winner =
-        candidates[0] && candidates[0].score >= MAPPING_THRESHOLD
-          ? candidates[0]
-          : null;
+    const perQuestion = lexical.mapQuestionsDetailed(
+      doc.questions.map((q) => q.text),
+    );
+    const assignments: QuestionAssignment[] = doc.questions.map((q, i) => {
+      const matches = perQuestion[i];
       return {
         questionId: q.id,
-        indicatorId: winner?.indicatorId ?? null,
-        confidence: winner?.score ?? candidates[0]?.score ?? 0,
+        indicatorId: matches[0]?.indicatorId ?? null,
+        confidence: matches[0]?.score ?? 0,
         engine: "v1",
-        alternatives: candidates.map((c) => ({
-          indicatorId: c.indicatorId,
-          confidence: c.score,
-        })),
+        matches,
         status: "suggested",
       };
     });
@@ -169,23 +205,35 @@ function MappingWorkspace({ doc }: { doc: MappingDoc }) {
         setApiError(data.error ?? `Eroare ${res.status}`);
         return;
       }
+      // Hybrid: the LLM picks the indicators; the local scorer selects the
+      // specific catalog questions inside them.
       const assignments: QuestionAssignment[] = doc.questions.map((q, i) => {
         const candidates: {
           indicatorId: string;
           confidence: number;
           rationale?: string;
         }[] = data.results?.[i]?.candidates ?? [];
-        const winner = candidates[0] ?? null;
+        const restrict = new Set(candidates.map((c) => c.indicatorId));
+        const matches =
+          restrict.size > 0
+            ? lexical.scoreQuestionDetailed(q.text, restrict).slice(0, 3)
+            : [];
+        // Guarantee at least the LLM winner's best question survives even
+        // when the local scorer is unsure.
+        if (matches.length === 0 && candidates[0]) {
+          matches.push({
+            indicatorId: candidates[0].indicatorId,
+            sourceIndex: 0,
+            score: candidates[0].confidence,
+          });
+        }
         return {
           questionId: q.id,
-          indicatorId: winner?.indicatorId ?? null,
-          confidence: winner?.confidence ?? 0,
+          indicatorId: candidates[0]?.indicatorId ?? null,
+          confidence: candidates[0]?.confidence ?? 0,
           engine: "v2",
-          rationale: winner?.rationale,
-          alternatives: candidates.map((c) => ({
-            indicatorId: c.indicatorId,
-            confidence: c.confidence,
-          })),
+          rationale: candidates[0]?.rationale,
+          matches,
           status: "suggested",
         };
       });
@@ -205,22 +253,22 @@ function MappingWorkspace({ doc }: { doc: MappingDoc }) {
   // ── Generation ───────────────────────────────────────────────────────────
 
   const buildCoverage = (): CoverageEntry[] =>
-    groups.ordered.map(([indicatorId, qids]) => ({
-      indicatorId,
-      questions: qids
+    groups.ordered.map((g) => ({
+      indicatorId: g.indicatorId,
+      questions: [...g.coveredQuestionIds]
         .map((qid) => questionById.get(qid)?.text)
         .filter((t): t is string => !!t),
     }));
 
   const generateGuide = () => {
-    const entries = groups.ordered.flatMap(([indicatorId]) => {
-      const ind = INDICATOR_BY_ID.get(indicatorId);
-      return (ind?.qualQuestions ?? []).map((text, sourceIndex) => ({
-        text,
-        indicatorId,
-        sourceIndex,
-      }));
-    });
+    // Only the SELECTED catalog questions — not the indicator's full battery.
+    const entries = groups.ordered.flatMap((g) =>
+      g.selections.map((sel) => ({
+        text: catalogQuestionText(sel.indicatorId, sel.sourceIndex, "en"),
+        indicatorId: sel.indicatorId,
+        sourceIndex: sel.sourceIndex,
+      })),
+    );
     const guide = createGuideFromMapping(
       `Ghid — ${doc.title}`,
       entries,
@@ -230,11 +278,27 @@ function MappingWorkspace({ doc }: { doc: MappingDoc }) {
   };
 
   const generateSurvey = () => {
-    const entries = groups.ordered.flatMap(([indicatorId]) => {
-      const ind = INDICATOR_BY_ID.get(indicatorId);
-      return (ind?.surveyItems ?? []).map((item, sourceIndex) => ({
-        stem: item.stem,
-        indicatorId,
+    // Per theme: keep the survey items whose stems match any covered
+    // stakeholder question; if none clears the floor, take the whole
+    // indicator (a theme must not arrive empty in the questionnaire).
+    const entries = groups.ordered.flatMap((g) => {
+      const ind = INDICATOR_BY_ID.get(g.indicatorId);
+      const all = ind?.surveyItems ?? [];
+      if (all.length === 0) return [];
+      const restrict = new Set([g.indicatorId]);
+      const picked = new Set<number>();
+      for (const qid of g.coveredQuestionIds) {
+        const text = questionById.get(qid)?.text;
+        if (!text) continue;
+        for (const m of lexical.scoreSurveyWithinIndicators(text, restrict)) {
+          if (m.score >= SURVEY_SELECT_FLOOR) picked.add(m.sourceIndex);
+        }
+      }
+      const indices =
+        picked.size > 0 ? [...picked].sort((a, b) => a - b) : all.map((_, i) => i);
+      return indices.map((sourceIndex) => ({
+        stem: all[sourceIndex].stem,
+        indicatorId: g.indicatorId,
         sourceIndex,
       }));
     });
@@ -245,6 +309,11 @@ function MappingWorkspace({ doc }: { doc: MappingDoc }) {
     );
     router.push(`/chestionare/${survey.id}`);
   };
+
+  const selectedCount = groups.ordered.reduce(
+    (n, g) => n + g.selections.length,
+    0,
+  );
 
   // ── UI ───────────────────────────────────────────────────────────────────
 
@@ -258,6 +327,29 @@ function MappingWorkspace({ doc }: { doc: MappingDoc }) {
           <ArrowLeft aria-hidden className="h-4 w-4" />
           Mapare
         </Link>
+        {hasRun && (
+          <div
+            role="radiogroup"
+            aria-label="Limba întrebărilor de ghid afișate"
+            className="flex items-center gap-0.5 rounded-md border border-border p-0.5"
+          >
+            {(["ro", "en"] as const).map((l) => (
+              <button
+                key={l}
+                role="radio"
+                aria-checked={displayLang === l}
+                onClick={() => setDisplayLang(l)}
+                className={`rounded px-2 py-1 text-xs font-semibold uppercase transition-colors ${
+                  displayLang === l
+                    ? "bg-indigo-9 text-white"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                {l}
+              </button>
+            ))}
+          </div>
+        )}
       </div>
 
       <input
@@ -267,19 +359,22 @@ function MappingWorkspace({ doc }: { doc: MappingDoc }) {
         className="mt-3 w-full rounded-md border border-transparent bg-transparent text-2xl font-semibold tracking-tight outline-none transition-colors hover:border-border focus:border-ring"
       />
       <p className="mt-1 text-sm text-muted-foreground">
-        {doc.questions.length}/{MAX_QUESTIONS} întrebări
+        {doc.questions.length}/{MAX_QUESTIONS} întrebări stakeholderi
         {hasRun && (
           <>
             {" "}
             · {groups.ordered.length} teme ·{" "}
-            {groups.unmapped.length > 0 ? (
-              <span className="font-medium text-amber-11">
-                {groups.unmapped.length} nemapate
-              </span>
-            ) : (
-              <span className="font-medium text-foreground">
-                toate mapate
-              </span>
+            <span className="font-medium text-foreground">
+              {selectedCount} întrebări de ghid selectate
+            </span>
+            {groups.unmapped.length > 0 && (
+              <>
+                {" "}
+                ·{" "}
+                <span className="font-medium text-amber-11">
+                  {groups.unmapped.length} nemapate
+                </span>
+              </>
             )}
           </>
         )}
@@ -349,7 +444,6 @@ function MappingWorkspace({ doc }: { doc: MappingDoc }) {
                   aria-label={`Întrebarea ${i + 1}`}
                   value={q.text}
                   onChange={(e) =>
-                    // Editing re-parses assignments away; fine pre-run.
                     setQuestions(
                       doc.id,
                       doc.questions.map((x) =>
@@ -390,7 +484,8 @@ function MappingWorkspace({ doc }: { doc: MappingDoc }) {
                 {
                   value: "v2",
                   label: "v2 — AI (OpenRouter)",
-                  title: "LLM prin OpenRouter — mai fin, dar trimite întrebările prin server",
+                  title:
+                    "LLM prin OpenRouter — mai fin, dar trimite întrebările prin server",
                 },
               ] as const
             ).map((opt) => (
@@ -443,47 +538,17 @@ function MappingWorkspace({ doc }: { doc: MappingDoc }) {
       {/* ── 3. Review board ──────────────────────────────────────────── */}
       {hasRun && (
         <div className="mt-6 flex flex-col gap-4">
-          {groups.ordered.map(([indicatorId, qids]) => {
-            const ind = INDICATOR_BY_ID.get(indicatorId);
-            if (!ind) return null;
-            const texts = qids
-              .map((qid) => questionById.get(qid)?.text ?? "")
-              .filter(Boolean);
-            const method = METHOD_UI[suggestMethod(texts)];
-            return (
-              <section
-                key={indicatorId}
-                className="rounded-xl border border-border bg-card p-4"
-              >
-                <div className="flex flex-wrap items-baseline gap-2">
-                  <h2 className="text-base font-semibold">{ind.name}</h2>
-                  <span className="text-xs text-muted-foreground">
-                    {ind.category}
-                  </span>
-                  <span
-                    className={`rounded-full px-2 py-0.5 text-xs font-medium ${method.className}`}
-                    title="Metoda sugerată pe baza formulării întrebărilor"
-                  >
-                    {method.label}
-                  </span>
-                  <span className="ml-auto text-xs tabular-nums text-slate-10">
-                    {qids.length}{" "}
-                    {qids.length === 1 ? "întrebare" : "întrebări"}
-                  </span>
-                </div>
-                <ul className="mt-3 flex flex-col gap-2">
-                  {qids.map((qid) => (
-                    <QuestionRow
-                      key={qid}
-                      docId={doc.id}
-                      question={questionById.get(qid)!}
-                      assignment={assignmentByQuestion.get(qid)!}
-                    />
-                  ))}
-                </ul>
-              </section>
-            );
-          })}
+          {groups.ordered.map((group) => (
+            <IndicatorGroupCard
+              key={group.indicatorId}
+              doc={doc}
+              group={group}
+              displayLang={displayLang}
+              questionById={questionById}
+              assignmentByQuestion={assignmentByQuestion}
+              lexical={lexical}
+            />
+          ))}
 
           {groups.unmapped.length > 0 && (
             <section className="rounded-xl border border-dashed border-amber-9/40 bg-card p-4">
@@ -491,16 +556,17 @@ function MappingWorkspace({ doc }: { doc: MappingDoc }) {
                 Nemapate
               </h2>
               <p className="mt-0.5 text-xs text-muted-foreground">
-                Sub pragul de încredere — atribuie-le manual sau lasă-le pe
-                dinafară.
+                Sub pragul de încredere — atribuie-le manual unui indicator sau
+                lasă-le pe dinafară.
               </p>
               <ul className="mt-3 flex flex-col gap-2">
                 {groups.unmapped.map((qid) => (
-                  <QuestionRow
+                  <StakeholderQuestionRow
                     key={qid}
                     docId={doc.id}
                     question={questionById.get(qid)!}
                     assignment={assignmentByQuestion.get(qid)!}
+                    lexical={lexical}
                   />
                 ))}
               </ul>
@@ -510,11 +576,11 @@ function MappingWorkspace({ doc }: { doc: MappingDoc }) {
       )}
 
       {/* ── 4. Generate ──────────────────────────────────────────────── */}
-      {hasRun && groups.ordered.length > 0 && (
+      {hasRun && selectedCount > 0 && (
         <div className="fixed inset-x-0 bottom-0 z-20 border-t border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
           <div className="mx-auto flex w-full max-w-3xl flex-wrap items-center gap-3 px-8 py-3">
             <span className="text-sm text-muted-foreground">
-              {groups.ordered.length} teme confirmate →
+              {selectedCount} întrebări din {groups.ordered.length} teme →
             </span>
             <button
               onClick={generateGuide}
@@ -537,22 +603,200 @@ function MappingWorkspace({ doc }: { doc: MappingDoc }) {
   );
 }
 
-// ── Question row (inside a group card) ─────────────────────────────────────
+// ── Indicator group card ───────────────────────────────────────────────────
 
-function QuestionRow({
+function IndicatorGroupCard({
+  doc,
+  group,
+  displayLang,
+  questionById,
+  assignmentByQuestion,
+  lexical,
+}: {
+  doc: MappingDoc;
+  group: {
+    indicatorId: string;
+    selections: Selection[];
+    coveredQuestionIds: Set<string>;
+  };
+  displayLang: "ro" | "en";
+  questionById: Map<string, { id: string; text: string }>;
+  assignmentByQuestion: Map<string, QuestionAssignment>;
+  lexical: LexicalEngine;
+}) {
+  const [showRest, setShowRest] = useState(false);
+  const ind = INDICATOR_BY_ID.get(group.indicatorId);
+  if (!ind) return null;
+
+  const coveredTexts = [...group.coveredQuestionIds]
+    .map((qid) => questionById.get(qid)?.text ?? "")
+    .filter(Boolean);
+  const method = METHOD_UI[suggestMethod(coveredTexts)];
+
+  const selectedIndices = new Set(group.selections.map((s) => s.sourceIndex));
+  const rest = (ind.qualQuestions ?? [])
+    .map((_, i) => i)
+    .filter((i) => !selectedIndices.has(i));
+
+  /** Short labels "Q3, Q7" for the stakeholder questions a selection covers. */
+  const shortLabel = (qid: string) => {
+    const idx = [...questionById.keys()].indexOf(qid);
+    return idx === -1 ? "?" : `Q${idx + 1}`;
+  };
+
+  return (
+    <section className="rounded-xl border border-border bg-card p-4">
+      <div className="flex flex-wrap items-baseline gap-2">
+        <h2 className="text-base font-semibold">{ind.name}</h2>
+        <span className="text-xs text-muted-foreground">{ind.category}</span>
+        <span
+          className={`rounded-full px-2 py-0.5 text-xs font-medium ${method.className}`}
+          title="Metoda sugerată pe baza formulării întrebărilor"
+        >
+          {method.label}
+        </span>
+        <span className="ml-auto text-xs tabular-nums text-slate-10">
+          {group.selections.length} selectate ·{" "}
+          {group.coveredQuestionIds.size} întrebări acoperite
+        </span>
+      </div>
+
+      {/* Selected catalog questions, with match % and coverage chips. */}
+      <ul className="mt-3 flex flex-col gap-2">
+        {group.selections.map((sel) => {
+          const key = selectionKey(sel.indicatorId, sel.sourceIndex);
+          const pct = Math.round(sel.matchScore * 100);
+          return (
+            <li
+              key={key}
+              className="flex items-start gap-2.5 rounded-lg border border-border bg-background p-2.5"
+            >
+              <input
+                type="checkbox"
+                checked
+                onChange={() => setSelectionOverride(doc.id, key, false)}
+                aria-label="Scoate întrebarea din selecție"
+                className="mt-1 h-4 w-4 shrink-0 accent-indigo-9"
+              />
+              <div className="min-w-0 flex-1">
+                <p className="text-sm leading-relaxed">
+                  {catalogQuestionText(
+                    sel.indicatorId,
+                    sel.sourceIndex,
+                    displayLang,
+                  )}
+                </p>
+                {sel.coveredQuestionIds.length > 0 && (
+                  <p className="mt-0.5 text-xs text-muted-foreground">
+                    acoperă:{" "}
+                    {sel.coveredQuestionIds.map((qid, i) => (
+                      <span
+                        key={qid}
+                        title={questionById.get(qid)?.text}
+                        className="font-medium text-slate-11"
+                      >
+                        {i > 0 && ", "}
+                        {shortLabel(qid)}
+                      </span>
+                    ))}
+                  </p>
+                )}
+              </div>
+              <span
+                className={`mt-0.5 shrink-0 rounded-full px-1.5 py-0.5 text-xs font-semibold tabular-nums ${
+                  pct >= 50
+                    ? "bg-indigo-3 text-indigo-11"
+                    : pct > 0
+                      ? "bg-amber-3 text-amber-11"
+                      : "bg-slate-3 text-slate-11"
+                }`}
+                title={pct > 0 ? `Potrivire ${pct}%` : "Adăugată manual"}
+              >
+                {pct > 0 ? `${pct}%` : "manual"}
+              </span>
+            </li>
+          );
+        })}
+      </ul>
+
+      {/* The indicator's remaining questions — addable manually. */}
+      {rest.length > 0 && (
+        <div className="mt-2">
+          <button
+            onClick={() => setShowRest((s) => !s)}
+            className="inline-flex items-center gap-1 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
+          >
+            {showRest ? (
+              <ChevronDown aria-hidden className="h-3.5 w-3.5" />
+            ) : (
+              <ChevronRight aria-hidden className="h-3.5 w-3.5" />
+            )}
+            alte {rest.length} întrebări din acest indicator
+          </button>
+          {showRest && (
+            <ul className="mt-2 flex flex-col gap-1.5">
+              {rest.map((sourceIndex) => {
+                const key = selectionKey(group.indicatorId, sourceIndex);
+                return (
+                  <li key={key} className="flex items-start gap-2.5 px-2.5">
+                    <input
+                      type="checkbox"
+                      checked={false}
+                      onChange={() => setSelectionOverride(doc.id, key, true)}
+                      aria-label="Adaugă întrebarea în selecție"
+                      className="mt-1 h-4 w-4 shrink-0 accent-indigo-9"
+                    />
+                    <p className="text-sm leading-relaxed text-muted-foreground">
+                      {catalogQuestionText(
+                        group.indicatorId,
+                        sourceIndex,
+                        displayLang,
+                      )}
+                    </p>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+        </div>
+      )}
+
+      {/* The stakeholder questions under this theme, with reassign. */}
+      <div className="mt-3 border-t border-border pt-3">
+        <ul className="flex flex-col gap-2">
+          {[...group.coveredQuestionIds].map((qid) => (
+            <StakeholderQuestionRow
+              key={qid}
+              docId={doc.id}
+              question={questionById.get(qid)!}
+              assignment={assignmentByQuestion.get(qid)!}
+              lexical={lexical}
+            />
+          ))}
+        </ul>
+      </div>
+    </section>
+  );
+}
+
+// ── Stakeholder question row ───────────────────────────────────────────────
+
+function StakeholderQuestionRow({
   docId,
   question,
   assignment,
+  lexical,
 }: {
   docId: string;
   question: { id: string; text: string };
   assignment: QuestionAssignment;
+  lexical: LexicalEngine;
 }) {
   const confidence = Math.round(assignment.confidence * 100);
   return (
-    <li className="flex items-start gap-2.5 rounded-lg border border-border bg-background p-2.5">
+    <li className="flex items-start gap-2.5">
       <div className="min-w-0 flex-1">
-        <p className="text-sm leading-relaxed">{question.text}</p>
+        <p className="text-sm leading-relaxed text-slate-11">{question.text}</p>
         {assignment.rationale && (
           <p className="mt-0.5 text-xs text-muted-foreground">
             {assignment.rationale}
@@ -571,7 +815,12 @@ function QuestionRow({
           {confidence}%
         </span>
       )}
-      <ReassignSelect docId={docId} question={question} assignment={assignment} />
+      <ReassignSelect
+        docId={docId}
+        question={question}
+        assignment={assignment}
+        lexical={lexical}
+      />
     </li>
   );
 }
@@ -581,10 +830,12 @@ function ReassignSelect({
   docId,
   question,
   assignment,
+  lexical,
 }: {
   docId: string;
   question: { id: string; text: string };
   assignment: QuestionAssignment;
+  lexical: LexicalEngine;
 }) {
   const byCategory = useMemo(() => {
     const map = new Map<string, Indicator[]>();
@@ -599,9 +850,19 @@ function ReassignSelect({
       value={assignment.indicatorId ?? ""}
       onChange={(e) => {
         const indicatorId = e.target.value || null;
-        reassignQuestion(docId, question.id, indicatorId);
-        // Manual correction → teach v1 for next time.
-        if (indicatorId) learnExample(indicatorId, question.text);
+        let matches: { indicatorId: string; sourceIndex: number; score: number }[] = [];
+        if (indicatorId) {
+          // Rescore the catalog questions WITHIN the chosen indicator.
+          matches = lexical
+            .scoreQuestionDetailed(question.text, new Set([indicatorId]))
+            .slice(0, 2);
+          if (matches.length === 0) {
+            matches = [{ indicatorId, sourceIndex: 0, score: 0 }];
+          }
+          // Manual correction → teach v1 for next time.
+          learnExample(indicatorId, question.text);
+        }
+        reassignQuestion(docId, question.id, indicatorId, matches);
       }}
       className="mt-0.5 h-7 w-32 shrink-0 rounded-md border border-input bg-background px-1 text-xs outline-none transition-colors focus:border-ring"
     >

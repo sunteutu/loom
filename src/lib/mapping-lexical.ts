@@ -32,6 +32,9 @@ export interface QuestionMatch {
 export const MAPPING_THRESHOLD = 0.25;
 /** Below this, a catalog question is not selected for a stakeholder question. */
 export const QUESTION_THRESHOLD = 0.25;
+/** Rescue floor: a clear theme with no strong single question still maps
+ *  to that theme's best question (shown with a low, amber percentage). */
+export const FALLBACK_THRESHOLD = 0.15;
 export const TOP_CANDIDATES = 5;
 /** Max catalog questions one stakeholder question can pull in. */
 export const MAX_MATCHES_PER_QUESTION = 3;
@@ -186,7 +189,22 @@ function buildQuestionIdf(docs: QuestionDoc[]): Map<string, number> {
 // ── Scoring ────────────────────────────────────────────────────────────────
 
 export interface LexicalEngine {
+  /** Indicator-level candidates (top 5). */
   scoreQuestion(text: string): MappingCandidate[];
+  /** Catalog-question-level matches for one stakeholder question,
+   *  optionally restricted to a set of indicator ids. */
+  scoreQuestionDetailed(
+    text: string,
+    restrictTo?: Set<string>,
+  ): QuestionMatch[];
+  /** Full run over the brief: detailed matches per question with the
+   *  corpus prior applied (questions analyzed together, not in isolation). */
+  mapQuestionsDetailed(texts: string[]): QuestionMatch[][];
+  /** Survey-item (stem) matches, restricted to a set of indicators. */
+  scoreSurveyWithinIndicators(
+    text: string,
+    indicatorIds: Set<string>,
+  ): QuestionMatch[];
 }
 
 /**
@@ -200,51 +218,169 @@ export function createLexicalEngine(
   const idf = buildIdf(corpus);
   // For prefix matching we need the token lists, not just the maps.
   const docTokens = corpus.map((doc) => [...doc.weights.entries()]);
+  const questionCorpus = buildQuestionCorpus();
+  const questionIdf = buildQuestionIdf(questionCorpus);
+  const surveyCorpus = buildSurveyCorpus();
+  const surveyIdf = buildQuestionIdf(surveyCorpus);
+
+  /** Indicator-level normalized scores (0–1) for every indicator. */
+  function scoreAllIndicators(queryTokens: string[]): Map<string, number> {
+    const result = new Map<string, number>();
+    if (queryTokens.length === 0) return result;
+    const raws = corpus.map((doc, di) => {
+      let score = 0;
+      for (const qt of queryTokens) {
+        // Exact hit first (cheap); fall back to prefix scan.
+        let weight = doc.weights.get(qt);
+        let matchedToken = qt;
+        if (weight === undefined) {
+          for (const [dt, w] of docTokens[di]) {
+            if (tokensMatch(qt, dt) && (weight === undefined || w > weight)) {
+              weight = w;
+              matchedToken = dt;
+            }
+          }
+        }
+        if (weight !== undefined) score += weight * (idf.get(matchedToken) ?? 1);
+      }
+      return score;
+    });
+    // Normalize by a query-length-aware ceiling so short and long
+    // questions produce comparable confidences; blend absolute strength
+    // with relative rank so a weak best match still falls under threshold.
+    const ceiling =
+      queryTokens.length * FIELD_WEIGHTS.keywords * Math.log(1 + INDICATORS.length);
+    const max = Math.max(...raws, 1e-9);
+    corpus.forEach((doc, di) => {
+      if (raws[di] > 0) {
+        result.set(
+          doc.indicatorId,
+          Math.min(1, (raws[di] / ceiling) * 2.2) * (raws[di] / max),
+        );
+      }
+    });
+    return result;
+  }
+
+  /**
+   * Question-text match as IDF-weighted overlap: what fraction of the
+   * query's information mass appears in this catalog question? Naturally
+   * 0–1 and length-invariant.
+   */
+  function overlapScore(
+    queryTokens: string[],
+    doc: QuestionDoc,
+    docIdf: Map<string, number>,
+    defaultIdf: number,
+  ): number {
+    let matched = 0;
+    let total = 0;
+    for (const qt of queryTokens) {
+      const tokenIdf = docIdf.get(qt) ?? defaultIdf;
+      total += tokenIdf;
+      if (doc.tokens.has(qt)) {
+        matched += tokenIdf;
+        continue;
+      }
+      for (const dt of doc.tokens) {
+        if (tokensMatch(qt, dt)) {
+          matched += docIdf.get(dt) ?? tokenIdf;
+          break;
+        }
+      }
+    }
+    return total > 0 ? Math.min(1, matched / total) : 0;
+  }
+
+  function detailed(
+    text: string,
+    docs: QuestionDoc[],
+    docIdf: Map<string, number>,
+    restrictTo?: Set<string>,
+  ): QuestionMatch[] {
+    const queryTokens = [...new Set(tokenize(text))];
+    if (queryTokens.length === 0) return [];
+    const indicatorScores = scoreAllIndicators(queryTokens);
+    const defaultIdf = Math.log(1 + docs.length);
+    const matches: QuestionMatch[] = [];
+    for (const doc of docs) {
+      if (restrictTo && !restrictTo.has(doc.indicatorId)) continue;
+      const qScore = overlapScore(queryTokens, doc, docIdf, defaultIdf);
+      const indScore = indicatorScores.get(doc.indicatorId) ?? 0;
+      const score =
+        QUESTION_MIX.question * qScore + QUESTION_MIX.indicator * indScore;
+      if (score > 0.05) {
+        matches.push({
+          indicatorId: doc.indicatorId,
+          sourceIndex: doc.sourceIndex,
+          score,
+        });
+      }
+    }
+    return matches.sort((a, b) => b.score - a.score).slice(0, 8);
+  }
 
   return {
     scoreQuestion(text: string): MappingCandidate[] {
-      const queryTokens = [...new Set(tokenize(text))];
-      if (queryTokens.length === 0) return [];
+      const scores = scoreAllIndicators([...new Set(tokenize(text))]);
+      return [...scores.entries()]
+        .map(([indicatorId, score]) => ({ indicatorId, score }))
+        .sort((a, b) => b.score - a.score)
+        .slice(0, TOP_CANDIDATES);
+    },
 
-      const scored = corpus.map((doc, di) => {
-        let score = 0;
-        for (const qt of queryTokens) {
-          // Exact hit first (cheap); fall back to prefix scan.
-          let weight = doc.weights.get(qt);
-          let matchedToken = qt;
-          if (weight === undefined) {
-            for (const [dt, w] of docTokens[di]) {
-              if (tokensMatch(qt, dt)) {
-                // Keep the best-weighted prefix match.
-                if (weight === undefined || w > weight) {
-                  weight = w;
-                  matchedToken = dt;
-                }
-              }
-            }
-          }
-          if (weight !== undefined) {
-            score += weight * (idf.get(matchedToken) ?? 1);
+    scoreQuestionDetailed(text, restrictTo) {
+      return detailed(text, questionCorpus, questionIdf, restrictTo);
+    },
+
+    mapQuestionsDetailed(texts) {
+      // Pass 1: independent detailed matches.
+      const perQuestion = texts.map((t) =>
+        detailed(t, questionCorpus, questionIdf),
+      );
+      // "Analyze together": count how many brief questions each indicator
+      // provisionally wins, then nudge candidates from dominant themes —
+      // disambiguates borderline questions toward the brief's main topics.
+      const hits = new Map<string, number>();
+      for (const matches of perQuestion) {
+        const winner = matches[0]?.indicatorId;
+        if (winner) hits.set(winner, (hits.get(winner) ?? 0) + 1);
+      }
+      return perQuestion.map((matches, qi) => {
+        const boosted = matches
+          .map((m) => {
+            const isOwnWinner = matches[0]?.indicatorId === m.indicatorId;
+            const others = (hits.get(m.indicatorId) ?? 0) - (isOwnWinner ? 1 : 0);
+            return {
+              ...m,
+              score: Math.min(
+                1,
+                m.score * (1 + CORPUS_PRIOR * Math.log2(1 + Math.max(0, others))),
+              ),
+            };
+          })
+          .sort((a, b) => b.score - a.score);
+        const strong = boosted
+          .filter((m) => m.score >= QUESTION_THRESHOLD)
+          .slice(0, MAX_MATCHES_PER_QUESTION);
+        if (strong.length > 0) return strong;
+        // Rescue: no single catalog question stands out, but ONLY when a
+        // theme itself is clear — walk the top candidates and take the first
+        // whose indicator context clears the indicator threshold (keeps junk
+        // out while saving "clear theme, vague question" cases).
+        const contexts = scoreAllIndicators([...new Set(tokenize(texts[qi]))]);
+        for (const candidate of boosted.slice(0, 5)) {
+          if (candidate.score < FALLBACK_THRESHOLD) break;
+          if ((contexts.get(candidate.indicatorId) ?? 0) >= MAPPING_THRESHOLD) {
+            return [candidate];
           }
         }
-        return { indicatorId: doc.indicatorId, raw: score };
+        return [];
       });
+    },
 
-      // Normalize by a query-length-aware ceiling so short and long
-      // questions produce comparable confidences.
-      const ceiling =
-        queryTokens.length * FIELD_WEIGHTS.keywords * Math.log(1 + INDICATORS.length);
-      const max = Math.max(...scored.map((s) => s.raw), 1e-9);
-      return scored
-        .filter((s) => s.raw > 0)
-        .sort((a, b) => b.raw - a.raw)
-        .slice(0, TOP_CANDIDATES)
-        .map((s) => ({
-          indicatorId: s.indicatorId,
-          // Blend absolute strength with relative rank: a weak best match
-          // should still fall under the threshold.
-          score: Math.min(1, (s.raw / ceiling) * 2.2) * (s.raw / max),
-        }));
+    scoreSurveyWithinIndicators(text, indicatorIds) {
+      return detailed(text, surveyCorpus, surveyIdf, indicatorIds);
     },
   };
 }

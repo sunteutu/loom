@@ -22,7 +22,7 @@ export const INDICATOR_KEYWORDS_RO: Record<string, string[]> = {
   "brand-usage": ["cine ne foloseste", "utilizatori actuali", "cat de des ne folosesc", "clienti activi"],
   bumo: ["brandul principal", "folosesc cel mai des", "marca principala", "cota de piata"],
   "brand-loyalty": ["loialitate", "fideli", "raman la noi", "ne-ar parasi", "retentie clienti", "fidelizare"],
-  "brand-advocacy": ["ne recomanda", "vorbesc despre noi", "ambasadori", "word of mouth", "din gura in gura"],
+  "brand-advocacy": ["ne recomanda", "vorbesc despre noi", "vorbi de bine despre noi", "ambasadori", "word of mouth", "din gura in gura"],
   "brand-image": ["imaginea brandului", "cum suntem perceputi", "perceptia", "ce cred despre noi", "asocieri", "ne diferentiem", "diferentiere", "pozitionare", "fata de concurenta"],
   "brand-affinity": ["legatura emotionala", "iubesc brandul", "atasament", "li se potriveste", "conexiune"],
   "brand-trust": ["au incredere in noi", "incredere in brand", "credibilitate", "brand de incredere"],
@@ -49,7 +49,7 @@ export const INDICATOR_KEYWORDS_RO: Record<string, string[]> = {
   // ── Purchase Behaviour & Pricing ─────────────────────────────────────────
   "purchase-intention": ["ar cumpara", "intentie de cumparare", "cati ar cumpara", "cumparare viitoare"],
   "purchase-triggers": ["ce ii convinge", "ce declanseaza cumpararea", "de ce cumpara", "factorul decisiv", "ce ii face sa aleaga"],
-  "purchase-barriers": ["de ce nu cumpara", "bariere", "ce ii opreste", "obstacole", "retineri", "de ce nu ne aleg"],
+  "purchase-barriers": ["de ce nu cumpara", "bariere", "ce ii opreste", "obstacole", "retineri", "de ce nu ne aleg", "ezita sa cumpere", "ezitare la cumparare"],
   "trial-intent": ["ar incerca", "ar testa", "prima incercare", "sa il probeze"],
   "repeat-purchase-intent": ["ar cumpara din nou", "recumparare", "a doua achizitie", "revin"],
   "willingness-to-pay": ["cat ar plati", "dispusi sa plateasca", "cat valoreaza pentru ei", "ar plati mai mult", "premium"],

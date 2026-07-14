@@ -10,6 +10,7 @@
  */
 
 import { useSyncExternalStore } from "react";
+import type { QuestionMatch } from "./mapping-lexical";
 
 export type MappingEngine = "v1" | "v2";
 
@@ -29,6 +30,8 @@ export interface QuestionAssignment {
   rationale?: string;
   /** Runner-up candidates, for the reassign dropdown. */
   alternatives?: { indicatorId: string; confidence: number }[];
+  /** Catalog questions matched to this stakeholder question (question-level). */
+  matches?: QuestionMatch[];
   status: "suggested" | "confirmed";
 }
 
@@ -37,8 +40,70 @@ export interface MappingDoc {
   title: string;
   questions: StakeholderQuestion[];
   assignments: QuestionAssignment[];
+  /** Manual include/exclude of catalog questions, keyed "indicatorId:sourceIndex".
+   *  true = force include, false = force exclude; absent = engine decides. */
+  selectionOverrides?: Record<string, boolean>;
   createdAt: number;
   updatedAt: number;
+}
+
+/** One selected catalog question: the unit the guide is generated from. */
+export interface Selection {
+  indicatorId: string;
+  sourceIndex: number;
+  /** Best match score across the stakeholder questions it covers (0 = manual add). */
+  matchScore: number;
+  /** Stakeholder questions this catalog question answers. */
+  coveredQuestionIds: string[];
+}
+
+export function selectionKey(indicatorId: string, sourceIndex: number): string {
+  return `${indicatorId}:${sourceIndex}`;
+}
+
+/**
+ * Pivot assignments into the selection list: multiple stakeholder
+ * questions hitting the same catalog question collapse into ONE entry
+ * (max score, all covered questions), then manual overrides apply.
+ */
+export function deriveSelections(doc: MappingDoc): Selection[] {
+  const byKey = new Map<string, Selection>();
+  for (const a of doc.assignments) {
+    for (const m of a.matches ?? []) {
+      const key = selectionKey(m.indicatorId, m.sourceIndex);
+      const existing = byKey.get(key);
+      if (existing) {
+        existing.matchScore = Math.max(existing.matchScore, m.score);
+        if (!existing.coveredQuestionIds.includes(a.questionId)) {
+          existing.coveredQuestionIds.push(a.questionId);
+        }
+      } else {
+        byKey.set(key, {
+          indicatorId: m.indicatorId,
+          sourceIndex: m.sourceIndex,
+          matchScore: m.score,
+          coveredQuestionIds: [a.questionId],
+        });
+      }
+    }
+  }
+  for (const [key, forced] of Object.entries(doc.selectionOverrides ?? {})) {
+    if (forced && !byKey.has(key)) {
+      const [indicatorId, idx] = [
+        key.slice(0, key.lastIndexOf(":")),
+        Number(key.slice(key.lastIndexOf(":") + 1)),
+      ];
+      byKey.set(key, {
+        indicatorId,
+        sourceIndex: idx,
+        matchScore: 0,
+        coveredQuestionIds: [],
+      });
+    } else if (!forced) {
+      byKey.delete(key);
+    }
+  }
+  return [...byKey.values()].sort((a, b) => b.matchScore - a.matchScore);
 }
 
 interface MappingStore {
@@ -209,11 +274,13 @@ export function setAssignments(id: string, assignments: QuestionAssignment[]) {
   updateMapping(id, (m) => ({ ...m, assignments }));
 }
 
-/** Manually reassign a question to an indicator (or null = unmapped). */
+/** Manually reassign a question to an indicator (or null = unmapped).
+ *  `matches` = catalog questions rescored within the new indicator. */
 export function reassignQuestion(
   id: string,
   questionId: string,
   indicatorId: string | null,
+  matches: QuestionMatch[] = [],
 ) {
   updateMapping(id, (m) => {
     const rest = m.assignments.filter((a) => a.questionId !== questionId);
@@ -228,10 +295,26 @@ export function reassignQuestion(
           confidence: 1,
           engine: prev?.engine ?? "v1",
           alternatives: prev?.alternatives,
+          matches: indicatorId ? matches : [],
           status: "confirmed",
         },
       ],
     };
+  });
+}
+
+/** Force include (true) / exclude (false) / engine default (null) for a
+ *  catalog question in the selection. */
+export function setSelectionOverride(
+  id: string,
+  key: string,
+  value: boolean | null,
+) {
+  updateMapping(id, (m) => {
+    const overrides = { ...(m.selectionOverrides ?? {}) };
+    if (value === null) delete overrides[key];
+    else overrides[key] = value;
+    return { ...m, selectionOverrides: overrides };
   });
 }
 
