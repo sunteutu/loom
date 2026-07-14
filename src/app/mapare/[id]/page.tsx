@@ -94,6 +94,15 @@ function applyReassign(
     learnExample(indicatorId, question.text);
   }
   reassignQuestion(docId, question.id, indicatorId, matches);
+  // Group cards are sorted by coverage, so the target theme may render far
+  // from where the user clicked — follow the question to its new home.
+  if (indicatorId) {
+    requestAnimationFrame(() => {
+      document
+        .querySelector(`[data-indicator-id="${indicatorId}"]`)
+        ?.scrollIntoView({ behavior: "smooth", block: "center" });
+    });
+  }
 }
 
 /** AI suggestion for one weak question (from the targeted v2 check). */
@@ -173,6 +182,7 @@ function MappingWorkspace({ doc }: { doc: MappingDoc }) {
 
   /** Groups: indicator → its selections + the stakeholder questions covered. */
   const groups = useMemo(() => {
+    const questionOrder = new Map(doc.questions.map((q, i) => [q.id, i]));
     const byIndicator = new Map<string, Selection[]>();
     for (const sel of selections) {
       byIndicator.set(sel.indicatorId, [
@@ -188,9 +198,18 @@ function MappingWorkspace({ doc }: { doc: MappingDoc }) {
           indicatorId,
           selections: sels.sort((a, b) => a.sourceIndex - b.sourceIndex),
           coveredQuestionIds: covered,
+          // Stable tie-break: the brief position of the earliest question
+          // covered — cards stop reshuffling on every reassign.
+          firstQuestionIdx: Math.min(
+            ...[...covered].map((qid) => questionOrder.get(qid) ?? Infinity),
+          ),
         };
       })
-      .sort((a, b) => b.coveredQuestionIds.size - a.coveredQuestionIds.size);
+      .sort(
+        (a, b) =>
+          b.coveredQuestionIds.size - a.coveredQuestionIds.size ||
+          a.firstQuestionIdx - b.firstQuestionIdx,
+      );
     const unmapped = doc.questions
       .filter((q) => {
         const a = assignmentByQuestion.get(q.id);
@@ -206,7 +225,10 @@ function MappingWorkspace({ doc }: { doc: MappingDoc }) {
   // ── Engines ──────────────────────────────────────────────────────────────
 
   const runV1 = () => {
-    const perQuestion = lexical.mapQuestionsDetailed(
+    // Fresh engine per run: corrections made THIS session must already be
+    // in the corpus when the user hits "Remapează" (no refresh needed).
+    const freshEngine = createLexicalEngine(readLearnedExamples());
+    const perQuestion = freshEngine.mapQuestionsDetailed(
       doc.questions.map((q) => q.text),
     );
     const assignments: QuestionAssignment[] = doc.questions.map((q, i) => {
@@ -283,12 +305,13 @@ function MappingWorkspace({ doc }: { doc: MappingDoc }) {
     else void runV2();
   };
 
-  /** Questions the engine is unsure about — the second-opinion targets. */
+  /** Questions the engine is unsure about — the second-opinion targets.
+   *  Manual (confirmed) decisions are final and never counted as weak. */
   const weakQuestions = useMemo(
     () =>
       doc.questions.filter((q) => {
         const a = assignmentByQuestion.get(q.id);
-        if (!a) return false;
+        if (!a || a.status === "confirmed") return false;
         return (
           !a.indicatorId ||
           (a.matches ?? []).length === 0 ||
@@ -756,7 +779,10 @@ function IndicatorGroupCard({
   };
 
   return (
-    <section className="rounded-xl border border-border bg-card p-4">
+    <section
+      data-indicator-id={group.indicatorId}
+      className="rounded-xl border border-border bg-card p-4"
+    >
       <div className="flex flex-wrap items-baseline gap-2">
         <h2 className="text-base font-semibold">{ind.name}</h2>
         <span className="text-xs text-muted-foreground">{ind.category}</span>
@@ -907,10 +933,13 @@ function StakeholderQuestionRow({
   aiSuggestions?: AiSuggestion[];
 }) {
   const confidence = Math.round(assignment.confidence * 100);
+  const isManual = assignment.status === "confirmed";
+  // Human decisions are final — no second-guessing with alternatives.
   const isWeak =
-    !assignment.indicatorId ||
-    (assignment.matches ?? []).length === 0 ||
-    assignment.confidence < WEAK_MATCH_THRESHOLD;
+    !isManual &&
+    (!assignment.indicatorId ||
+      (assignment.matches ?? []).length === 0 ||
+      assignment.confidence < WEAK_MATCH_THRESHOLD);
 
   // Second opinion: only computed for weak rows, and only alternatives to
   // the current theme (cross-searches qual questions + survey stems + context).
@@ -982,18 +1011,26 @@ function StakeholderQuestionRow({
           </div>
         )}
       </div>
-      {assignment.indicatorId && (
-        <span
-          className={`mt-0.5 shrink-0 rounded-full px-1.5 py-0.5 text-xs font-semibold tabular-nums ${
-            confidence >= 60
-              ? "bg-slate-3 text-slate-11"
-              : "bg-amber-3 text-amber-11"
-          }`}
-          title={`Încredere ${confidence}% (${assignment.engine})`}
-        >
-          {confidence}%
-        </span>
-      )}
+      {assignment.indicatorId &&
+        (isManual ? (
+          <span
+            className="mt-0.5 shrink-0 rounded-full bg-slate-3 px-1.5 py-0.5 text-xs font-semibold text-slate-11"
+            title="Alegerea ta — motorul a reținut-o pentru mapările viitoare"
+          >
+            ✓ manual
+          </span>
+        ) : (
+          <span
+            className={`mt-0.5 shrink-0 rounded-full px-1.5 py-0.5 text-xs font-semibold tabular-nums ${
+              confidence >= 60
+                ? "bg-slate-3 text-slate-11"
+                : "bg-amber-3 text-amber-11"
+            }`}
+            title={`Încredere ${confidence}% (${assignment.engine})`}
+          >
+            {confidence}%
+          </span>
+        ))}
       <ReassignSelect
         docId={docId}
         question={question}

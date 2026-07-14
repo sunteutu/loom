@@ -292,7 +292,10 @@ export function reassignQuestion(
         {
           questionId,
           indicatorId,
-          confidence: 1,
+          // The real rescored fit, not a fake 100% — "confirmed" already
+          // carries the "human decision" meaning; the UI shows a manual
+          // badge instead of a percentage for confirmed rows.
+          confidence: matches[0]?.score ?? 0,
           engine: prev?.engine ?? "v1",
           alternatives: prev?.alternatives,
           matches: indicatorId ? matches : [],
