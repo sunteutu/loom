@@ -20,9 +20,25 @@ export interface MappingCandidate {
   score: number;
 }
 
+/** A specific catalog question (or survey stem) matched to a stakeholder question. */
+export interface QuestionMatch {
+  indicatorId: string;
+  sourceIndex: number;
+  /** Combined 0–1: 0.65·question-text + 0.35·indicator-context. */
+  score: number;
+}
+
 /** Below this, a question lands in the "unmapped" bucket. */
 export const MAPPING_THRESHOLD = 0.25;
+/** Below this, a catalog question is not selected for a stakeholder question. */
+export const QUESTION_THRESHOLD = 0.25;
 export const TOP_CANDIDATES = 5;
+/** Max catalog questions one stakeholder question can pull in. */
+export const MAX_MATCHES_PER_QUESTION = 3;
+
+const QUESTION_MIX = { question: 0.65, indicator: 0.35 };
+/** Corpus prior: modest boost for indicators hit by several brief questions. */
+const CORPUS_PRIOR = 0.08;
 
 // ── Tokenization ───────────────────────────────────────────────────────────
 
@@ -111,6 +127,59 @@ function buildIdf(corpus: IndicatorDoc[]): Map<string, number> {
   for (const [token, count] of df) {
     idf.set(token, Math.log(1 + n / count));
   }
+  return idf;
+}
+
+// ── Question-level corpus ──────────────────────────────────────────────────
+
+interface QuestionDoc {
+  indicatorId: string;
+  sourceIndex: number;
+  tokens: Set<string>;
+}
+
+/** One doc per catalog qual question: EN + RO text of the same question. */
+function buildQuestionCorpus(): QuestionDoc[] {
+  const docs: QuestionDoc[] = [];
+  for (const ind of INDICATORS) {
+    const ro = INDICATOR_QUAL_RO[ind.id];
+    (ind.qualQuestions ?? []).forEach((q, sourceIndex) => {
+      const text = `${q} ${ro?.qualQuestions[sourceIndex] ?? ""}`;
+      docs.push({
+        indicatorId: ind.id,
+        sourceIndex,
+        tokens: new Set(tokenize(text)),
+      });
+    });
+  }
+  return docs;
+}
+
+/** One doc per survey item: EN + RO stem. */
+function buildSurveyCorpus(): QuestionDoc[] {
+  const docs: QuestionDoc[] = [];
+  for (const ind of INDICATORS) {
+    const ro = INDICATOR_SURVEY_RO[ind.id];
+    (ind.surveyItems ?? []).forEach((item, sourceIndex) => {
+      const text = `${item.stem} ${ro?.[sourceIndex]?.stem ?? ""}`;
+      docs.push({
+        indicatorId: ind.id,
+        sourceIndex,
+        tokens: new Set(tokenize(text)),
+      });
+    });
+  }
+  return docs;
+}
+
+function buildQuestionIdf(docs: QuestionDoc[]): Map<string, number> {
+  const df = new Map<string, number>();
+  for (const doc of docs) {
+    for (const token of doc.tokens) df.set(token, (df.get(token) ?? 0) + 1);
+  }
+  const n = docs.length;
+  const idf = new Map<string, number>();
+  for (const [token, count] of df) idf.set(token, Math.log(1 + n / count));
   return idf;
 }
 
