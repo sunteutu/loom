@@ -18,6 +18,7 @@ import { INDICATORS, type Indicator, type SurveyItem } from "./indicators";
 import { INDICATOR_SURVEY_RO, type SurveyItemRo } from "./indicators-survey-ro";
 import {
   applyVariables,
+  coverageToMarkdown,
   formatMinutes,
   type GuideLanguage,
 } from "./guide-export";
@@ -169,6 +170,7 @@ export function surveyToMarkdown(
     `# ${survey.title}`,
     "",
     `_Chestionar · ${formatDate(survey.updatedAt)} · ${survey.items.length} întrebări · LOI ${formatMinutes(surveyLoiMinutes(survey))}_`,
+    ...(survey.coverage?.length ? coverageToMarkdown(survey.coverage) : []),
   ];
   let q = 0;
   for (const group of groupSurveyItems(survey.items)) {
@@ -258,6 +260,40 @@ export function buildSurveyDocument(
       color: opts.color ?? BODY,
       bold: opts.bold,
     });
+
+  if (survey.coverage?.length) {
+    children.push(
+      new Paragraph({
+        heading: HeadingLevel.HEADING_2,
+        spacing: { before: 200, after: 160 },
+        children: [
+          new TextRun({
+            text: "Acoperirea obiectivelor",
+            font: FONT,
+            color: HEADING,
+          }),
+        ],
+      }),
+    );
+    for (const entry of survey.coverage) {
+      const ind = INDICATOR_BY_ID.get(entry.indicatorId);
+      children.push(
+        new Paragraph({
+          spacing: { before: 120, after: 60 },
+          children: [bodyRun(ind?.name ?? entry.indicatorId, { bold: true, color: INK })],
+        }),
+      );
+      for (const qText of entry.questions) {
+        children.push(
+          new Paragraph({
+            spacing: { after: 40 },
+            indent: { left: 360 },
+            children: [bodyRun(`– ${qText}`, { size: 20, color: MUTED })],
+          }),
+        );
+      }
+    }
+  }
 
   let q = 0;
   for (const group of groupSurveyItems(survey.items)) {

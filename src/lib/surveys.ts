@@ -9,7 +9,7 @@
  */
 
 import { useSyncExternalStore } from "react";
-import type { GuideVariables } from "./guides";
+import type { CoverageEntry, GuideVariables } from "./guides";
 
 export interface SurveyDocItem {
   id: string;
@@ -26,6 +26,8 @@ export interface SurveyDoc {
   title: string;
   variables: GuideVariables;
   items: SurveyDocItem[];
+  /** Stakeholder-question coverage, set when generated from a mapping. */
+  coverage?: CoverageEntry[];
   createdAt: number;
   updatedAt: number;
 }
@@ -133,6 +135,26 @@ export interface SurveyItemRef {
   stem: string;
   indicatorId: string;
   sourceIndex: number;
+}
+
+/** Create a pre-filled questionnaire from a mapping run (items + coverage). */
+export function createSurveyFromMapping(
+  title: string,
+  entries: SurveyItemRef[],
+  coverage: CoverageEntry[],
+): SurveyDoc {
+  const store = read();
+  const survey: SurveyDoc = {
+    id: crypto.randomUUID(),
+    title,
+    variables: {},
+    items: entries.map((e) => ({ id: crypto.randomUUID(), ...e })),
+    coverage,
+    createdAt: Date.now(),
+    updatedAt: Date.now(),
+  };
+  write({ surveys: [...store.surveys, survey], activeSurveyId: survey.id });
+  return survey;
 }
 
 /** Add catalog items to the active questionnaire (created if none). */

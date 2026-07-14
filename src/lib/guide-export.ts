@@ -22,6 +22,7 @@ import {
   guideTotalMinutes,
   INTRO_MINUTES,
   OUTRO_MINUTES,
+  type CoverageEntry,
   type Guide,
   type GuideItem,
   type GuideVariables,
@@ -157,6 +158,18 @@ function slugify(title: string): string {
   );
 }
 
+/** Coverage lines for Markdown: indicator name + the stakeholder questions it answers. */
+export function coverageToMarkdown(coverage: CoverageEntry[]): string[] {
+  const lines: string[] = ["", "## Acoperirea obiectivelor", ""];
+  for (const entry of coverage) {
+    const ind = INDICATOR_BY_ID.get(entry.indicatorId);
+    lines.push(`**${ind?.name ?? entry.indicatorId}**`);
+    for (const q of entry.questions) lines.push(`- ${q}`);
+    lines.push("");
+  }
+  return lines;
+}
+
 // ── Markdown ───────────────────────────────────────────────────────────────
 
 export function guideToMarkdown(guide: Guide, lang: GuideLanguage = "en"): string {
@@ -166,6 +179,7 @@ export function guideToMarkdown(guide: Guide, lang: GuideLanguage = "en"): strin
     `# ${guide.title}`,
     "",
     `_Ghid de interviu · ${formatDate(guide.updatedAt)} · ${guide.items.length} întrebări · ${formatMinutes(guideTotalMinutes(guide))}_`,
+    ...(guide.coverage?.length ? coverageToMarkdown(guide.coverage) : []),
     "",
     `## Introducere (${formatMinutes(INTRO_MINUTES)})`,
     "",
@@ -255,6 +269,57 @@ export function buildGuideDocument(
       ],
     }),
   ];
+
+  // Traceability first — the client-facing "your question X is covered
+  // by section Y" table, rendered as styled paragraphs (Pages-safe).
+  if (guide.coverage?.length) {
+    children.push(
+      new Paragraph({
+        heading: HeadingLevel.HEADING_2,
+        spacing: { before: 200, after: 160 },
+        children: [
+          new TextRun({
+            text: "Acoperirea obiectivelor",
+            font: FONT,
+            color: HEADING,
+          }),
+        ],
+      }),
+    );
+    for (const entry of guide.coverage) {
+      const ind = INDICATOR_BY_ID.get(entry.indicatorId);
+      children.push(
+        new Paragraph({
+          spacing: { before: 120, after: 60 },
+          children: [
+            new TextRun({
+              text: ind?.name ?? entry.indicatorId,
+              font: FONT,
+              bold: true,
+              size: 22,
+              color: INK,
+            }),
+          ],
+        }),
+      );
+      for (const q of entry.questions) {
+        children.push(
+          new Paragraph({
+            spacing: { after: 40 },
+            indent: { left: 360 },
+            children: [
+              new TextRun({
+                text: `– ${q}`,
+                font: FONT,
+                size: 20,
+                color: MUTED,
+              }),
+            ],
+          }),
+        );
+      }
+    }
+  }
 
   const scriptSection = (title: string, minutes: number, text: string) => {
     children.push(

@@ -26,6 +26,13 @@ export interface GuideItem {
   sourceIndex?: number;
 }
 
+/** Traceability from a mapping run: which stakeholder questions each
+ *  indicator section covers. Rendered as "Acoperirea obiectivelor". */
+export interface CoverageEntry {
+  indicatorId: string;
+  questions: string[];
+}
+
 export interface Guide {
   id: string;
   title: string;
@@ -35,6 +42,8 @@ export interface Guide {
   minutesPerQuestion?: number;
   /** Target interview duration in minutes (default 60). */
   targetMinutes?: number;
+  /** Stakeholder-question coverage, set when generated from a mapping. */
+  coverage?: CoverageEntry[];
   /** Moderator intro script; unset = language-specific default at render. */
   intro?: string;
   /** Closing script; unset = language-specific default at render. */
@@ -143,6 +152,26 @@ export function createGuide(title = "Ghid nou"): Guide {
     title,
     variables: {},
     items: [],
+    createdAt: Date.now(),
+    updatedAt: Date.now(),
+  };
+  write({ guides: [...store.guides, guide], activeGuideId: guide.id });
+  return guide;
+}
+
+/** Create a pre-filled guide from a mapping run (items + coverage). */
+export function createGuideFromMapping(
+  title: string,
+  entries: QuestionRef[],
+  coverage: CoverageEntry[],
+): Guide {
+  const store = read();
+  const guide: Guide = {
+    id: crypto.randomUUID(),
+    title,
+    variables: {},
+    items: entries.map((e) => ({ id: crypto.randomUUID(), ...e })),
+    coverage,
     createdAt: Date.now(),
     updatedAt: Date.now(),
   };

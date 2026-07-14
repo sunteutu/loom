@@ -13,6 +13,7 @@ import {
   Moon,
   NotebookPen,
   Sun,
+  Waypoints,
 } from "lucide-react";
 import { getActiveGuide, useGuideStore } from "@/lib/guides";
 import { getActiveSurvey, useSurveyStore } from "@/lib/surveys";
@@ -28,6 +29,7 @@ const sections: {
   {
     label: "Research",
     items: [
+      { href: "/mapare", label: "Mapare", icon: Waypoints },
       { href: "/ghiduri", label: "Ghiduri", icon: NotebookPen },
       { href: "/chestionare", label: "Chestionare", icon: ClipboardList },
     ],
