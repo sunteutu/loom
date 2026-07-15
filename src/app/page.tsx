@@ -1,103 +1,46 @@
-"use client";
+import { auth } from "@clerk/nextjs/server";
+import { SignInButton, SignUpButton } from "@clerk/nextjs";
+import { FlaskConical } from "lucide-react";
+import { HomeDashboard } from "@/components/HomeDashboard";
 
-import { useState } from "react";
-import { SignInButton, SignUpButton, UserButton } from "@clerk/nextjs";
-import { Authenticated, Unauthenticated, useMutation, useQuery } from "convex/react";
-import { api } from "../../convex/_generated/api";
+export default async function Home() {
+  // Session state comes from the server (Clerk middleware), so the right
+  // variant is in the very first render — no signed-out flash after login.
+  const { userId } = await auth();
 
-export default function Home() {
   return (
-    <main className="mx-auto flex w-full max-w-xl flex-1 flex-col gap-8 p-8">
-      <header className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Convex + Clerk</h1>
-        <Authenticated>
-          <UserButton />
-        </Authenticated>
-      </header>
-
-      <Unauthenticated>
-        <div className="flex flex-col items-start gap-4">
-          <p className="text-sm text-neutral-500">
-            Sign in to see your tasks, stored in Convex and scoped to your
-            Clerk user.
-          </p>
-          <div className="flex gap-2">
-            <SignInButton>
-              <button className="rounded-md bg-foreground px-4 py-2 text-sm font-medium text-background">
-                Sign in
-              </button>
-            </SignInButton>
-            <SignUpButton>
-              <button className="rounded-md border border-neutral-300 px-4 py-2 text-sm font-medium dark:border-neutral-700">
-                Sign up
-              </button>
-            </SignUpButton>
-          </div>
-        </div>
-      </Unauthenticated>
-
-      <Authenticated>
-        <Tasks />
-      </Authenticated>
+    <main className="mx-auto w-full max-w-4xl flex-1 px-8 pb-16 pt-8">
+      {userId ? <HomeDashboard /> : <Landing />}
     </main>
   );
 }
 
-function Tasks() {
-  const tasks = useQuery(api.tasks.list);
-  const addTask = useMutation(api.tasks.add);
-  const toggleTask = useMutation(api.tasks.toggle);
-  const [text, setText] = useState("");
-
+function Landing() {
   return (
-    <div className="flex flex-col gap-4">
-      <form
-        className="flex gap-2"
-        onSubmit={(e) => {
-          e.preventDefault();
-          const trimmed = text.trim();
-          if (!trimmed) return;
-          void addTask({ text: trimmed });
-          setText("");
-        }}
-      >
-        <input
-          aria-label="New task"
-          value={text}
-          onChange={(e) => setText(e.target.value)}
-          placeholder="New task..."
-          className="flex-1 rounded-md border border-neutral-300 px-3 py-2 text-sm dark:border-neutral-700 dark:bg-neutral-900"
-        />
-        <button
-          type="submit"
-          className="rounded-md bg-foreground px-4 py-2 text-sm font-medium text-background"
-        >
-          Add
-        </button>
-      </form>
-
-      {tasks === undefined ? (
-        <p className="text-sm text-neutral-500">Loading…</p>
-      ) : tasks.length === 0 ? (
-        <p className="text-sm text-neutral-500">No tasks yet. Add one above.</p>
-      ) : (
-        <ul className="flex flex-col gap-2">
-          {tasks.map((task) => (
-            <li key={task._id}>
-              <label className="flex cursor-pointer items-center gap-3 rounded-md border border-neutral-200 px-3 py-2 text-sm dark:border-neutral-800">
-                <input
-                  type="checkbox"
-                  checked={task.isCompleted}
-                  onChange={() => void toggleTask({ id: task._id })}
-                />
-                <span className={task.isCompleted ? "line-through opacity-50" : ""}>
-                  {task.text}
-                </span>
-              </label>
-            </li>
-          ))}
-        </ul>
-      )}
+    <div className="flex min-h-[70vh] flex-col items-center justify-center gap-6 text-center">
+      <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-indigo-3">
+        <FlaskConical aria-hidden className="h-7 w-7 text-indigo-11" />
+      </div>
+      <div className="max-w-lg">
+        <h1 className="text-3xl font-semibold tracking-tight">Loom</h1>
+        <p className="mt-2 text-base text-muted-foreground">
+          Construiește studii de research — ghiduri de interviu și chestionare
+          — pornind de la un catalog de indicatori gold-standard, cu mapare
+          automată pe obiectivele stakeholderilor.
+        </p>
+      </div>
+      <div className="flex gap-3">
+        <SignInButton>
+          <button className="inline-flex h-10 items-center rounded-lg bg-indigo-9 px-5 text-sm font-medium text-white shadow-sm transition-colors hover:bg-indigo-10">
+            Intră în cont
+          </button>
+        </SignInButton>
+        <SignUpButton>
+          <button className="inline-flex h-10 items-center rounded-lg border border-border px-5 text-sm font-medium text-muted-foreground transition-colors hover:border-ring hover:text-foreground">
+            Creează cont
+          </button>
+        </SignUpButton>
+      </div>
     </div>
   );
 }
