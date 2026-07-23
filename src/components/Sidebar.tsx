@@ -6,17 +6,27 @@ import { usePathname } from "next/navigation";
 import { useTheme } from "next-themes";
 import {
   ClipboardList,
+  Cog,
   FlaskConical,
+  Gamepad2,
   Gauge,
   Home,
   Monitor,
   Moon,
   NotebookPen,
+  Palette,
+  Plane,
+  Receipt,
+  Scissors,
   Sun,
+  Tv,
+  UserRound,
   Waypoints,
 } from "lucide-react";
 import { getActiveGuide, useGuideStore } from "@/lib/guides";
 import { getActiveSurvey, useSurveyStore } from "@/lib/surveys";
+import { useLoomTheme } from "@/components/ThemeProvider";
+import { THEMES, themeSupportsModes, type LoomTheme } from "@/lib/themes";
 
 const sections: {
   label: string | null;
@@ -42,46 +52,92 @@ const sections: {
 
 const HIDDEN_PREFIXES = ["/sign-in", "/sign-up"];
 
-const THEME_OPTIONS = [
-  { value: "light", label: "Light theme", icon: Sun },
-  { value: "system", label: "System theme", icon: Monitor },
-  { value: "dark", label: "Dark theme", icon: Moon },
+const MODE_OPTIONS = [
+  { value: "light", label: "Light", icon: Sun },
+  { value: "system", label: "System", icon: Monitor },
+  { value: "dark", label: "Dark", icon: Moon },
 ] as const;
 
+const THEME_ICONS: Record<LoomTheme, React.ComponentType<{ className?: string }>> = {
+  classic: Palette,
+  metal: Cog,
+  cyberdeck: Gamepad2,
+  vhs: Tv,
+  broderie: Scissors,
+  bon: Receipt,
+  splitflap: Plane,
+};
+
 function ThemeToggle() {
-  const { theme, setTheme } = useTheme();
-  // useTheme reads localStorage, so the value only exists after mount;
+  const { theme, setTheme } = useLoomTheme();
+  const { theme: mode, setTheme: setMode } = useTheme();
+  // Both hooks read localStorage, so the values only exist after mount;
   // render the controls without an active state until then to avoid a
   // hydration mismatch.
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
+  // Fixed-appearance themes ignore the mode; keep the row visible (layout
+  // stability) but inert.
+  const modesLocked = mounted && !themeSupportsModes(theme);
 
   return (
-    <div
-      role="radiogroup"
-      aria-label="Theme"
-      className="flex w-fit items-center gap-0.5 rounded-full border border-sidebar-border bg-sidebar p-0.5"
-    >
-      {THEME_OPTIONS.map((opt) => {
-        const active = mounted && theme === opt.value;
-        return (
-          <button
-            key={opt.value}
-            role="radio"
-            aria-checked={active}
-            aria-label={opt.label}
-            title={opt.label}
-            onClick={() => setTheme(opt.value)}
-            className={`rounded-full p-1.5 transition-colors ${
-              active
-                ? "bg-sidebar-accent text-sidebar-accent-foreground shadow-sm"
-                : "text-muted-foreground hover:text-sidebar-accent-foreground"
-            }`}
-          >
-            <opt.icon className="h-4 w-4" aria-hidden />
-          </button>
-        );
-      })}
+    <div className="flex w-fit flex-col gap-1">
+      <div
+        role="radiogroup"
+        aria-label="Mod"
+        className="grid grid-cols-3 gap-0.5 rounded-2xl border border-sidebar-border bg-sidebar p-0.5"
+      >
+        {MODE_OPTIONS.map((opt) => {
+          const active = mounted && !modesLocked && mode === opt.value;
+          return (
+            <button
+              key={opt.value}
+              role="radio"
+              aria-checked={active}
+              aria-label={opt.label}
+              title={
+                modesLocked ? "Tema curentă are un singur mod" : opt.label
+              }
+              disabled={modesLocked}
+              onClick={() => setMode(opt.value)}
+              className={`rounded-full p-1.5 transition-colors disabled:cursor-not-allowed disabled:opacity-40 ${
+                active
+                  ? "bg-sidebar-accent text-sidebar-accent-foreground shadow-sm"
+                  : "text-muted-foreground hover:text-sidebar-accent-foreground"
+              }`}
+            >
+              <opt.icon className="h-4 w-4" aria-hidden />
+            </button>
+          );
+        })}
+      </div>
+      <div
+        role="radiogroup"
+        aria-label="Temă"
+        className="grid grid-cols-4 gap-0.5 rounded-2xl border border-sidebar-border bg-sidebar p-0.5"
+      >
+        {THEMES.map((t) => {
+          const Icon = THEME_ICONS[t.id];
+          const active = mounted && theme === t.id;
+          return (
+            <button
+              key={t.id}
+              role="radio"
+              aria-checked={active}
+              aria-label={t.label}
+              title={t.label}
+              onClick={() => setTheme(t.id)}
+              className={`rounded-full p-1.5 transition-colors ${
+                active
+                  ? "bg-sidebar-accent text-sidebar-accent-foreground shadow-sm"
+                  : "text-muted-foreground hover:text-sidebar-accent-foreground"
+              }`}
+            >
+              <Icon className="h-4 w-4" aria-hidden />
+            </button>
+          );
+        })}
+      </div>
     </div>
   );
 }
@@ -153,7 +209,19 @@ export function Sidebar() {
         ))}
       </nav>
 
-      <div className="border-t border-sidebar-border px-3 py-3">
+      <div className="flex flex-col gap-2 border-t border-sidebar-border px-3 py-3">
+        <Link
+          href="/profil"
+          aria-current={pathname.startsWith("/profil") ? "page" : undefined}
+          className={`flex items-center gap-2.5 rounded-md px-2 py-1.5 text-base transition-colors ${
+            pathname.startsWith("/profil")
+              ? "bg-sidebar-accent font-medium text-sidebar-accent-foreground"
+              : "text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+          }`}
+        >
+          <UserRound className="h-4 w-4" aria-hidden />
+          Profil
+        </Link>
         <ThemeToggle />
       </div>
     </aside>

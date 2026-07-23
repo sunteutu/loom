@@ -140,6 +140,2687 @@
   --popover-foreground: var(--slate-12);
 }
 
+/* ========================= Custom themes ==========================
+   Each theme seeds 6 colors (--tt-bg/fg/accent/on-accent/warn/danger)
+   and the shared block regenerates the Radix slate/indigo/amber/red
+   steps from them with color-mix, so every bg-slate-* / text-indigo-*
+   utility in the app rethemes automatically. Per-theme blocks below
+   only add the palette seeds plus the signature decorations. */
+
+html[data-theme="vhs"],
+html[data-theme="broderie"],
+html[data-theme="bon"],
+html[data-theme="splitflap"],
+html[data-theme="metal"],
+html[data-theme="cyberdeck"] {
+  --slate-1: color-mix(in oklab, var(--tt-fg) 3%, var(--tt-bg));
+  --slate-2: color-mix(in oklab, var(--tt-fg) 5%, var(--tt-bg));
+  --slate-3: color-mix(in oklab, var(--tt-fg) 8%, var(--tt-bg));
+  --slate-4: color-mix(in oklab, var(--tt-fg) 11%, var(--tt-bg));
+  --slate-5: color-mix(in oklab, var(--tt-fg) 14%, var(--tt-bg));
+  --slate-6: color-mix(in oklab, var(--tt-fg) 18%, var(--tt-bg));
+  --slate-7: color-mix(in oklab, var(--tt-fg) 25%, var(--tt-bg));
+  --slate-8: color-mix(in oklab, var(--tt-fg) 33%, var(--tt-bg));
+  --slate-9: color-mix(in oklab, var(--tt-fg) 45%, var(--tt-bg));
+  --slate-10: color-mix(in oklab, var(--tt-fg) 52%, var(--tt-bg));
+  --slate-11: color-mix(in oklab, var(--tt-fg) 70%, var(--tt-bg));
+  --slate-12: color-mix(in oklab, var(--tt-fg) 95%, var(--tt-bg));
+  --indigo-1: color-mix(in oklab, var(--tt-accent) 4%, var(--tt-bg));
+  --indigo-2: color-mix(in oklab, var(--tt-accent) 7%, var(--tt-bg));
+  --indigo-3: color-mix(in oklab, var(--tt-accent) 12%, var(--tt-bg));
+  --indigo-4: color-mix(in oklab, var(--tt-accent) 17%, var(--tt-bg));
+  --indigo-5: color-mix(in oklab, var(--tt-accent) 23%, var(--tt-bg));
+  --indigo-6: color-mix(in oklab, var(--tt-accent) 30%, var(--tt-bg));
+  --indigo-7: color-mix(in oklab, var(--tt-accent) 40%, var(--tt-bg));
+  --indigo-8: color-mix(in oklab, var(--tt-accent) 55%, var(--tt-bg));
+  --indigo-9: var(--tt-accent);
+  --indigo-10: color-mix(in oklab, var(--tt-fg) 12%, var(--tt-accent));
+  --indigo-11: color-mix(in oklab, var(--tt-accent) 72%, var(--tt-fg));
+  --indigo-12: color-mix(in oklab, var(--tt-accent) 35%, var(--tt-fg));
+  --amber-2: color-mix(in oklab, var(--tt-warn) 8%, var(--tt-bg));
+  --amber-3: color-mix(in oklab, var(--tt-warn) 16%, var(--tt-bg));
+  --amber-4: color-mix(in oklab, var(--tt-warn) 24%, var(--tt-bg));
+  --amber-6: color-mix(in oklab, var(--tt-warn) 38%, var(--tt-bg));
+  --amber-9: var(--tt-warn);
+  --amber-11: color-mix(in oklab, var(--tt-warn) 70%, var(--tt-fg));
+  --red-3: color-mix(in oklab, var(--tt-danger) 14%, var(--tt-bg));
+  --red-9: var(--tt-danger);
+  --red-11: color-mix(in oklab, var(--tt-danger) 70%, var(--tt-fg));
+  --card: color-mix(in oklab, var(--tt-fg) 4%, var(--tt-bg));
+  --card-foreground: var(--slate-12);
+  --popover: color-mix(in oklab, var(--tt-fg) 4%, var(--tt-bg));
+  --popover-foreground: var(--slate-12);
+  --primary-foreground: var(--tt-on-accent);
+  --sidebar-primary-foreground: var(--tt-on-accent);
+}
+
+/* --- Retro Nostalgia (cyberdeck): Y2K „XP Luna" — cer azur peste deal
+   verde, albastru start-button, muchii ferme și umbre dure de pixel --- */
+html[data-theme="cyberdeck"] {
+  color-scheme: light;
+  --tt-bg: #e6f2fc;
+  --tt-fg: #12365c;
+  --tt-accent: #1273e6;
+  --tt-on-accent: #ffffff;
+  --tt-warn: #9a7a10;
+  --tt-danger: #c23a3a;
+  --radius: 0.375rem;
+  --card: #ffffff;
+  --popover: #ffffff;
+}
+/* fundalul „Bliss": cer senin care coboară în iarbă */
+html[data-theme="cyberdeck"] body {
+  background-image: linear-gradient(
+    180deg,
+    #6db3f2 0%,
+    #a8d4f7 38%,
+    #d7ecfb 52%,
+    #8fce5a 56%,
+    #5aab35 78%,
+    #3f8f26 100%
+  );
+  background-attachment: fixed;
+}
+html[data-theme="cyberdeck"] h2,
+html[data-theme="cyberdeck"] h3 {
+  font-family: var(--font-stitch);
+  letter-spacing: 0.02em;
+  color: #0b52c0;
+}
+/* etichetele de secțiune și blocurile de intent stau direct pe gradient —
+   pe iarba verde își pierdeau contrastul; un chip alb translucid le ține
+   citețe oriunde ar cădea */
+html[data-theme="cyberdeck"] main h2,
+html[data-theme="cyberdeck"] main section > p {
+  width: fit-content;
+  padding: 3px 10px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(3px);
+}
+/* butoanele primare sar în față cu umbră dură, ca ferestrele XP */
+html[data-theme="cyberdeck"] [class*="bg-indigo-9"] {
+  box-shadow: 3px 3px 0 rgba(11, 82, 192, 0.3);
+  transition:
+    transform 0.15s,
+    box-shadow 0.15s;
+}
+html[data-theme="cyberdeck"] :is(button, a)[class*="bg-indigo-9"]:hover {
+  transform: translate(-1px, -2px);
+  box-shadow: 5px 6px 0 rgba(11, 82, 192, 0.3);
+}
+/* cardurile = ferestre cu bordură azur și umbră dură */
+html[data-theme="cyberdeck"] [class*="bg-card"] {
+  border-color: color-mix(in oklab, #0b52c0 22%, #ffffff);
+  box-shadow: 4px 4px 0 rgba(11, 82, 192, 0.12);
+}
+
+/* --- VHS: OSD pe casetă, scanlines și aberație cromatică ---
+   VT323 e condensat și citit greu la mărimi normale — root-ul urcă la 21px,
+   iar toate mărimile rem din app scalează odată cu el. */
+html[data-theme="vhs"] {
+  color-scheme: dark;
+  font-size: 21px;
+  --tt-bg: #0b0b10;
+  --tt-fg: #e8e6df;
+  --tt-accent: #ff2d95;
+  --tt-on-accent: #14030c;
+  --tt-warn: #ffd23f;
+  --tt-danger: #ff5a5a;
+  --radius: 0px;
+  --font-sans: var(--font-vhs);
+}
+html[data-theme="vhs"] body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 90;
+  background: repeating-linear-gradient(
+      0deg,
+      rgba(0, 0, 0, 0.22) 0px,
+      rgba(0, 0, 0, 0.22) 1px,
+      transparent 1px,
+      transparent 3px
+    ),
+    radial-gradient(ellipse at center, transparent 62%, rgba(0, 0, 0, 0.38));
+}
+html[data-theme="vhs"] body::before {
+  content: "● REC  SP 0:00:14";
+  position: fixed;
+  top: 14px;
+  right: 20px;
+  z-index: 91;
+  font-family: var(--font-vhs);
+  font-size: 20px;
+  color: #ffffff;
+  text-shadow:
+    0 0 6px rgba(255, 45, 120, 0.8),
+    1px 0 0 rgba(255, 0, 60, 0.6),
+    -1px 0 0 rgba(0, 255, 255, 0.6);
+  animation: vhs-blink 1.6s steps(2, start) infinite;
+  pointer-events: none;
+}
+@keyframes vhs-blink {
+  50% {
+    opacity: 0.35;
+  }
+}
+/* — glitch pe titluri: două animații independente pe proprietăți diferite —
+   `vhs-ab` mișcă permanent aberația RGB (jitter + licăr de tracking),
+   `vhs-tear` stă cuminte ~80% din ciclu, apoi rupe titlul în benzi
+   orizontale deplasate, ca o casetă cu banda stricată. steps(1) face
+   valorile să SARĂ, nu să gliseze — exact ca un semnal analog prost. */
+html[data-theme="vhs"] h1 {
+  text-shadow:
+    2px 0 0 rgba(255, 0, 90, 0.45),
+    -2px 0 0 rgba(0, 229, 255, 0.45);
+  animation:
+    vhs-ab 2.4s steps(1, end) infinite,
+    vhs-tear 6.8s steps(1, end) infinite;
+}
+@keyframes vhs-ab {
+  0%, 100% {
+    text-shadow:
+      2px 0 0 rgba(255, 0, 90, 0.45),
+      -2px 0 0 rgba(0, 229, 255, 0.45);
+    filter: none;
+  }
+  9% {
+    text-shadow:
+      3px 0 0 rgba(255, 0, 90, 0.6),
+      -3px 0 0 rgba(0, 229, 255, 0.6);
+  }
+  13% {
+    text-shadow:
+      1.5px 0 0 rgba(255, 0, 90, 0.4),
+      -1.5px 0 0 rgba(0, 229, 255, 0.4);
+  }
+  38% {
+    text-shadow:
+      2px 1px 0 rgba(255, 0, 90, 0.5),
+      -2px -1px 0 rgba(0, 229, 255, 0.5);
+    filter: brightness(1.07);
+  }
+  42% {
+    text-shadow:
+      2.5px 0 0 rgba(255, 0, 90, 0.45),
+      -2.5px 0 0 rgba(0, 229, 255, 0.45);
+    filter: none;
+  }
+  71% {
+    text-shadow:
+      -3px 0 0 rgba(255, 0, 90, 0.55),
+      3px 0 0 rgba(0, 229, 255, 0.55);
+  }
+  74% {
+    text-shadow:
+      2px 0 0 rgba(255, 0, 90, 0.45),
+      -2px 0 0 rgba(0, 229, 255, 0.45);
+  }
+}
+@keyframes vhs-tear {
+  0%, 78%, 86%, 100% {
+    clip-path: none;
+    transform: none;
+  }
+  79% {
+    clip-path: inset(8% -12px 58% -12px);
+    transform: translateX(-8px);
+  }
+  80.4% {
+    clip-path: inset(52% -12px 12% -12px);
+    transform: translateX(9px);
+  }
+  81.6% {
+    clip-path: inset(30% -12px 38% -12px);
+    transform: translateX(-5px) skewX(5deg);
+  }
+  82.8% {
+    clip-path: inset(0% -12px 72% -12px);
+    transform: translateX(6px);
+  }
+  84% {
+    clip-path: none;
+    transform: translateX(-2px) skewX(-2deg);
+  }
+}
+/* headerele de secțiune sunt mici — aberație de 1px + jitter discret,
+   fără rupturi (rămân citețe) */
+html[data-theme="vhs"] h2,
+html[data-theme="vhs"] h3 {
+  text-shadow:
+    1px 0 0 rgba(255, 0, 90, 0.3),
+    -1px 0 0 rgba(0, 229, 255, 0.3);
+  animation: vhs-ab-mica 3.4s steps(1, end) infinite;
+}
+@keyframes vhs-ab-mica {
+  0%, 100% {
+    text-shadow:
+      1px 0 0 rgba(255, 0, 90, 0.3),
+      -1px 0 0 rgba(0, 229, 255, 0.3);
+  }
+  47% {
+    text-shadow:
+      1.5px 0 0 rgba(255, 0, 90, 0.45),
+      -1.5px 0 0 rgba(0, 229, 255, 0.45);
+  }
+  52% {
+    text-shadow:
+      -1px 0 0 rgba(255, 0, 90, 0.35),
+      1px 0 0 rgba(0, 229, 255, 0.35);
+  }
+  56% {
+    text-shadow:
+      1px 0 0 rgba(255, 0, 90, 0.3),
+      -1px 0 0 rgba(0, 229, 255, 0.3);
+  }
+}
+html[data-theme="vhs"] h2 span {
+  text-shadow: none;
+}
+
+/* — lizibilitate: elementele cu mărimi fixe în px primesc și ele un boost — */
+html[data-theme="vhs"] .loom-hero h1 {
+  font-size: clamp(42px, 5.6vw, 62px);
+}
+html[data-theme="vhs"] .loom-hero > p {
+  font-size: 22px;
+}
+html[data-theme="vhs"] .loom-eyebrow {
+  font-size: 18px;
+}
+html[data-theme="vhs"] .loom-btn {
+  font-size: 21px;
+  padding: 14px 24px;
+}
+html[data-theme="vhs"] .loom-card h3 {
+  font-size: 24px;
+}
+html[data-theme="vhs"] .loom-card p {
+  font-size: 20px;
+}
+html[data-theme="vhs"] .loom-badge {
+  font-size: 17px;
+}
+html[data-theme="vhs"] body::before {
+  font-size: 24px;
+}
+
+/* --- Broderie: gherghef albastru, petice de pânză aida cusute --- */
+html[data-theme="broderie"] {
+  color-scheme: light;
+  --tt-bg: #f6efe2;
+  --tt-fg: #53402f;
+  --tt-accent: #c04a32;
+  --tt-on-accent: #fff6ea;
+  --tt-warn: #a9741f;
+  --tt-danger: #a83232;
+  --radius: 1rem;
+  /* pânza ghergefului e denim; seed-urile rămân crem pentru suprafețe */
+  --background: #7d9cd4;
+  --card: #fbf5e8;
+  --popover: #fbf5e8;
+  /* direct pe denim, scala de gri trece pe crem ca textul să fie lizibil */
+  --slate-1: color-mix(in oklab, #fff6ea 3%, #7d9cd4);
+  --slate-2: color-mix(in oklab, #fff6ea 6%, #7d9cd4);
+  --slate-3: color-mix(in oklab, #fff6ea 10%, #7d9cd4);
+  --slate-4: color-mix(in oklab, #fff6ea 14%, #7d9cd4);
+  --slate-5: color-mix(in oklab, #fff6ea 18%, #7d9cd4);
+  --slate-6: color-mix(in oklab, #fff6ea 24%, #7d9cd4);
+  --slate-7: color-mix(in oklab, #fff6ea 32%, #7d9cd4);
+  --slate-8: color-mix(in oklab, #fff6ea 42%, #7d9cd4);
+  --slate-9: color-mix(in oklab, #fff6ea 52%, #7d9cd4);
+  --slate-10: color-mix(in oklab, #fff6ea 64%, #7d9cd4);
+  --slate-11: color-mix(in oklab, #fff6ea 86%, #7d9cd4);
+  --slate-12: #fff8ec;
+}
+/* peticele crem readuc scala la maro; color se re-setează pentru moștenire */
+html[data-theme="broderie"] [class*="bg-card"],
+html[data-theme="broderie"] [class*="bg-popover"],
+html[data-theme="broderie"] [class*="bg-sidebar"],
+html[data-theme="broderie"] [class~="bg-slate-2"],
+html[data-theme="broderie"] [class~="bg-slate-3"],
+html[data-theme="broderie"] input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+html[data-theme="broderie"] textarea,
+html[data-theme="broderie"] select {
+  --slate-1: color-mix(in oklab, var(--tt-fg) 3%, var(--tt-bg));
+  --slate-2: color-mix(in oklab, var(--tt-fg) 5%, var(--tt-bg));
+  --slate-3: color-mix(in oklab, var(--tt-fg) 8%, var(--tt-bg));
+  --slate-4: color-mix(in oklab, var(--tt-fg) 11%, var(--tt-bg));
+  --slate-5: color-mix(in oklab, var(--tt-fg) 14%, var(--tt-bg));
+  --slate-6: color-mix(in oklab, var(--tt-fg) 18%, var(--tt-bg));
+  --slate-7: color-mix(in oklab, var(--tt-fg) 25%, var(--tt-bg));
+  --slate-8: color-mix(in oklab, var(--tt-fg) 33%, var(--tt-bg));
+  --slate-9: color-mix(in oklab, var(--tt-fg) 45%, var(--tt-bg));
+  --slate-10: color-mix(in oklab, var(--tt-fg) 52%, var(--tt-bg));
+  --slate-11: color-mix(in oklab, var(--tt-fg) 70%, var(--tt-bg));
+  --slate-12: color-mix(in oklab, var(--tt-fg) 95%, var(--tt-bg));
+  /* aliasurile semantice se rezolvă pe html, deci trebuie re-legate local */
+  --foreground: var(--slate-12);
+  --card-foreground: var(--slate-12);
+  --popover-foreground: var(--slate-12);
+  --secondary: var(--slate-3);
+  --secondary-foreground: var(--slate-12);
+  --muted: var(--slate-3);
+  --muted-foreground: var(--slate-11);
+  --accent: var(--slate-3);
+  --accent-foreground: var(--slate-12);
+  --border: var(--slate-6);
+  --input: var(--slate-7);
+  --sidebar: var(--slate-2);
+  --sidebar-foreground: var(--slate-12);
+  --sidebar-accent: var(--slate-4);
+  --sidebar-accent-foreground: var(--slate-12);
+  --sidebar-border: var(--slate-6);
+  color: var(--slate-12);
+}
+/* zonele denim din interiorul peticelor (bg-background) revin la text crem */
+html[data-theme="broderie"] [class~="bg-background"] {
+  --slate-1: color-mix(in oklab, #fff6ea 3%, #7d9cd4);
+  --slate-2: color-mix(in oklab, #fff6ea 6%, #7d9cd4);
+  --slate-3: color-mix(in oklab, #fff6ea 10%, #7d9cd4);
+  --slate-4: color-mix(in oklab, #fff6ea 14%, #7d9cd4);
+  --slate-5: color-mix(in oklab, #fff6ea 18%, #7d9cd4);
+  --slate-6: color-mix(in oklab, #fff6ea 24%, #7d9cd4);
+  --slate-7: color-mix(in oklab, #fff6ea 32%, #7d9cd4);
+  --slate-8: color-mix(in oklab, #fff6ea 42%, #7d9cd4);
+  --slate-9: color-mix(in oklab, #fff6ea 52%, #7d9cd4);
+  --slate-10: color-mix(in oklab, #fff6ea 64%, #7d9cd4);
+  --slate-11: color-mix(in oklab, #fff6ea 86%, #7d9cd4);
+  --slate-12: #fff8ec;
+  --foreground: var(--slate-12);
+  --secondary: var(--slate-3);
+  --secondary-foreground: var(--slate-12);
+  --muted: var(--slate-3);
+  --muted-foreground: var(--slate-11);
+  --accent: var(--slate-3);
+  --accent-foreground: var(--slate-12);
+  --border: var(--slate-6);
+  --input: var(--slate-7);
+  --sidebar-accent: var(--slate-4);
+  --sidebar-accent-foreground: var(--slate-12);
+  color: var(--slate-12);
+}
+/* controalele de formular au mereu fundal crem (vezi regula lor de mai jos),
+   deci chiar și cu clasa bg-background textul rămâne pe scala maro — altfel
+   select-urile ajung crem pe crem și devin ilizibile */
+html[data-theme="broderie"] input[class~="bg-background"]:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+html[data-theme="broderie"] textarea[class~="bg-background"],
+html[data-theme="broderie"] select[class~="bg-background"] {
+  --slate-11: color-mix(in oklab, var(--tt-fg) 70%, var(--tt-bg));
+  --slate-12: color-mix(in oklab, var(--tt-fg) 95%, var(--tt-bg));
+  --foreground: var(--slate-12);
+  --muted-foreground: var(--slate-11);
+  color: var(--slate-12);
+}
+/* pânză cu textură: zgomot fin + vignetă + fire de urzeală/băteală */
+html[data-theme="broderie"] body {
+  background-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 .05 0'/></filter><rect width='160' height='160' filter='url(%23n)'/></svg>"),
+    radial-gradient(120% 100% at 50% 38%, transparent 58%, rgba(25, 40, 78, 0.22) 100%),
+    repeating-linear-gradient(
+      0deg,
+      rgba(255, 255, 255, 0.05) 0 1px,
+      rgba(35, 55, 100, 0.06) 1px 2px,
+      transparent 2px 3px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0.04) 0 1px,
+      rgba(35, 55, 100, 0.05) 1px 2px,
+      transparent 2px 3px
+    );
+}
+html[data-theme="broderie"] h1,
+html[data-theme="broderie"] h2,
+html[data-theme="broderie"] h3 {
+  font-family: var(--font-stitch);
+  letter-spacing: 0.01em;
+}
+/* etichetele de secțiune și blocurile de intent stau direct pe denim, unde
+   textul crem abia se citește — primesc petice crem cu text maro */
+html[data-theme="broderie"] main h2,
+html[data-theme="broderie"] main section > p {
+  --slate-6: color-mix(in oklab, var(--tt-fg) 18%, var(--tt-bg));
+  --slate-10: color-mix(in oklab, var(--tt-fg) 52%, var(--tt-bg));
+  --slate-11: color-mix(in oklab, var(--tt-fg) 70%, var(--tt-bg));
+  --slate-12: color-mix(in oklab, var(--tt-fg) 95%, var(--tt-bg));
+  --foreground: var(--slate-12);
+  color: var(--slate-12);
+  width: fit-content;
+  padding: 3px 10px;
+  border-radius: 8px;
+  background: rgba(251, 245, 232, 0.92);
+  box-shadow: 0 2px 8px -4px rgba(25, 40, 78, 0.4);
+}
+/* titlurile mari = cross-stitch: litere pixel umplute cu X-uri cusute */
+html[data-theme="broderie"] h1 {
+  background-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='9' height='9'><path d='M1.5 1.5 L7.5 7.5 M7.5 1.5 L1.5 7.5' stroke='black' stroke-width='2' stroke-linecap='round' opacity='.28'/></svg>"),
+    linear-gradient(178deg, #c04a32, #a83e28);
+  background-size: 9px 9px, auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(1px 1.5px 0 rgba(60, 30, 20, 0.35));
+}
+/* petice de pânză aida: împunsături pe contur + cruciulițe X în colțuri */
+html[data-theme="broderie"] [class*="bg-card"] {
+  border: 4px solid transparent;
+  border-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='36' height='36'><rect width='36' height='36' fill='none'/><path d='M2 2 H34 V34 H2 Z' fill='none' stroke='%23703020' stroke-width='2.6' stroke-dasharray='6 5' stroke-linecap='round' opacity='.45' transform='translate(.7,.9)'/><path d='M2 2 H34 V34 H2 Z' fill='none' stroke='%23c04a32' stroke-width='2.6' stroke-dasharray='6 5' stroke-linecap='round'/></svg>")
+    12 / 5px round;
+  border-radius: 0;
+  background:
+    url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14'><path d='M3 3 L11 11 M11 3 L3 11' stroke='%23703020' stroke-width='3' stroke-linecap='round' opacity='.4' transform='translate(.6,.8)'/><path d='M3 3 L11 11 M11 3 L3 11' stroke='%23c04a32' stroke-width='3' stroke-linecap='round'/></svg>")
+      no-repeat 7px 7px / 12px 12px,
+    url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14'><path d='M3 3 L11 11 M11 3 L3 11' stroke='%23703020' stroke-width='3' stroke-linecap='round' opacity='.4' transform='translate(.6,.8)'/><path d='M3 3 L11 11 M11 3 L3 11' stroke='%23c04a32' stroke-width='3' stroke-linecap='round'/></svg>")
+      no-repeat calc(100% - 7px) 7px / 12px 12px,
+    url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14'><path d='M3 3 L11 11 M11 3 L3 11' stroke='%23703020' stroke-width='3' stroke-linecap='round' opacity='.4' transform='translate(.6,.8)'/><path d='M3 3 L11 11 M11 3 L3 11' stroke='%23c04a32' stroke-width='3' stroke-linecap='round'/></svg>")
+      no-repeat 7px calc(100% - 7px) / 12px 12px,
+    url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14'><path d='M3 3 L11 11 M11 3 L3 11' stroke='%23703020' stroke-width='3' stroke-linecap='round' opacity='.4' transform='translate(.6,.8)'/><path d='M3 3 L11 11 M11 3 L3 11' stroke='%23c04a32' stroke-width='3' stroke-linecap='round'/></svg>")
+      no-repeat calc(100% - 7px) calc(100% - 7px) / 12px 12px,
+    var(--card);
+  box-shadow: 0 10px 26px -14px rgba(25, 40, 78, 0.55);
+}
+/* sidebar-ul = petic mare de pânză, cu aceleași cusături */
+html[data-theme="broderie"] aside[class*="bg-sidebar"] {
+  border: 4px solid transparent;
+  border-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='36' height='36'><rect width='36' height='36' fill='none'/><path d='M2 2 H34 V34 H2 Z' fill='none' stroke='%23703020' stroke-width='2.6' stroke-dasharray='6 5' stroke-linecap='round' opacity='.45' transform='translate(.7,.9)'/><path d='M2 2 H34 V34 H2 Z' fill='none' stroke='%23c04a32' stroke-width='2.6' stroke-dasharray='6 5' stroke-linecap='round'/></svg>")
+    12 / 5px round;
+  background: var(--sidebar);
+  box-shadow: 0 10px 26px -14px rgba(25, 40, 78, 0.55);
+}
+html[data-theme="broderie"] input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+html[data-theme="broderie"] textarea,
+html[data-theme="broderie"] select {
+  border: 4px solid transparent;
+  border-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='36' height='36'><rect width='36' height='36' fill='none'/><path d='M2 2 H34 V34 H2 Z' fill='none' stroke='%23703020' stroke-width='2.6' stroke-dasharray='6 5' stroke-linecap='round' opacity='.45' transform='translate(.7,.9)'/><path d='M2 2 H34 V34 H2 Z' fill='none' stroke='%23c04a32' stroke-width='2.6' stroke-dasharray='6 5' stroke-linecap='round'/></svg>")
+    12 / 5px round;
+  border-radius: 0;
+  background-color: var(--card);
+}
+/* Bordurile devin cusături pe orice container cu colțuri rotunjite. */
+html[data-theme="broderie"] [class*="rounded-md"],
+html[data-theme="broderie"] [class*="rounded-lg"],
+html[data-theme="broderie"] [class*="rounded-xl"],
+html[data-theme="broderie"] [class*="rounded-2xl"] {
+  border-style: dashed;
+}
+/* alfabetul de sampler, cusut discret pe pânză jos-stânga */
+.loom-bq {
+  position: absolute;
+  pointer-events: none;
+}
+html[data-theme="broderie"] .bq-alpha {
+  position: absolute;
+  left: 3%;
+  bottom: 4%;
+  font-family: var(--font-stitch);
+  font-size: 21px;
+  line-height: 1.55;
+  letter-spacing: 0.2em;
+  color: rgba(143, 52, 35, 0.32);
+  transform: rotate(-2deg);
+}
+
+/* --- Bon fiscal: hârtie termică, doar cerneală și mono --- */
+html[data-theme="bon"] {
+  color-scheme: light;
+  --tt-bg: #f7f5ee;
+  --tt-fg: #24211a;
+  --tt-accent: #24211a;
+  --tt-on-accent: #f7f5ee;
+  --tt-warn: #8a6d1f;
+  --tt-danger: #a03030;
+  --radius: 0px;
+  --font-sans: var(--font-geist-mono);
+  --card: #fdfcf7;
+  --popover: #fdfcf7;
+}
+html[data-theme="bon"] h1,
+html[data-theme="bon"] h2,
+html[data-theme="bon"] h3,
+html[data-theme="bon"] h4 {
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+}
+html[data-theme="bon"] [class*="rounded-md"],
+html[data-theme="bon"] [class*="rounded-lg"],
+html[data-theme="bon"] [class*="rounded-xl"],
+html[data-theme="bon"] [class*="rounded-2xl"] {
+  border-style: dashed;
+}
+/* rând normal la capătul paginii (body e flex-col), ca finalul unui bon
+   adevărat — fixat pe viewport se suprapunea peste text la scroll */
+html[data-theme="bon"] body::after {
+  content: "*** VĂ MULȚUMIM! NU SE ACORDĂ REST ***";
+  padding: 14px 0 10px;
+  text-align: center;
+  font-family: var(--font-geist-mono);
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  color: color-mix(in srgb, var(--tt-fg) 40%, transparent);
+  pointer-events: none;
+}
+
+/* --- Split-flap: tabloul de plecări din aeroport --- */
+html[data-theme="splitflap"] {
+  color-scheme: dark;
+  --tt-bg: #1b1c21;
+  --tt-fg: #f3efe4;
+  --tt-accent: #ffb400;
+  --tt-on-accent: #191204;
+  --tt-warn: #ffb400;
+  --tt-danger: #ff6b57;
+  --radius: 0.4rem;
+  --card: #0f1013;
+  --popover: #121317;
+}
+html[data-theme="splitflap"] h1,
+html[data-theme="splitflap"] h2,
+html[data-theme="splitflap"] h3 {
+  font-family: var(--font-flap);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+html[data-theme="splitflap"] h1 {
+  animation: flap-in 0.5s cubic-bezier(0.3, 0.7, 0.3, 1);
+  transform-origin: 50% 0;
+}
+@keyframes flap-in {
+  from {
+    transform: perspective(600px) rotateX(-70deg);
+    opacity: 0;
+  }
+}
+/* Plăcuțele au balamaua orizontală la mijloc, ca literele mecanice. */
+html[data-theme="splitflap"] [class*="bg-card"] {
+  background-image: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.05),
+    rgba(255, 255, 255, 0.01) 48%,
+    rgba(0, 0, 0, 0.35) 50%,
+    rgba(0, 0, 0, 0) 52%
+  );
+}
+/* fereastra terminalului la ora albastră */
+html[data-theme="splitflap"] body {
+  background-image: linear-gradient(
+    180deg,
+    #232c4e 0%,
+    #1b2340 26%,
+    #141a30 44%,
+    #0e1120 58%,
+    #0b0c14 100%
+  );
+  background-attachment: fixed;
+}
+/* secțiunile devin gate-uri anunțate */
+html[data-theme="splitflap"] main {
+  counter-reset: gate;
+}
+html[data-theme="splitflap"] main h2 {
+  counter-increment: gate;
+}
+html[data-theme="splitflap"] main h2::before {
+  content: "◆ ";
+  color: var(--indigo-9);
+}
+html[data-theme="splitflap"] main h2::after {
+  content: " — GATE 0" counter(gate);
+  color: var(--slate-11);
+  font-size: 0.7em;
+  letter-spacing: 0.2em;
+}
+html[data-theme="splitflap"] main h2 span {
+  color: var(--slate-11);
+}
+/* loc pentru banda de anunțuri, ca ultimul rând să nu rămână sub ea */
+html[data-theme="splitflap"] main {
+  padding-bottom: 88px;
+}
+/* pista cu lumini de balizaj, jos, în perspectivă */
+.sf-runway {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 46vh;
+}
+.sf-runway svg {
+  width: 100%;
+  height: 100%;
+}
+.sf-blink {
+  animation: rw-blink 2.6s ease-in-out infinite;
+}
+.sf-blink.sf-b2 {
+  animation-delay: 0.9s;
+}
+.sf-blink.sf-b3 {
+  animation-delay: 1.7s;
+}
+@keyframes rw-blink {
+  0%,
+  100% {
+    opacity: 0.25;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+/* avioane-siluetă la altitudini, viteze și direcții diferite;
+   delay-urile negative le pun în mijlocul traseului încă de la load */
+.sf-plane {
+  position: absolute;
+  top: 13%;
+  left: 0;
+  opacity: 0.85;
+  animation: plane-cross 75s linear infinite;
+}
+.sf-plane.sf-p2 {
+  top: 7%;
+  opacity: 0.55;
+  animation-duration: 110s;
+  animation-delay: -70s;
+}
+.sf-plane.sf-p3 {
+  top: 21%;
+  opacity: 0.72;
+  animation-name: plane-cross-rev;
+  animation-duration: 90s;
+  animation-delay: -35s;
+}
+.sf-plane.sf-p4 {
+  top: 4%;
+  opacity: 0.4;
+  animation-name: plane-cross-rev;
+  animation-duration: 140s;
+  animation-delay: -100s;
+}
+.sf-poslight {
+  animation: rw-blink 1.1s steps(2, start) infinite;
+}
+@keyframes plane-cross {
+  from {
+    transform: translateX(-10vw);
+  }
+  to {
+    transform: translateX(110vw);
+  }
+}
+@keyframes plane-cross-rev {
+  from {
+    transform: translateX(110vw) scaleX(-1);
+  }
+  to {
+    transform: translateX(-10vw) scaleX(-1);
+  }
+}
+/* luna — sus în dreapta, în cerul liber dintre hero și eticheta de bagaj
+   (în stânga ar sta ascunsă sub sidebar). Sferă cu shading real: lumina
+   cade din stânga-sus, terminatorul se scufundă jos-dreapta, marginea se
+   întunecă (limb darkening), craterele au peretele dinspre lumină umbrit
+   și buza opusă luminată. */
+.sf-moon {
+  position: absolute;
+  top: 6%;
+  right: 15%;
+  width: 116px;
+  height: 116px;
+  border-radius: 50%;
+  background:
+    /* speculara difuză dinspre soare */
+    radial-gradient(circle at 30% 26%, rgba(255, 255, 250, 0.95), rgba(255, 255, 250, 0) 48%),
+    /* terminatorul: umbra care înghite sfertul de jos-dreapta */
+    radial-gradient(circle at 74% 78%, rgba(72, 66, 50, 0.5), rgba(72, 66, 50, 0) 62%),
+    /* corpul cu limb darkening spre margine */
+    radial-gradient(circle at 50% 50%, #f4efdf 55%, #e0d9c3 76%, #bdb49e 93%, #9d9480 100%);
+  box-shadow:
+    0 0 46px 16px rgba(240, 235, 215, 0.3),
+    0 0 130px 52px rgba(200, 210, 255, 0.18),
+    inset -18px -22px 42px rgba(58, 52, 38, 0.55),
+    inset 7px 9px 20px rgba(255, 255, 250, 0.45);
+}
+.sf-moon::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background:
+    /* mări selenare — pete mari, moi, ușor gri-albăstrui */
+    radial-gradient(ellipse 34% 26% at 58% 46%, rgba(118, 112, 94, 0.22), transparent 72%),
+    radial-gradient(ellipse 24% 30% at 34% 64%, rgba(118, 112, 94, 0.18), transparent 70%),
+    /* cratere: bolul umbrit + buza luminată decalată spre jos-dreapta */
+    radial-gradient(circle at 63% 28%, rgba(108, 100, 80, 0.5) 0 7.5%, transparent 8.5%),
+    radial-gradient(circle at 64.8% 30.4%, rgba(255, 255, 248, 0.55) 0 8.5%, transparent 9.5%),
+    radial-gradient(circle at 38% 58%, rgba(108, 100, 80, 0.44) 0 10.5%, transparent 11.5%),
+    radial-gradient(circle at 40.2% 60.8%, rgba(255, 255, 248, 0.45) 0 11.5%, transparent 12.5%),
+    radial-gradient(circle at 71% 62%, rgba(96, 88, 68, 0.42) 0 5.5%, transparent 6.5%),
+    radial-gradient(circle at 72.6% 64%, rgba(255, 253, 240, 0.4) 0 6.5%, transparent 7.5%),
+    radial-gradient(circle at 52% 40%, rgba(108, 100, 80, 0.34) 0 4.5%, transparent 5.5%),
+    radial-gradient(circle at 53.4% 41.8%, rgba(255, 255, 248, 0.4) 0 5.5%, transparent 6.5%),
+    radial-gradient(circle at 26% 42%, rgba(108, 100, 80, 0.3) 0 3.5%, transparent 4.5%),
+    radial-gradient(circle at 27.2% 43.6%, rgba(255, 255, 248, 0.35) 0 4.5%, transparent 5.5%),
+    radial-gradient(circle at 47% 76%, rgba(96, 88, 68, 0.3) 0 3%, transparent 4%);
+}
+/* banda de anunțuri a aeroportului */
+.sf-ticker {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  /* sub stratul de conținut (z-1): banda rămâne pe „geamul terminalului",
+     dar nu mai acoperă sidebar-ul (switcher-ul de teme) sau finalul paginii */
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+  background: rgba(8, 9, 11, 0.85);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 6px 0;
+  font-family: var(--font-geist-mono);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.3em;
+  color: var(--indigo-9);
+}
+.sf-tape {
+  display: inline-block;
+  white-space: nowrap;
+  animation: ticker-run 48s linear infinite;
+}
+@keyframes ticker-run {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+/* --- Metal („Titanium"): totul frezat/gravat în metal, accent albastru
+   anodizat. Singura temă custom cu variante light + dark: seed-urile se
+   rezolvă la folosire, deci blocul comun de regenerare servește ambele
+   moduri — html.dark schimbă doar seed-urile. --- */
+html[data-theme="metal"] {
+  --tt-bg: #c9cdd4;
+  --tt-fg: #14171b;
+  --tt-accent: #33639e;
+  --tt-on-accent: #ffffff;
+  --tt-warn: #9a6c1f;
+  --tt-danger: #9d3438;
+  --radius: 0.7rem;
+  --card: #dfe2e7;
+  --popover: #dfe2e7;
+}
+html[data-theme="metal"].dark {
+  --tt-bg: #1b1e23;
+  --tt-fg: #e9ebef;
+  --tt-accent: #4e83c6;
+  --tt-warn: #b98a3a;
+  --tt-danger: #b6484d;
+  --card: #2b2f36;
+  --popover: #2b2f36;
+}
+/* aluminiu laminat: periaj fin + lumină de sus + benzi de sheen */
+html[data-theme="metal"] body {
+  background-image: repeating-linear-gradient(
+      0deg,
+      rgba(255, 255, 255, 0.07) 0 1px,
+      rgba(12, 16, 24, 0.055) 1px 2px,
+      transparent 2px 3px
+    ),
+    radial-gradient(1200px 500px at 30% -10%, rgba(255, 255, 255, 0.45), transparent 60%),
+    linear-gradient(
+      115deg,
+      #aab0b9 0%,
+      #e2e6eb 14%,
+      #9ba1ac 30%,
+      #d7dbe1 46%,
+      #8f96a1 62%,
+      #dde1e7 78%,
+      #a4aab4 92%,
+      #c2c7cf 100%
+    );
+  background-attachment: fixed;
+}
+/* oțel negru brunat: periaj + vignetă + lumină rece + benzi late de sheen */
+html[data-theme="metal"].dark body {
+  background-image: repeating-linear-gradient(
+      0deg,
+      rgba(255, 255, 255, 0.05) 0 1px,
+      rgba(0, 0, 0, 0.4) 1px 2px,
+      transparent 2px 3px
+    ),
+    radial-gradient(140% 120% at 50% 40%, transparent 55%, rgba(0, 0, 0, 0.55) 100%),
+    radial-gradient(1200px 500px at 30% -10%, rgba(165, 195, 240, 0.16), transparent 60%),
+    linear-gradient(
+      115deg,
+      #16181d 0%,
+      #383e48 14%,
+      #101216 30%,
+      #2f353e 46%,
+      #0a0c0f 62%,
+      #333944 78%,
+      #14161a 92%,
+      #1d2026 100%
+    );
+  background-attachment: fixed;
+}
+/* cursorul = săgeată de metal încins: miez alb-incandescent, aură de jar.
+   Doar cursorul „default" — mâna de pe linkuri și I-beam-ul din inputuri
+   rămân ale sistemului, ca să nu se piardă afordanțele. */
+html[data-theme="metal"] body {
+  cursor:
+    url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='30' height='30'><path d='M9 3 L9 20.5 L13.2 16.7 L15.9 22.9 L19 21.6 L16.4 15.5 L22 15.1 Z' fill='none' stroke='%23ff3d00' stroke-width='6' stroke-linejoin='round' opacity='.35'/><path d='M9 3 L9 20.5 L13.2 16.7 L15.9 22.9 L19 21.6 L16.4 15.5 L22 15.1 Z' fill='none' stroke='%23ff8a3c' stroke-width='3' stroke-linejoin='round' opacity='.85'/><path d='M9 3 L9 20.5 L13.2 16.7 L15.9 22.9 L19 21.6 L16.4 15.5 L22 15.1 Z' fill='%23ffffff' stroke='%23c2470f' stroke-width='1'/></svg>")
+      9 3,
+    default;
+}
+/* titlurile mari = oțel lustruit cu sweep de lumină */
+html[data-theme="metal"] h1 {
+  /* sweep-ul rămâne, dar opririle „luminoase" sunt gri medii — cele aproape
+     albe dispăreau în fundalul de aluminiu deschis */
+  background-image: linear-gradient(
+    105deg,
+    #1f242c 0%,
+    #5c6675 30%,
+    #2c323b 50%,
+    #515b69 68%,
+    #232830 100%
+  );
+  background-size: 220% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  animation: metal-sheen 7s ease-in-out infinite alternate;
+  filter: drop-shadow(0 1px 1px rgba(255, 255, 255, 0.45));
+}
+html[data-theme="metal"].dark h1 {
+  /* chrome lustruit — banda albă strălucitoare mătură literele */
+  background-image: linear-gradient(
+    105deg,
+    #9aa4b2 0%,
+    #ffffff 18%,
+    #6d7787 32%,
+    #f6faff 48%,
+    #7d8896 62%,
+    #ffffff 80%,
+    #9aa4b2 100%
+  );
+  background-size: 260% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  animation: metal-sheen 4.5s ease-in-out infinite alternate;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.8));
+}
+@keyframes metal-sheen {
+  from {
+    background-position: 0% 0;
+  }
+  to {
+    background-position: 100% 0;
+  }
+}
+/* sidebar-ul = placă frezată */
+html[data-theme="metal"] aside[class*="bg-sidebar"] {
+  background-image: repeating-linear-gradient(
+      0deg,
+      rgba(255, 255, 255, 0.06) 0 1px,
+      rgba(12, 16, 24, 0.04) 1px 2px,
+      transparent 2px 3px
+    ),
+    linear-gradient(180deg, #e5e8ec, #c3c8d0);
+  border-right-color: #8b929d;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.95),
+    6px 0 24px -12px rgba(22, 27, 37, 0.6);
+}
+html[data-theme="metal"].dark aside[class*="bg-sidebar"] {
+  background-image: repeating-linear-gradient(
+      0deg,
+      rgba(255, 255, 255, 0.03) 0 1px,
+      rgba(0, 0, 0, 0.2) 1px 2px,
+      transparent 2px 3px
+    ),
+    linear-gradient(180deg, #33383f, #1e2126);
+  border-right-color: #0a0c0f;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.14),
+    6px 0 28px -12px rgba(0, 0, 0, 0.85);
+}
+/* elementul activ din navigație = slot presat în placă */
+html[data-theme="metal"] aside [class*="bg-sidebar-accent"] {
+  box-shadow:
+    inset 0 2px 5px rgba(20, 26, 36, 0.35),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.55);
+}
+html[data-theme="metal"].dark aside [class*="bg-sidebar-accent"] {
+  box-shadow:
+    inset 0 2px 6px rgba(0, 0, 0, 0.75),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.08);
+}
+/* cardurile = plăci de metal; texturile sunt translucide ca să lase
+   culoarea de bază (--card sau alt bg-*) vizibilă dedesubt */
+html[data-theme="metal"] [class*="bg-card"] {
+  background-image: repeating-linear-gradient(
+      0deg,
+      rgba(255, 255, 255, 0.05) 0 1px,
+      rgba(12, 16, 24, 0.03) 1px 2px,
+      transparent 2px 3px
+    ),
+    linear-gradient(150deg, rgba(255, 255, 255, 0.45), rgba(20, 26, 36, 0.08) 70%);
+  border-color: #f4f6f9;
+  border-bottom-color: #8b929d;
+  border-right-color: #9aa0aa;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    inset 0 -1px 3px rgba(20, 26, 36, 0.15),
+    0 12px 26px -14px rgba(22, 27, 37, 0.6);
+}
+html[data-theme="metal"].dark [class*="bg-card"] {
+  background-image: repeating-linear-gradient(
+      0deg,
+      rgba(255, 255, 255, 0.03) 0 1px,
+      rgba(0, 0, 0, 0.2) 1px 2px,
+      transparent 2px 3px
+    ),
+    linear-gradient(150deg, rgba(255, 255, 255, 0.07), rgba(0, 0, 0, 0.25) 70%);
+  border-color: #454b54;
+  border-top-color: #575d68;
+  border-bottom-color: #0c0e11;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    0 14px 30px -16px rgba(0, 0, 0, 0.85);
+}
+/* plăcile mari primesc și șuruburi în colțuri */
+html[data-theme="metal"] [class*="bg-card"][class*="rounded-xl"] {
+  position: relative;
+}
+html[data-theme="metal"] [class*="bg-card"][class*="rounded-xl"]::before,
+html[data-theme="metal"] [class*="bg-card"][class*="rounded-xl"]::after {
+  content: "";
+  position: absolute;
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background:
+    linear-gradient(
+      45deg,
+      transparent 44%,
+      rgba(40, 46, 56, 0.85) 46%,
+      rgba(40, 46, 56, 0.85) 54%,
+      transparent 56%
+    ),
+    radial-gradient(circle at 32% 28%, #f4f6fa, #9aa1ab 65%, #6a717c);
+  box-shadow:
+    inset 0 -1px 2px rgba(20, 26, 36, 0.5),
+    0 1px 0 rgba(255, 255, 255, 0.7);
+  pointer-events: none;
+}
+html[data-theme="metal"] [class*="bg-card"][class*="rounded-xl"]::before {
+  top: 7px;
+  left: 7px;
+}
+html[data-theme="metal"] [class*="bg-card"][class*="rounded-xl"]::after {
+  bottom: 7px;
+  right: 7px;
+  transform: rotate(35deg);
+}
+html[data-theme="metal"].dark [class*="bg-card"][class*="rounded-xl"]::before,
+html[data-theme="metal"].dark [class*="bg-card"][class*="rounded-xl"]::after {
+  background:
+    linear-gradient(
+      45deg,
+      transparent 44%,
+      rgba(0, 0, 0, 0.85) 46%,
+      rgba(0, 0, 0, 0.85) 54%,
+      transparent 56%
+    ),
+    radial-gradient(circle at 32% 28%, #8a919c, #3a3f47 65%, #16181d);
+  box-shadow:
+    inset 0 -1px 2px rgba(0, 0, 0, 0.8),
+    0 1px 0 rgba(255, 255, 255, 0.12);
+}
+/* acțiunile primare = butoane frezate, albastru anodizat */
+html[data-theme="metal"] [class*="bg-indigo-9"] {
+  background-image: linear-gradient(180deg, #5e93cf, #3b6fae 48%, #2b5488);
+  text-shadow: 0 -1px 0 rgba(5, 20, 40, 0.4);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.5),
+    inset 0 -2px 4px rgba(8, 24, 46, 0.4),
+    0 8px 16px -8px rgba(25, 55, 95, 0.7);
+}
+html[data-theme="metal"] [class*="bg-indigo-9"]:hover {
+  background-image: linear-gradient(180deg, #6ba0da, #4479b8 48%, #315f96);
+}
+html[data-theme="metal"].dark [class*="bg-indigo-9"] {
+  background-image: linear-gradient(180deg, #6ba0da, #3b6fae 48%, #27507f);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.45),
+    inset 0 -2px 4px rgba(5, 18, 36, 0.5),
+    0 8px 18px -8px rgba(0, 0, 0, 0.8),
+    0 0 24px rgba(90, 150, 220, 0.3);
+}
+html[data-theme="metal"].dark [class*="bg-indigo-9"]:hover {
+  background-image: linear-gradient(180deg, #7cabe0, #4479b8 48%, #2d578c);
+}
+/* inputurile = sloturi frezate */
+html[data-theme="metal"] input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+html[data-theme="metal"] textarea,
+html[data-theme="metal"] select {
+  background-color: #c9ced6;
+  border-color: #a3a9b2;
+  box-shadow:
+    inset 0 2px 5px rgba(20, 26, 36, 0.3),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.6);
+}
+html[data-theme="metal"] input::placeholder,
+html[data-theme="metal"] textarea::placeholder {
+  color: #7b828d;
+}
+html[data-theme="metal"].dark input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+html[data-theme="metal"].dark textarea,
+html[data-theme="metal"].dark select {
+  background-color: #15171b;
+  border-color: #3d434b;
+  box-shadow:
+    inset 0 2px 6px rgba(0, 0, 0, 0.7),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.07);
+}
+html[data-theme="metal"].dark input::placeholder,
+html[data-theme="metal"].dark textarea::placeholder {
+  color: #6d747f;
+}
+
+/* ==================== Decorațiuni de temă ====================
+   Elementele de mai jos sunt randate de ThemeDecorations.tsx doar când
+   tema respectivă e activă. */
+
+/* — Retro Nostalgia: bule de săpun iridescente, poppabile — */
+.loom-bubble {
+  position: absolute;
+  bottom: -190px;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 30% 24%, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0) 26%),
+    radial-gradient(circle at 63% 38%, rgba(255, 255, 255, 0.35), rgba(255, 255, 255, 0) 16%),
+    radial-gradient(circle at 50% 90%, rgba(255, 255, 255, 0.45), rgba(255, 255, 255, 0) 34%),
+    conic-gradient(
+      from 210deg,
+      rgba(255, 160, 190, 0.2),
+      rgba(255, 232, 160, 0.16),
+      rgba(160, 255, 222, 0.2),
+      rgba(150, 195, 255, 0.26),
+      rgba(215, 170, 255, 0.18),
+      rgba(255, 160, 190, 0.2)
+    );
+  border: 1px solid rgba(255, 255, 255, 0.65);
+  box-shadow:
+    inset 0 0 24px rgba(255, 255, 255, 0.35),
+    inset 0 -16px 30px rgba(130, 185, 255, 0.38),
+    inset 10px 14px 30px rgba(255, 255, 255, 0.28),
+    0 14px 34px rgba(60, 120, 200, 0.18);
+  backdrop-filter: blur(2px) saturate(1.25);
+  -webkit-backdrop-filter: blur(2px) saturate(1.25);
+  animation: bubbleRise linear infinite;
+  will-change: transform;
+}
+.loom-bubble::before {
+  content: "";
+  position: absolute;
+  top: 12%;
+  left: 16%;
+  width: 32%;
+  height: 18%;
+  border-radius: 50%;
+  background: linear-gradient(rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.4));
+  filter: blur(2px);
+  transform: rotate(-28deg);
+}
+.loom-bubble::after {
+  content: "";
+  position: absolute;
+  inset: 5%;
+  border-radius: 50%;
+  border: 2.5px solid transparent;
+  border-bottom-color: rgba(255, 255, 255, 0.45);
+  border-right-color: rgba(190, 230, 255, 0.4);
+  border-left-color: rgba(255, 205, 230, 0.22);
+  filter: blur(1px);
+}
+.bubble-1 { width: 120px; height: 120px; left: 7%;  animation-duration: 30s; animation-delay: -4s; }
+.bubble-2 { width: 56px;  height: 56px;  left: 19%; animation-duration: 21s; animation-delay: -13s; }
+.bubble-3 { width: 160px; height: 160px; left: 79%; animation-duration: 38s; animation-delay: -22s; }
+.bubble-4 { width: 40px;  height: 40px;  left: 37%; animation-duration: 17s; animation-delay: -8s; }
+.bubble-5 { width: 95px;  height: 95px;  left: 60%; animation-duration: 26s; animation-delay: -18s; }
+.bubble-6 { width: 68px;  height: 68px;  left: 48%; animation-duration: 23s; animation-delay: -2s; }
+.bubble-7 { width: 34px;  height: 34px;  left: 68%; animation-duration: 15s; animation-delay: -10s; }
+.bubble-8 { width: 84px;  height: 84px;  left: 28%; animation-duration: 33s; animation-delay: -27s; }
+/* urcă prin tot cadrul, cu legănare, respirație și fade elegant sus */
+@keyframes bubbleRise {
+  0%   { transform: translateY(0)      translateX(0)     scale(0.94) rotate(0deg); opacity: 0; }
+  6%   { opacity: 0.95; }
+  22%  { transform: translateY(-26vh)  translateX(28px)  scale(1)    rotate(4deg); }
+  46%  { transform: translateY(-54vh)  translateX(-20px) scale(1.05) rotate(-3deg); }
+  72%  { transform: translateY(-82vh)  translateX(24px)  scale(1)    rotate(4deg); }
+  92%  { opacity: 0.9; }
+  100% { transform: translateY(-118vh) translateX(-6px)  scale(1.08) rotate(-2deg); opacity: 0; }
+}
+/* spargerea bulei */
+.burst {
+  position: fixed;
+  z-index: 60;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+.burst .film,
+.burst .ring,
+.burst .drop {
+  position: absolute;
+  left: 0;
+  top: 0;
+  border-radius: 50%;
+}
+.burst .film {
+  width: var(--size);
+  height: var(--size);
+  background:
+    radial-gradient(circle at 30% 24%, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0) 30%),
+    conic-gradient(
+      from 210deg,
+      rgba(255, 160, 190, 0.3),
+      rgba(255, 232, 160, 0.24),
+      rgba(160, 255, 222, 0.3),
+      rgba(150, 195, 255, 0.36),
+      rgba(215, 170, 255, 0.26),
+      rgba(255, 160, 190, 0.3)
+    );
+  animation: filmPop 0.3s ease-out forwards;
+}
+@keyframes filmPop {
+  from { transform: translate(-50%, -50%) scale(1); opacity: 0.95; }
+  to   { transform: translate(-50%, -50%) scale(1.45); opacity: 0; }
+}
+.burst .ring {
+  width: var(--size);
+  height: var(--size);
+  border: 2.5px solid rgba(255, 255, 255, 0.9);
+  box-shadow: 0 0 20px rgba(160, 210, 255, 0.9), inset 0 0 14px rgba(255, 255, 255, 0.5);
+  animation: ringPop 0.55s cubic-bezier(0.2, 0.7, 0.3, 1) forwards;
+}
+@keyframes ringPop {
+  from { transform: translate(-50%, -50%) scale(0.9); opacity: 1; }
+  to   { transform: translate(-50%, -50%) scale(2.1); opacity: 0; }
+}
+.burst .drop {
+  background: radial-gradient(circle at 35% 30%, #ffffff, rgba(185, 225, 255, 0.9));
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.85);
+  animation: dropFly var(--dur) cubic-bezier(0.15, 0.6, 0.3, 1) forwards;
+}
+@keyframes dropFly {
+  from { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+  to {
+    transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy) + 22px)) scale(0.25);
+    opacity: 0;
+  }
+}
+/* post-it roz */
+.sticky-note {
+  position: fixed;
+  top: 110px;
+  right: 3%;
+  z-index: 2;
+  width: 200px;
+  padding: 18px 20px;
+  background: #ffddef;
+  color: #b03b7c;
+  font-family: var(--font-stitch);
+  font-size: 16px;
+  line-height: 1.5;
+  transform: rotate(3deg);
+  box-shadow: 6px 8px 0 rgba(11, 82, 192, 0.16);
+  animation: loom-float 20s ease-in-out infinite alternate;
+  pointer-events: none;
+}
+@keyframes loom-float {
+  0%   { transform: translateY(0) rotate(2deg); }
+  100% { transform: translateY(-16px) rotate(4deg); }
+}
+
+/* — Split-flap: plăcuțe de litere, etichetă de bagaj, gate + ceas — */
+/* literele titlului sunt cartonașe de calendar de birou: plăcuțe cu
+   balama la mijloc, care se rostogolesc în jos de câteva ori (JS le
+   ciclează prin caractere aleatorii) până se opresc pe litera corectă */
+html[data-theme="splitflap"] main h1 .flap-char {
+  display: inline-block;
+  min-width: 0.74em;
+  text-align: center;
+  margin: 0.04em 0.035em;
+  padding: 0.05em 0.05em 0.1em;
+  background: linear-gradient(180deg, #17181f, #0b0c10 48%, #000 50%, #12131a 52%, #0d0e13);
+  border-radius: 0.12em;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.09),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.6),
+    0 2px 4px rgba(0, 0, 0, 0.55);
+}
+html[data-theme="splitflap"] main h1 .flap-char.flip {
+  animation: flap-cycle 0.26s linear;
+  transform-origin: 50% 50%;
+}
+/* rostogolire verticală: cartonașul se răstoarnă de sus în jos,
+   ca fila unui calendar de birou care cade peste inele */
+@keyframes flap-cycle {
+  0%   { transform: perspective(280px) rotateX(0); }
+  49%  { transform: perspective(280px) rotateX(-89deg); filter: brightness(1.5); }
+  50%  { transform: perspective(280px) rotateX(89deg);  filter: brightness(0.55); }
+  100% { transform: perspective(280px) rotateX(0); }
+}
+/* etichetă de bagaj care se leagănă */
+.bag-tag {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  align-items: center;
+  position: fixed;
+  top: 96px;
+  right: 3%;
+  z-index: 2;
+  width: 152px;
+  padding: 28px 14px 14px;
+  background: #f2efe6;
+  color: #15161a;
+  border-radius: 10px;
+  transform-origin: 50% -18px;
+  box-shadow: 0 16px 32px -14px rgba(0, 0, 0, 0.85);
+  animation: tag-sway 7s ease-in-out infinite alternate;
+  font-family: var(--font-geist-mono);
+  font-weight: 700;
+  font-size: 14.5px;
+  letter-spacing: 0.06em;
+  text-align: center;
+  pointer-events: none;
+}
+.bag-tag .hole {
+  position: absolute;
+  top: 8px;
+  left: 50%;
+  width: 13px;
+  height: 13px;
+  margin-left: -6.5px;
+  border-radius: 50%;
+  background: #0e1120;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.9), 0 0 0 3px #d9d5c8;
+}
+.bag-tag span {
+  font-weight: 600;
+  font-size: 9px;
+  letter-spacing: 0.16em;
+  color: #6b675c;
+}
+.bag-tag .bars {
+  width: 100%;
+  height: 28px;
+  background: repeating-linear-gradient(
+    90deg,
+    #15161a 0 2px,
+    transparent 2px 5px,
+    #15161a 5px 6px,
+    transparent 6px 10px
+  );
+}
+@keyframes tag-sway {
+  from { transform: rotate(2.5deg); }
+  to   { transform: rotate(5.5deg); }
+}
+/* gate sign + ceas live, în colțul din dreapta-sus */
+.sf-topright {
+  position: fixed;
+  top: 14px;
+  right: 18px;
+  z-index: 46;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  pointer-events: none;
+}
+.sf-gate {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 10px;
+  background: #0a0b0e;
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  font-family: var(--font-geist-mono);
+  font-weight: 600;
+  font-size: 12px;
+  letter-spacing: 0.18em;
+  color: var(--foreground);
+}
+.sf-gate i {
+  font-style: normal;
+  color: var(--indigo-9);
+}
+.sf-clock {
+  font-family: var(--font-geist-mono);
+  font-weight: 600;
+  font-size: 16px;
+  letter-spacing: 0.12em;
+  color: var(--foreground);
+  text-shadow: 0 0 10px rgba(242, 239, 230, 0.35);
+}
+.sf-clock b {
+  animation: clock-pulse 2s steps(2, start) infinite;
+}
+@keyframes clock-pulse {
+  50% { opacity: 0.25; }
+}
+
+/* — Bon fiscal: bonuri vechi pe tejghea + perforații de rolă — */
+html[data-theme="bon"] .old-bon {
+  position: absolute;
+  width: 120px;
+  height: 170px;
+  padding-top: 26px;
+  background:
+    repeating-linear-gradient(
+        180deg,
+        transparent 0 14px,
+        rgba(36, 33, 26, 0.26) 14px 16px,
+        transparent 16px 22px,
+        rgba(36, 33, 26, 0.18) 22px 23px
+      )
+      content-box,
+    #f6f4ea;
+  box-shadow: 0 8px 18px -10px rgba(60, 50, 30, 0.45);
+  opacity: 0.6;
+}
+html[data-theme="bon"] .old-bon::before {
+  content: "* * *";
+  position: absolute;
+  top: 7px;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-family: var(--font-geist-mono);
+  font-weight: 500;
+  font-size: 9px;
+  color: rgba(36, 33, 26, 0.4);
+  letter-spacing: 0.3em;
+}
+html[data-theme="bon"] .old-bon::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -7px;
+  height: 7px;
+  background:
+    linear-gradient(-45deg, transparent 5px, #f6f4ea 5px) 0 0 / 10px 10px repeat-x,
+    linear-gradient(45deg, transparent 5px, #f6f4ea 5px) 5px 0 / 10px 10px repeat-x;
+}
+html[data-theme="bon"] .old-bon.ob1 { top: 13%; left: 2.5%; transform: rotate(-9deg); }
+html[data-theme="bon"] .old-bon.ob2 { bottom: 15%; right: 3%; transform: rotate(7deg); width: 104px; height: 148px; }
+html[data-theme="bon"] .old-bon.ob3 { top: 56%; right: 7%; transform: rotate(-4deg); width: 92px; height: 118px; opacity: 0.45; }
+/* perforații de hârtie de rolă pe carduri */
+html[data-theme="bon"] [class*="bg-card"] {
+  background:
+    radial-gradient(circle at 10px 11px, rgba(36, 33, 26, 0.15) 2.4px, transparent 2.9px) left top / 20px 22px repeat-y,
+    radial-gradient(circle at 10px 11px, rgba(36, 33, 26, 0.15) 2.4px, transparent 2.9px) right top / 20px 22px repeat-y,
+    var(--card);
+  box-shadow: 0 8px 20px -10px rgba(60, 50, 30, 0.4);
+}
+
+/* pe ecrane înguste, decorul fix din margini ar călca peste conținut */
+@media (max-width: 1100px) {
+  .bag-tag,
+  .sticky-note,
+  .sf-topright {
+    display: none;
+  }
+}
+
+/* ============================================================
+   Bon fiscal: editorul de ghid/chestionar devine un bon mare,
+   iar exportul trece printr-o imprimantă fiscală (overlay).
+   Elementele decorative există mereu în DOM, dar sunt vizibile
+   doar pe tema „bon" — restul temelor nu le văd deloc.
+   ============================================================ */
+.bon-slot,
+.bon-head,
+.bon-price,
+.bon-total,
+.bon-barcode {
+  display: none;
+}
+
+/* — imprimanta de deasupra bonului din editor — */
+html[data-theme="bon"] .bon-slot {
+  display: block;
+  position: relative;
+  z-index: 2;
+  max-width: 700px;
+  margin: 2.5rem auto -10px;
+  height: 36px;
+  border-radius: 9px 9px 3px 3px;
+  background: linear-gradient(180deg, #3f3a2e, #24211a 55%, #151310);
+  box-shadow:
+    0 12px 26px -10px rgba(23, 21, 15, 0.6),
+    inset 0 1px 0 rgba(255, 255, 255, 0.14);
+}
+html[data-theme="bon"] .bon-slot::before {
+  content: "LOOM FP-2000 · FISCAL";
+  position: absolute;
+  left: 14px;
+  top: 6px;
+  font-family: var(--font-geist-mono);
+  font-weight: 500;
+  font-size: 8.5px;
+  letter-spacing: 0.2em;
+  color: #8a857a;
+}
+html[data-theme="bon"] .bon-slot::after {
+  content: "";
+  position: absolute;
+  left: 22px;
+  right: 22px;
+  bottom: 6px;
+  height: 6px;
+  border-radius: 3px;
+  background: #0a0906;
+  box-shadow:
+    inset 0 2px 3px rgba(0, 0, 0, 0.9),
+    0 1px 0 rgba(255, 255, 255, 0.08);
+}
+html[data-theme="bon"] .bon-slot i {
+  position: absolute;
+  right: 14px;
+  top: 8px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #79e07c;
+  box-shadow: 0 0 8px rgba(121, 224, 124, 0.9);
+  animation: bon-led 1.6s steps(2, end) infinite;
+}
+@keyframes bon-led {
+  50% { opacity: 0.3; }
+}
+
+/* — hârtia: lista de întrebări devine bonul propriu-zis — */
+html[data-theme="bon"] .bon-paper {
+  position: relative;
+  z-index: 1;
+  max-width: 660px;
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 26px 24px 34px;
+  background:
+    repeating-linear-gradient(180deg, transparent 0 42px, rgba(36, 33, 26, 0.03) 42px 43px),
+    #fdfcf7;
+  box-shadow:
+    0 18px 40px -18px rgba(60, 50, 30, 0.5),
+    0 2px 8px rgba(60, 50, 30, 0.16);
+  font-family: var(--font-geist-mono);
+  animation: bon-print-in 1.7s steps(22, end) backwards;
+}
+@keyframes bon-print-in {
+  from { clip-path: inset(0 0 100% 0); }
+  to   { clip-path: inset(0 0 -10% 0); }
+}
+/* zimți sus și jos, ca la hârtia ruptă din rolă */
+html[data-theme="bon"] .bon-paper::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: -7px;
+  height: 7px;
+  background:
+    linear-gradient(-135deg, transparent 5px, #fdfcf7 5px) 0 0 / 10px 10px repeat-x,
+    linear-gradient(135deg, transparent 5px, #fdfcf7 5px) 5px 0 / 10px 10px repeat-x;
+}
+html[data-theme="bon"] .bon-paper::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -7px;
+  height: 7px;
+  background:
+    linear-gradient(-45deg, transparent 5px, #fdfcf7 5px) 0 0 / 10px 10px repeat-x,
+    linear-gradient(45deg, transparent 5px, #fdfcf7 5px) 5px 0 / 10px 10px repeat-x;
+}
+
+/* antetul bonului */
+html[data-theme="bon"] .bon-head {
+  display: block;
+  text-align: center;
+  text-transform: uppercase;
+  color: var(--tt-fg);
+}
+html[data-theme="bon"] .bon-head .bh-firm {
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+}
+html[data-theme="bon"] .bon-head .bh-sub {
+  margin-top: 3px;
+  font-size: 9.5px;
+  letter-spacing: 0.18em;
+  color: color-mix(in srgb, var(--tt-fg) 55%, transparent);
+}
+html[data-theme="bon"] .bon-head .bh-title {
+  margin-top: 10px;
+  font-size: 14.5px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+html[data-theme="bon"] .bon-head::after {
+  content: "· · · · · · · · · · · · · · · · · · · · · · · ·";
+  display: block;
+  margin-top: 10px;
+  overflow: hidden;
+  white-space: nowrap;
+  font-size: 11px;
+  color: rgba(36, 33, 26, 0.45);
+}
+
+/* secțiunile devin delimitatoare ==== CA PE BON ==== */
+html[data-theme="bon"] .bon-paper h2 {
+  justify-content: center;
+  letter-spacing: 0.1em;
+  color: var(--tt-fg);
+}
+html[data-theme="bon"] .bon-paper h2::before { content: "==== "; }
+html[data-theme="bon"] .bon-paper h2::after { content: " ===="; }
+
+/* rândurile de articole: fără carduri, doar cerneală pe hârtie */
+html[data-theme="bon"] .bon-paper li.bon-item {
+  background: transparent;
+  border: 0;
+  border-bottom: 1px dashed rgba(36, 33, 26, 0.22);
+  border-radius: 0;
+  box-shadow: none;
+  padding: 8px 2px;
+  animation: bon-row-in 0.45s steps(6, end) backwards;
+}
+@keyframes bon-row-in {
+  from { clip-path: inset(0 0 100% 0); opacity: 0; }
+  to   { clip-path: inset(0 0 -5% 0); opacity: 1; }
+}
+/* întrebările rămân sentence-case: caps + mono + coloană îngustă era cea
+   mai obositoare combinație de citit; majusculele rămân pe delimitatoare */
+html[data-theme="bon"] .bon-paper li.bon-item textarea {
+  font-size: 13px;
+  line-height: 1.55;
+  letter-spacing: 0.02em;
+}
+/* intro/încheiere: tot pe hârtie, fără chenar de card */
+html[data-theme="bon"] .bon-paper section > div[class*="bg-card"] {
+  background: transparent;
+  border-color: transparent;
+  box-shadow: none;
+  padding: 0 2px;
+}
+html[data-theme="bon"] .bon-paper section textarea {
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+/* prețul articolului (minutele), cu font de casă de marcat */
+html[data-theme="bon"] .bon-price {
+  display: inline-block;
+  margin-top: 8px;
+  white-space: nowrap;
+  font-family: var(--font-geist-mono);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--tt-fg);
+}
+
+/* totalurile cu puncte de conducere + codul de bare */
+html[data-theme="bon"] .bon-total {
+  display: block;
+  margin-top: 4px;
+  font-size: 12.5px;
+  text-transform: uppercase;
+  color: var(--tt-fg);
+}
+html[data-theme="bon"] .bon-total .br {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 2.5px 0;
+}
+html[data-theme="bon"] .bon-total .br i {
+  flex: 1;
+  border-bottom: 2px dotted rgba(36, 33, 26, 0.4);
+  transform: translateY(-3px);
+}
+html[data-theme="bon"] .bon-total .br.grand {
+  margin-top: 7px;
+  padding-top: 9px;
+  border-top: 1px dashed rgba(36, 33, 26, 0.35);
+  font-size: 15px;
+  font-weight: 700;
+}
+html[data-theme="bon"] .bon-barcode {
+  display: block;
+  margin-top: 18px;
+  text-align: center;
+}
+html[data-theme="bon"] .bon-barcode .bars,
+.bon-ticket .bars {
+  height: 40px;
+  max-width: 280px;
+  margin: 0 auto;
+  background: repeating-linear-gradient(
+    90deg,
+    #24211a 0 2px, transparent 2px 4px,
+    #24211a 4px 7px, transparent 7px 9px,
+    #24211a 9px 10px, transparent 10px 14px,
+    #24211a 14px 15px, transparent 15px 17px
+  );
+}
+html[data-theme="bon"] .bon-barcode p {
+  margin-top: 5px;
+  font-size: 10.5px;
+  letter-spacing: 0.34em;
+  color: rgba(36, 33, 26, 0.75);
+}
+
+/* formularul de adăugare: banda de „scanat" articole noi */
+html[data-theme="bon"] .bon-add {
+  max-width: 700px;
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+}
+html[data-theme="bon"] .bon-add input {
+  font-size: 13px;
+  letter-spacing: 0.03em;
+}
+
+/* ————— overlay-ul de export: mașina de bonuri ————— */
+.bon-ovl {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  overflow-y: auto;
+  padding: 6vh 16px 48px;
+  background: rgba(23, 21, 15, 0.55);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+  animation: bon-ovl-in 0.25s ease;
+}
+@keyframes bon-ovl-in {
+  from { opacity: 0; }
+}
+.bon-ovl-inner {
+  width: min(92vw, 430px);
+  font-family: var(--font-geist-mono);
+}
+.bon-machine {
+  position: relative;
+  z-index: 2;
+  padding: 16px 18px 14px;
+  border-radius: 14px 14px 6px 6px;
+  background: linear-gradient(180deg, #3f3a2e, #24211a 55%, #151310);
+  box-shadow:
+    0 24px 50px -20px rgba(0, 0, 0, 0.8),
+    inset 0 1px 0 rgba(255, 255, 255, 0.14);
+}
+.bon-machine .bm-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+.bon-machine .bm-brand {
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: #a59f8e;
+}
+.bon-machine .bm-led {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #e8b12c;
+  box-shadow: 0 0 8px rgba(232, 177, 44, 0.9);
+  animation: bon-led 0.5s steps(2, end) infinite;
+}
+.bon-machine .bm-led.ok {
+  background: #79e07c;
+  box-shadow: 0 0 8px rgba(121, 224, 124, 0.9);
+  animation: none;
+}
+.bon-machine .bm-slot {
+  height: 9px;
+  border-radius: 4px;
+  background: #070604;
+  box-shadow:
+    inset 0 2px 4px rgba(0, 0, 0, 0.95),
+    0 1px 0 rgba(255, 255, 255, 0.1);
+}
+/* fereastra din care iese bonul: taie tot ce e deasupra poziției finale */
+.bon-out {
+  position: relative;
+  z-index: 1;
+  margin: 0 26px;
+  overflow: hidden;
+  padding-bottom: 8px;
+}
+.bon-ticket {
+  position: relative;
+  padding: 20px 18px 26px;
+  background: #fdfcf7;
+  color: #24211a;
+  box-shadow: 0 24px 44px -18px rgba(0, 0, 0, 0.65);
+  animation: bon-ticket-out 2.2s steps(26, end) backwards;
+}
+@keyframes bon-ticket-out {
+  from { transform: translateY(-101%); }
+  to   { transform: translateY(0); }
+}
+.bon-out.cut .bon-ticket {
+  animation: bon-ticket-fall 0.65s ease-in forwards;
+}
+@keyframes bon-ticket-fall {
+  30% { transform: translateY(12px) rotate(1.5deg); opacity: 1; }
+  100% { transform: translateY(110%) rotate(5deg); opacity: 0; }
+}
+.bon-ticket::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -7px;
+  height: 7px;
+  background:
+    linear-gradient(-45deg, transparent 5px, #fdfcf7 5px) 0 0 / 10px 10px repeat-x,
+    linear-gradient(45deg, transparent 5px, #fdfcf7 5px) 5px 0 / 10px 10px repeat-x;
+}
+.bon-ticket .bt-head {
+  text-align: center;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+}
+.bon-ticket .bt-meta {
+  margin-top: 4px;
+  text-align: center;
+  font-size: 9.5px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: rgba(36, 33, 26, 0.6);
+}
+.bon-ticket .bt-sep {
+  margin: 12px 0;
+  border-top: 1px dashed rgba(36, 33, 26, 0.4);
+}
+.bon-ticket .bt-title {
+  text-align: center;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.bon-ticket .br {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 2.5px 0;
+  font-size: 12px;
+  text-transform: uppercase;
+}
+.bon-ticket .br i {
+  flex: 1;
+  border-bottom: 2px dotted rgba(36, 33, 26, 0.4);
+  transform: translateY(-3px);
+}
+.bon-ticket .br.grand {
+  margin-top: 5px;
+  font-size: 14.5px;
+  font-weight: 700;
+}
+.bon-ticket .bt-num {
+  margin-top: 5px;
+  text-align: center;
+  font-size: 10.5px;
+  letter-spacing: 0.34em;
+  color: rgba(36, 33, 26, 0.75);
+}
+.bon-ticket .bt-thanks {
+  margin-top: 14px;
+  text-align: center;
+  font-size: 9.5px;
+  letter-spacing: 0.2em;
+  color: rgba(36, 33, 26, 0.55);
+}
+.bon-ovl-actions {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 20px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s;
+}
+.bon-ovl-actions.show {
+  opacity: 1;
+  pointer-events: auto;
+}
+.bon-ovl-actions button {
+  padding: 9px 16px;
+  font-family: var(--font-geist-mono);
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.bon-ovl-actions .bo-cancel {
+  border: 1px dashed rgba(253, 252, 247, 0.55);
+  background: transparent;
+  color: #fdfcf7;
+}
+.bon-ovl-actions .bo-cancel:hover {
+  background: rgba(253, 252, 247, 0.12);
+}
+.bon-ovl-actions .bo-save {
+  border: 1px solid #fdfcf7;
+  background: #fdfcf7;
+  color: #24211a;
+}
+.bon-ovl-actions .bo-save:hover {
+  background: #ece9df;
+}
+
+/* ============================================================
+   Home: hero + carduri quick-links, portate din mockups/teme.html.
+   Elementele de „chrome" ale hero-ului (fereastra retro, șuruburile,
+   ștampila, rândurile de bon, antetul de tablou) există mereu în DOM
+   și sunt afișate doar de tema care le folosește.
+   ============================================================ */
+
+/* Home-ul are două variante în DOM: pe Clasic (fără data-theme) rămâne
+   dashboard-ul sobru din live, pe temele custom intră varianta din mockup.
+   Comutarea pe atributul de pe <html> e stabilită pre-paint de scriptul
+   de temă, deci nu există flash sau mismatch la hidratare. */
+.home-when-themed {
+  display: none;
+}
+html[data-theme] .home-when-themed {
+  display: block;
+}
+html[data-theme] .home-when-classic {
+  display: none;
+}
+
+.loom-hero {
+  position: relative;
+  max-width: 720px;
+  padding: 36px 0 8px;
+}
+.loom-hero h1 {
+  font-size: clamp(34px, 4.8vw, 52px);
+  font-weight: 700;
+  line-height: 1.08;
+  letter-spacing: -0.02em;
+  margin: 0 0 18px;
+}
+.loom-hero > p {
+  font-size: 16.5px;
+  color: var(--muted-foreground);
+  max-width: 54ch;
+  margin: 0 0 28px;
+}
+.loom-grad {
+  color: var(--indigo-11);
+}
+.loom-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--indigo-11);
+  background: var(--indigo-3);
+  border: 1px solid var(--indigo-6);
+  padding: 5px 12px;
+  border-radius: 999px;
+  margin-bottom: 22px;
+}
+.loom-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+}
+
+/* — butoanele hero — */
+.loom-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-size: 15px;
+  line-height: 1;
+  font-weight: 500;
+  border: none;
+  border-radius: calc(var(--radius) + 2px);
+  padding: 13px 22px;
+  transition:
+    transform 0.18s ease,
+    box-shadow 0.18s ease,
+    background 0.18s ease;
+}
+.loom-btn:active {
+  transform: translateY(0) !important;
+}
+.loom-btn-primary {
+  background-color: var(--indigo-9);
+  color: var(--primary-foreground);
+  font-weight: 600;
+  box-shadow: 0 8px 28px -8px color-mix(in oklab, var(--indigo-9) 50%, transparent);
+}
+.loom-btn-primary:hover {
+  background-color: var(--indigo-10);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 32px -8px color-mix(in oklab, var(--indigo-9) 65%, transparent);
+}
+.loom-btn-secondary {
+  background-color: var(--card);
+  color: var(--foreground);
+  border: 1px solid var(--border);
+}
+.loom-btn-secondary:hover {
+  border-color: var(--slate-8);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px -8px rgba(33, 32, 28, 0.22);
+}
+html[data-theme="broderie"] .loom-btn {
+  border-radius: 999px;
+}
+/* pe peticul crem al hero-ului scala e tot cea de denim (text crem) —
+   butonul secundar primește explicit maro pe crem, altfel devine ilizibil */
+html[data-theme="broderie"] .loom-btn-secondary {
+  border: 2px dashed #cdbb9c;
+  background-color: #fbf5e8;
+  color: color-mix(in oklab, #53402f 95%, #f6efe2);
+}
+html[data-theme="bon"] .loom-btn {
+  border-radius: 0;
+}
+html[data-theme="bon"] .loom-btn-secondary {
+  border-style: dashed;
+}
+html[data-theme="splitflap"] .loom-btn {
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 600;
+}
+html[data-theme="splitflap"] .loom-btn-primary {
+  box-shadow: 0 0 20px color-mix(in oklab, var(--indigo-9) 40%, transparent);
+}
+html[data-theme="vhs"] .loom-btn-primary {
+  box-shadow: 0 0 18px color-mix(in oklab, var(--indigo-9) 45%, transparent);
+}
+
+/* — chrome-ul de hero per temă: ascuns implicit — */
+.loom-win,
+.loom-screws,
+.loom-stamp,
+.loom-slot,
+.loom-bon-head,
+.loom-bon-rows,
+.loom-bon-code {
+  display: none;
+}
+
+/* ————— Retro Nostalgia: fereastra „loom.exe" ————— */
+html[data-theme="cyberdeck"] .loom-hero {
+  max-width: 780px;
+  margin-top: 16px;
+  padding: 0 0 34px;
+  background: #fdfeff;
+  border: 2.5px solid #0b52c0;
+  border-radius: 4px;
+  box-shadow: 10px 10px 0 rgba(11, 82, 192, 0.28);
+  overflow: hidden;
+}
+html[data-theme="cyberdeck"] .loom-hero > * {
+  margin-left: 34px;
+  margin-right: 34px;
+}
+html[data-theme="cyberdeck"] .loom-win {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: linear-gradient(90deg, #0b52c0, #2b8cf2);
+  color: #fff;
+  font-family: var(--font-pixel);
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  padding: 8px 12px;
+  margin: 0 0 30px;
+}
+html[data-theme="cyberdeck"] .loom-win .win-btns {
+  margin-left: auto;
+  display: flex;
+  gap: 5px;
+}
+html[data-theme="cyberdeck"] .loom-win .win-btns i {
+  width: 17px;
+  height: 15px;
+  background: #dceafc;
+  border: 1.5px solid #0b52c0;
+  display: grid;
+  place-items: center;
+  font-family: var(--font-pixel);
+  font-weight: 700;
+  font-size: 9px;
+  font-style: normal;
+  color: #0b52c0;
+}
+html[data-theme="cyberdeck"] .loom-hero h1 {
+  font-family: var(--font-pixel);
+  font-weight: 700;
+  font-size: clamp(22px, 3.2vw, 36px);
+  line-height: 1.3;
+  letter-spacing: 0;
+  color: #0b52c0;
+}
+html[data-theme="cyberdeck"] .loom-grad {
+  color: #ffd23e;
+  text-shadow:
+    2.5px 2.5px 0 #ff5ea8,
+    -2.5px -2.5px 0 #35e0e8;
+}
+html[data-theme="cyberdeck"] .loom-eyebrow {
+  background: #e2f3d9;
+  color: #2b7d26;
+  border-color: #a9d99a;
+}
+/* p-ul din hero stă pe fereastra albă — nu are nevoie de chip-ul translucid */
+html[data-theme="cyberdeck"] main .loom-hero > p {
+  width: auto;
+  padding: 0;
+  border-radius: 0;
+  background: transparent;
+  backdrop-filter: none;
+}
+
+/* ————— Metal: placă frezată cu șuruburi ————— */
+html[data-theme="metal"] .loom-hero {
+  max-width: 780px;
+  margin-top: 16px;
+  padding: 48px 44px 40px;
+  background:
+    repeating-linear-gradient(
+      0deg,
+      rgba(255, 255, 255, 0.05) 0 1px,
+      rgba(12, 16, 24, 0.035) 1px 2px,
+      transparent 2px 3px
+    ),
+    linear-gradient(150deg, #e4e7ec, #c2c7cf 70%, #d2d6dc);
+  border-radius: 22px;
+  border: 1px solid #f2f4f7;
+  border-bottom-color: #8b929d;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    inset 0 -2px 6px rgba(20, 26, 36, 0.18),
+    0 24px 48px -22px rgba(22, 27, 37, 0.65);
+}
+html[data-theme="metal"] .loom-screws {
+  display: block;
+}
+html[data-theme="metal"] .loom-screws i {
+  position: absolute;
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  background:
+    linear-gradient(
+      45deg,
+      transparent 44%,
+      rgba(40, 46, 56, 0.85) 46%,
+      rgba(40, 46, 56, 0.85) 54%,
+      transparent 56%
+    ),
+    radial-gradient(circle at 32% 28%, #f4f6fa, #9aa1ab 65%, #6a717c);
+  box-shadow:
+    inset 0 -1px 2px rgba(20, 26, 36, 0.5),
+    0 1px 0 rgba(255, 255, 255, 0.7);
+}
+html[data-theme="metal"] .loom-screws i:nth-child(1) { top: 14px; left: 14px; }
+html[data-theme="metal"] .loom-screws i:nth-child(2) { top: 14px; right: 14px; transform: rotate(35deg); }
+html[data-theme="metal"] .loom-screws i:nth-child(3) { bottom: 14px; left: 14px; transform: rotate(70deg); }
+html[data-theme="metal"] .loom-screws i:nth-child(4) { bottom: 14px; right: 14px; transform: rotate(15deg); }
+html[data-theme="metal"] .loom-eyebrow {
+  background: #bcc1ca;
+  color: #22262c;
+  border-color: #eef0f4;
+  box-shadow:
+    inset 0 1.5px 3px rgba(20, 26, 36, 0.35),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.6);
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+html[data-theme="metal"] .loom-btn-secondary {
+  background: linear-gradient(180deg, #eef0f4, #c9cdd5);
+  border: 1px solid #f4f6f9;
+  border-bottom-color: #8b929d;
+  color: #22262c;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.7);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    0 5px 12px -6px rgba(22, 27, 37, 0.5);
+}
+/* dark: oțel forjat */
+html[data-theme="metal"].dark .loom-hero {
+  background:
+    radial-gradient(640px 240px at 32% -4%, rgba(175, 205, 245, 0.14), transparent 70%),
+    repeating-linear-gradient(
+      0deg,
+      rgba(255, 255, 255, 0.035) 0 1px,
+      rgba(0, 0, 0, 0.22) 1px 2px,
+      transparent 2px 3px
+    ),
+    linear-gradient(150deg, #3a4049, #1d2026 55%, #2c313a);
+  border: 1px solid #454b54;
+  border-top-color: #6a7280;
+  border-bottom-color: #060708;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.18),
+    inset 0 -3px 8px rgba(0, 0, 0, 0.65),
+    0 32px 64px -26px rgba(0, 0, 0, 0.95);
+}
+html[data-theme="metal"].dark .loom-screws i {
+  background:
+    linear-gradient(
+      45deg,
+      transparent 44%,
+      rgba(0, 0, 0, 0.85) 46%,
+      rgba(0, 0, 0, 0.85) 54%,
+      transparent 56%
+    ),
+    radial-gradient(circle at 32% 28%, #8a919c, #3a3f47 65%, #16181d);
+  box-shadow:
+    inset 0 -1px 2px rgba(0, 0, 0, 0.8),
+    0 1px 0 rgba(255, 255, 255, 0.12);
+}
+html[data-theme="metal"].dark .loom-eyebrow {
+  background: #15171b;
+  color: #c7ccd4;
+  border-color: #3d434b;
+  box-shadow:
+    inset 0 2px 4px rgba(0, 0, 0, 0.7),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.08);
+  text-shadow: none;
+}
+html[data-theme="metal"].dark .loom-btn-secondary {
+  background: linear-gradient(180deg, #4a505a, #2b2f36);
+  border: 1px solid #575d68;
+  border-bottom-color: #0e1013;
+  color: #e9ebef;
+  text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.55);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.2),
+    0 6px 14px -6px rgba(0, 0, 0, 0.8);
+}
+
+/* ————— VHS: titlu OSD ————— */
+html[data-theme="vhs"] .loom-hero h1 {
+  text-transform: uppercase;
+}
+html[data-theme="vhs"] .loom-grad {
+  color: var(--indigo-9);
+}
+
+/* ————— Broderie: hero = petic mare de pânză aida ————— */
+html[data-theme="broderie"] .loom-hero {
+  max-width: 780px;
+  margin-top: 16px;
+  padding: 40px 38px 36px;
+  border: 4px solid transparent;
+  border-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='36' height='36'><rect width='36' height='36' fill='none'/><path d='M2 2 H34 V34 H2 Z' fill='none' stroke='%23703020' stroke-width='2.6' stroke-dasharray='6 5' stroke-linecap='round' opacity='.45' transform='translate(.7,.9)'/><path d='M2 2 H34 V34 H2 Z' fill='none' stroke='%23c04a32' stroke-width='2.6' stroke-dasharray='6 5' stroke-linecap='round'/></svg>")
+    12 / 5px round;
+  border-radius: 0;
+  background:
+    url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14'><path d='M3 3 L11 11 M11 3 L3 11' stroke='%23703020' stroke-width='3' stroke-linecap='round' opacity='.4' transform='translate(.6,.8)'/><path d='M3 3 L11 11 M11 3 L3 11' stroke='%23c04a32' stroke-width='3' stroke-linecap='round'/></svg>")
+      no-repeat 7px 7px / 12px 12px,
+    url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14'><path d='M3 3 L11 11 M11 3 L3 11' stroke='%23703020' stroke-width='3' stroke-linecap='round' opacity='.4' transform='translate(.6,.8)'/><path d='M3 3 L11 11 M11 3 L3 11' stroke='%23c04a32' stroke-width='3' stroke-linecap='round'/></svg>")
+      no-repeat calc(100% - 7px) 7px / 12px 12px,
+    url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14'><path d='M3 3 L11 11 M11 3 L3 11' stroke='%23703020' stroke-width='3' stroke-linecap='round' opacity='.4' transform='translate(.6,.8)'/><path d='M3 3 L11 11 M11 3 L3 11' stroke='%23c04a32' stroke-width='3' stroke-linecap='round'/></svg>")
+      no-repeat 7px calc(100% - 7px) / 12px 12px,
+    url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14'><path d='M3 3 L11 11 M11 3 L3 11' stroke='%23703020' stroke-width='3' stroke-linecap='round' opacity='.4' transform='translate(.6,.8)'/><path d='M3 3 L11 11 M11 3 L3 11' stroke='%23c04a32' stroke-width='3' stroke-linecap='round'/></svg>")
+      no-repeat calc(100% - 7px) calc(100% - 7px) / 12px 12px,
+    #fbf5e8;
+  box-shadow: 0 10px 26px -14px rgba(25, 40, 78, 0.55);
+}
+/* pe peticul crem textul revine la scala maro */
+html[data-theme="broderie"] main .loom-hero > p {
+  color: color-mix(in oklab, #53402f 70%, #f6efe2);
+  width: auto;
+  padding: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+html[data-theme="broderie"] .loom-grad {
+  background-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='9' height='9'><path d='M1.5 1.5 L7.5 7.5 M7.5 1.5 L1.5 7.5' stroke='black' stroke-width='2' stroke-linecap='round' opacity='.28'/></svg>"),
+    linear-gradient(178deg, #f2b705, #d99c04);
+  background-size: 9px 9px, auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+}
+html[data-theme="broderie"] .loom-eyebrow {
+  border-style: dashed;
+  background: #eef3e7;
+  color: #4c6a43;
+  border-color: #a9bb9a;
+}
+
+/* ————— Bon fiscal: hero = bonul propriu-zis ————— */
+html[data-theme="bon"] .loom-slot {
+  display: block;
+  position: relative;
+  z-index: 3;
+  width: 668px;
+  max-width: 100%;
+  height: 30px;
+  margin: 28px 0 -16px -14px;
+  border-radius: 8px;
+  background: linear-gradient(180deg, #4a4a48, #2b2b29 45%, #171716 55%, #3a3a38);
+  box-shadow:
+    0 8px 16px -6px rgba(36, 33, 26, 0.55),
+    inset 0 1px 0 rgba(255, 255, 255, 0.22);
+}
+html[data-theme="bon"] .loom-slot::before {
+  content: "";
+  position: absolute;
+  left: 16px;
+  right: 16px;
+  top: 50%;
+  height: 6px;
+  margin-top: -3px;
+  border-radius: 3px;
+  background: linear-gradient(180deg, #050505, #1c1c1a);
+  box-shadow: inset 0 1px 3px #000;
+}
+html[data-theme="bon"] .loom-slot::after {
+  content: "";
+  position: absolute;
+  right: 8px;
+  top: 8px;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #c25048;
+  box-shadow: 0 0 6px rgba(194, 80, 72, 0.8);
+}
+html[data-theme="bon"] .loom-hero {
+  max-width: 640px;
+  margin-top: 8px;
+  padding: 96px 40px 40px;
+  background: var(--card);
+  border: 1px dashed var(--border);
+  box-shadow: 0 14px 34px -22px rgba(36, 33, 26, 0.55);
+  animation: loom-bon-print 2.1s steps(22, end) backwards;
+  -webkit-mask-image: repeating-linear-gradient(180deg, #000 0 118px, rgba(0, 0, 0, 0.8) 124px, #000 132px);
+  mask-image: repeating-linear-gradient(180deg, #000 0 118px, rgba(0, 0, 0, 0.8) 124px, #000 132px);
+}
+@keyframes loom-bon-print {
+  from { clip-path: inset(0 -8px 100% -8px); }
+  to   { clip-path: inset(0 -8px -16px -8px); }
+}
+/* zimți jos, ca hârtia ruptă din rolă */
+html[data-theme="bon"] .loom-hero::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -11px;
+  height: 11px;
+  background:
+    linear-gradient(-45deg, transparent 8px, var(--card) 8px) 0 0 / 16px 16px repeat-x,
+    linear-gradient(45deg, transparent 8px, var(--card) 8px) 8px 0 / 16px 16px repeat-x;
+}
+html[data-theme="bon"] .loom-bon-head {
+  display: block;
+  position: absolute;
+  top: 16px;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-family: var(--font-geist-mono);
+  font-weight: 500;
+  font-size: 11px;
+  line-height: 2;
+  letter-spacing: 0.12em;
+  color: var(--muted-foreground);
+}
+html[data-theme="bon"] .loom-stamp {
+  display: block;
+  position: absolute;
+  top: 92px;
+  right: 24px;
+  z-index: 2;
+  padding: 6px 14px;
+  border: 3px double #b3372e;
+  border-radius: 8px;
+  color: #b3372e;
+  font-family: var(--font-geist-mono);
+  font-weight: 700;
+  font-size: 21px;
+  letter-spacing: 0.18em;
+  transform: rotate(-13deg);
+  opacity: 0.78;
+  mix-blend-mode: multiply;
+}
+html[data-theme="bon"] .loom-grad {
+  background: var(--foreground);
+  color: var(--card);
+  padding: 0 10px;
+}
+html[data-theme="bon"] .loom-eyebrow {
+  border-radius: 0;
+  border-style: dashed;
+}
+/* rândurile de casă cu dot-leaders */
+html[data-theme="bon"] .loom-bon-rows {
+  display: block;
+  margin-top: 26px;
+  padding-top: 14px;
+  border-top: 1px dashed var(--border);
+  font-family: var(--font-geist-mono);
+  font-weight: 500;
+  font-size: 13.5px;
+  letter-spacing: 0.04em;
+}
+html[data-theme="bon"] .loom-bon-rows .br {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 3px 0;
+}
+html[data-theme="bon"] .loom-bon-rows .dots {
+  flex: 1;
+  border-bottom: 2px dotted var(--slate-8);
+  transform: translateY(-3px);
+}
+html[data-theme="bon"] .loom-bon-rows .sub {
+  color: var(--muted-foreground);
+}
+html[data-theme="bon"] .loom-bon-rows .total {
+  font-weight: 700;
+  font-size: 16.5px;
+  margin-top: 5px;
+}
+/* cod de bare + QR la baza bonului */
+html[data-theme="bon"] .loom-bon-code {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin-top: 22px;
+}
+html[data-theme="bon"] .loom-bon-code .bc {
+  flex: 1;
+}
+html[data-theme="bon"] .loom-bon-code .bars {
+  height: 42px;
+  background: repeating-linear-gradient(
+    90deg,
+    #24211a 0 2px, transparent 2px 4px,
+    #24211a 4px 7px, transparent 7px 9px,
+    #24211a 9px 10px, transparent 10px 13px,
+    #24211a 13px 17px, transparent 17px 20px
+  );
+}
+html[data-theme="bon"] .loom-bon-code .num {
+  margin-top: 5px;
+  text-align: center;
+  font-family: var(--font-geist-mono);
+  font-weight: 500;
+  font-size: 12px;
+  letter-spacing: 0.32em;
+}
+
+/* ————— Split-flap: hero = tabloul de plecări ————— */
+html[data-theme="splitflap"] .loom-hero {
+  max-width: 780px;
+  margin-top: 16px;
+  padding: 72px 40px 40px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.07),
+    0 24px 48px -26px rgba(0, 0, 0, 0.9);
+}
+html[data-theme="splitflap"] .loom-hero::before {
+  content: "LOOM AIR · PLECĂRI — DEPARTURES · TERMINAL R · GATE 07";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  padding: 11px 20px;
+  background: #08090b;
+  border-bottom: 1px solid var(--border);
+  font-family: var(--font-geist-mono);
+  font-weight: 500;
+  font-size: 12px;
+  letter-spacing: 0.24em;
+  color: var(--indigo-9);
+}
+html[data-theme="splitflap"] .loom-grad {
+  color: var(--indigo-9);
+}
+
+/* ————— Cardurile quick-links (glass + chip + lift) ————— */
+.loom-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 18px;
+}
+.loom-card {
+  display: block;
+  background-color: var(--card);
+  border: 1px solid var(--border);
+  border-radius: calc(var(--radius) * 1.8);
+  padding: 22px;
+  box-shadow: 0 2px 16px -8px rgba(33, 32, 28, 0.14);
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+  animation: loom-rise 0.5s cubic-bezier(0.2, 0.7, 0.3, 1) backwards;
+}
+.loom-card:nth-child(2) {
+  animation-delay: 0.08s;
+}
+.loom-card:nth-child(3) {
+  animation-delay: 0.16s;
+}
+@keyframes loom-rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+}
+.loom-card:hover {
+  transform: translateY(-4px);
+  box-shadow:
+    0 14px 34px -14px rgba(33, 32, 28, 0.28),
+    0 8px 28px -8px color-mix(in oklab, var(--indigo-9) 30%, transparent);
+}
+.loom-card h3 {
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0 0 6px;
+}
+.loom-card p {
+  font-size: 14px;
+  color: var(--muted-foreground);
+  margin: 0 0 14px;
+}
+.loom-chip {
+  width: 42px;
+  height: 42px;
+  border-radius: calc(var(--radius) + 3px);
+  display: grid;
+  place-items: center;
+  background: linear-gradient(135deg, var(--indigo-9), var(--indigo-11));
+  font-size: 19px;
+  margin-bottom: 14px;
+}
+.loom-chip.alt {
+  background: linear-gradient(135deg, var(--indigo-11), var(--indigo-9));
+}
+html[data-theme="bon"] .loom-chip {
+  background: var(--foreground);
+}
+html[data-theme="broderie"] .loom-chip {
+  border-radius: 999px;
+  background: linear-gradient(135deg, #f2b705, #c04a32);
+}
+html[data-theme="broderie"] .loom-chip.alt {
+  background: linear-gradient(135deg, #8fb3e8, #5a8b4c);
+}
+.loom-card-meta {
+  display: flex;
+  gap: 8px;
+}
+.loom-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12.5px;
+  font-weight: 600;
+  padding: 3px 11px;
+  border-radius: 999px;
+}
+html[data-theme="bon"] .loom-badge,
+html[data-theme="vhs"] .loom-badge {
+  border-radius: 2px;
+}
+.loom-badge-warm {
+  background: var(--indigo-3);
+  color: var(--indigo-11);
+}
+.loom-badge-accent {
+  background: var(--amber-3);
+  color: var(--amber-11);
+}
+.loom-badge-neutral {
+  background: var(--slate-3);
+  color: var(--slate-11);
+}
+/* rânduri de bon pe carduri (tema Bon) */
+html[data-theme="bon"] .loom-cards .loom-card:nth-child(1)::after { content: "3 BUC × 5,00 .......... 15,00"; }
+html[data-theme="bon"] .loom-cards .loom-card:nth-child(2)::after { content: "12 BUC × 1,00 ......... 12,00"; }
+html[data-theme="bon"] .loom-cards .loom-card:nth-child(3)::after { content: "0 BUC .................. 0,00"; }
+html[data-theme="bon"] .loom-cards .loom-card::after {
+  display: block;
+  margin-top: 14px;
+  padding-top: 10px;
+  border-top: 1px dashed var(--border);
+  font-family: var(--font-geist-mono);
+  font-weight: 500;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  color: var(--muted-foreground);
+}
+/* rânduri de plecări pe carduri (tema Split-flap) */
+html[data-theme="splitflap"] .loom-cards .loom-card:nth-child(1)::after { content: "MAPARE · ON TIME"; }
+html[data-theme="splitflap"] .loom-cards .loom-card:nth-child(2)::after {
+  content: "GHIDURI · BOARDING";
+  color: var(--indigo-9);
+  animation: clock-pulse 1.6s steps(2, start) infinite;
+}
+html[data-theme="splitflap"] .loom-cards .loom-card:nth-child(3)::after {
+  content: "CHESTIONARE · DELAYED";
+  color: var(--red-11);
+}
+html[data-theme="splitflap"] .loom-cards .loom-card::after {
+  display: block;
+  margin-top: 14px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border);
+  font-family: var(--font-geist-mono);
+  font-weight: 600;
+  font-size: 11.5px;
+  letter-spacing: 0.2em;
+  color: var(--foreground);
+}
+
+/* ————— Fundal fun: blobs de culoare (Retro Nostalgia / VHS) ————— */
+.loom-blob {
+  position: absolute;
+  border-radius: 46% 54% 62% 38% / 55% 44% 56% 45%;
+  filter: blur(70px);
+  opacity: 0.5;
+}
+.loom-blob-a {
+  width: 520px;
+  height: 460px;
+  top: -140px;
+  right: -100px;
+  background: radial-gradient(
+    circle at 35% 35%,
+    color-mix(in oklab, var(--indigo-9) 38%, #fff),
+    color-mix(in oklab, var(--indigo-9) 30%, transparent) 70%
+  );
+  animation: loom-drift 42s ease-in-out infinite alternate;
+}
+.loom-blob-b {
+  width: 480px;
+  height: 440px;
+  bottom: -160px;
+  left: -120px;
+  background: radial-gradient(
+    circle at 60% 40%,
+    color-mix(in oklab, var(--amber-9) 30%, #fff),
+    color-mix(in oklab, var(--amber-9) 24%, transparent) 70%
+  );
+  animation: loom-drift 36s ease-in-out -18s infinite alternate-reverse;
+}
+.loom-blob-c {
+  width: 300px;
+  height: 280px;
+  top: 42%;
+  left: 55%;
+  background: radial-gradient(
+    circle at 50% 50%,
+    color-mix(in oklab, var(--indigo-9) 20%, transparent),
+    color-mix(in oklab, var(--amber-9) 12%, transparent) 75%
+  );
+  animation: loom-drift 50s ease-in-out -30s infinite alternate;
+}
+@keyframes loom-drift {
+  0%   { transform: translate(0, 0) rotate(0deg) scale(1); }
+  100% { transform: translate(46px, 34px) rotate(14deg) scale(1.08); }
+}
+html[data-theme="cyberdeck"] .loom-blob { opacity: 0.22; }
+html[data-theme="vhs"] .loom-blob { opacity: 0.3; }
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
@@ -149,6 +2830,11 @@
   }
   html {
     @apply font-sans;
+  }
+  /* întrebările lungi nu se mai tund la rows=N — textarea crește după
+     conținut (browserele fără field-sizing păstrează comportamentul vechi) */
+  textarea {
+    field-sizing: content;
   }
   /* Visible keyboard focus everywhere; components with their own
      focus-visible ring opt out via focus-visible:outline-none. */

@@ -7,4 +7,9 @@ export default defineSchema({
     isCompleted: v.boolean(),
     userId: v.string(),
   }).index("by_user", ["userId"]),
+  userSettings: defineTable({
+    userId: v.string(),
+    theme: v.string(),
+    mode: v.string(),
+  }).index("by_user", ["userId"]),
 });

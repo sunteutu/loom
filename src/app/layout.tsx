@@ -1,9 +1,20 @@
 import type { Metadata } from "next";
-import { IBM_Plex_Mono, IBM_Plex_Sans } from "next/font/google";
+import {
+  IBM_Plex_Mono,
+  IBM_Plex_Sans,
+  Oswald,
+  Pixelify_Sans,
+  Silkscreen,
+  VT323,
+} from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
 import { ConvexClientProvider } from "@/components/ConvexClientProvider";
+import { DevIndicatorDock } from "@/components/DevIndicatorDock";
+import { ScratchCanvas } from "@/components/ScratchCanvas";
 import { Sidebar } from "@/components/Sidebar";
+import { ThemeDecorations } from "@/components/ThemeDecorations";
 import { ThemeProvider } from "@/components/ThemeProvider";
+import { ThemeSync } from "@/components/ThemeSync";
 import "./globals.css";
 
 const plexSans = IBM_Plex_Sans({
@@ -15,6 +26,31 @@ const plexMono = IBM_Plex_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
+});
+
+// Theme display fonts: each custom theme in globals.css picks up the variable
+// it needs; they are self-hosted subsets, loaded once for the whole app.
+const vhsFont = VT323({
+  variable: "--font-vhs",
+  subsets: ["latin"],
+  weight: "400",
+});
+
+const stitchFont = Pixelify_Sans({
+  variable: "--font-stitch",
+  subsets: ["latin"],
+});
+
+const flapFont = Oswald({
+  variable: "--font-flap",
+  subsets: ["latin"],
+});
+
+// fontul pixel Y2K al ferestrei „loom.exe" din hero (Retro Nostalgia)
+const pixelFont = Silkscreen({
+  variable: "--font-pixel",
+  subsets: ["latin"],
+  weight: ["400", "700"],
 });
 
 export const metadata: Metadata = {
@@ -31,7 +67,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${plexSans.variable} ${plexMono.variable} h-full antialiased`}
+      className={`${plexSans.variable} ${plexMono.variable} ${vhsFont.variable} ${stitchFont.variable} ${flapFont.variable} ${pixelFont.variable} h-full antialiased`}
       suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col">
@@ -44,7 +80,11 @@ export default function RootLayout({
         <ThemeProvider>
           <ClerkProvider>
             <ConvexClientProvider>
-              <div className="flex min-h-screen">
+              <ThemeSync />
+              <DevIndicatorDock />
+              <ScratchCanvas />
+              <ThemeDecorations />
+              <div className="relative z-[1] flex min-h-screen">
                 <Sidebar />
                 <div
                   id="main-content"

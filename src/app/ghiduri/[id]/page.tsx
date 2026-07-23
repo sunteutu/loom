@@ -34,6 +34,13 @@ import {
 } from "@/lib/guides";
 import { lintGuide } from "@/lib/guide-lint";
 import { LintPanel } from "@/components/LintPanel";
+import { useLoomTheme } from "@/components/ThemeProvider";
+import {
+  BonExportOverlay,
+  bonCode,
+  formatBonDate,
+} from "@/components/BonExportOverlay";
+import { bonFeed } from "@/lib/themeAudio";
 import {
   downloadDocx,
   downloadMarkdown,
@@ -116,11 +123,16 @@ export default function GhidPage() {
 function GuideEditor({ guide, isActive }: { guide: Guide; isActive: boolean }) {
   const [newQuestion, setNewQuestion] = useState("");
   const [lang, setLang] = useState<GuideLanguage>("en");
+  const { theme } = useLoomTheme();
+  // Pe tema „bon" exportul trece prin imprimanta fiscală (overlay);
+  // reține formatul cerut până când utilizatorul salvează sau renunță.
+  const [bonExport, setBonExport] = useState<"md" | "docx" | null>(null);
   const groups = groupItems(guide.items);
   const pace = guidePace(guide);
   const target = guideTarget(guide);
   const totalMinutes = guideTotalMinutes(guide);
   const issues = lintGuide(guide, lang);
+  const bonMinutes = (m: number) => m.toFixed(2).replace(".", ",");
 
   /** Re-check before export; errors require an explicit override. */
   const confirmExport = () => {
@@ -131,6 +143,16 @@ function GuideEditor({ guide, isActive }: { guide: Guide; isActive: boolean }) {
         .map((e) => `• ${e.message}`)
         .join("\n\n")}\n\nExporți oricum?`,
     );
+  };
+
+  const startExport = (format: "md" | "docx") => {
+    if (!confirmExport()) return;
+    if (theme === "bon") {
+      setBonExport(format);
+      return;
+    }
+    if (format === "md") downloadMarkdown(guide, lang);
+    else void downloadDocx(guide, lang);
   };
 
   // Continuous numbering across groups, same as the export.
@@ -183,7 +205,7 @@ function GuideEditor({ guide, isActive }: { guide: Guide; isActive: boolean }) {
             ))}
           </div>
           <button
-            onClick={() => confirmExport() && downloadMarkdown(guide, lang)}
+            onClick={() => startExport("md")}
             disabled={guide.items.length === 0}
             className="inline-flex items-center gap-1.5 rounded-md border border-border px-2.5 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:border-ring hover:text-foreground disabled:cursor-not-allowed disabled:opacity-40"
           >
@@ -191,7 +213,7 @@ function GuideEditor({ guide, isActive }: { guide: Guide; isActive: boolean }) {
             Markdown
           </button>
           <button
-            onClick={() => confirmExport() && void downloadDocx(guide, lang)}
+            onClick={() => startExport("docx")}
             disabled={guide.items.length === 0}
             className="inline-flex items-center gap-1.5 rounded-md bg-indigo-9 px-3 py-1.5 text-sm font-medium text-white shadow-sm transition-colors hover:bg-indigo-10 disabled:cursor-not-allowed disabled:opacity-40"
           >
@@ -304,8 +326,22 @@ function GuideEditor({ guide, isActive }: { guide: Guide; isActive: boolean }) {
           </Link>
         </div>
       ) : (
-        <div className="mt-8 flex flex-col gap-6">
-          <ScriptSection
+        <>
+          {/* Imprimanta de deasupra bonului — vizibilă doar pe tema „bon". */}
+          <div className="bon-slot" aria-hidden>
+            <i />
+          </div>
+          <div className="bon-paper mt-8 flex flex-col gap-6">
+            <div className="bon-head" aria-hidden>
+              <p className="bh-firm">*** LOOM SRL · CUI RO123456 ***</p>
+              <p className="bh-sub">STUDII &amp; CAFEA · CASA 1</p>
+              <p className="bh-sub">
+                BON FISCAL NR. {bonCode(guide.id).slice(0, 4)} ·{" "}
+                {formatBonDate(guide.updatedAt)}
+              </p>
+              <p className="bh-title">{guide.title || "Ghid fără titlu"}</p>
+            </div>
+            <ScriptSection
             title="Introducere"
             minutes={INTRO_MINUTES}
             value={resolveIntro(guide, lang)}
@@ -341,7 +377,7 @@ function GuideEditor({ guide, isActive }: { guide: Guide; isActive: boolean }) {
                   return (
                     <li
                       key={item.id}
-                      className="group flex items-start gap-2.5 rounded-lg border border-border bg-card p-3"
+                      className="bon-item group flex items-start gap-2.5 rounded-lg border border-border bg-card p-3"
                     >
                       <span
                         aria-hidden
@@ -358,6 +394,9 @@ function GuideEditor({ guide, isActive }: { guide: Guide; isActive: boolean }) {
                         rows={2}
                         className="min-h-9 flex-1 resize-y rounded-md border border-transparent bg-transparent px-1.5 py-1 text-base leading-relaxed outline-none transition-colors hover:border-border focus:border-ring"
                       />
+                      <span className="bon-price" aria-hidden>
+                        {bonMinutes(pace)}
+                      </span>
                       <div className="flex shrink-0 flex-col gap-0.5">
                         <button
                           onClick={() => moveItem(guide.id, item.id, -1)}
@@ -395,17 +434,48 @@ function GuideEditor({ guide, isActive }: { guide: Guide; isActive: boolean }) {
             value={resolveOutro(guide, lang)}
             onChange={(text) => setOutro(guide.id, text)}
           />
-        </div>
+            <div className="bon-total" aria-hidden>
+              <div className="br">
+                <span>Intro + închidere</span>
+                <i />
+                <span>{bonMinutes(INTRO_MINUTES + OUTRO_MINUTES)}</span>
+              </div>
+              <div className="br">
+                <span>
+                  Articole {guide.items.length} buc × {bonMinutes(pace)}
+                </span>
+                <i />
+                <span>{bonMinutes(guide.items.length * pace)}</span>
+              </div>
+              <div className="br grand">
+                <span>Total</span>
+                <i />
+                <span>{formatMinutes(totalMinutes)}</span>
+              </div>
+            </div>
+            <div className="bon-barcode" aria-hidden>
+              <div className="bars" />
+              <p>{bonCode(guide.id)}</p>
+            </div>
+          </div>
+        </>
       )}
 
       <form
-        className="mt-6 flex gap-2"
+        className="bon-add mt-6 flex gap-2"
         onSubmit={(e) => {
           e.preventDefault();
           const text = newQuestion.trim();
           if (!text) return;
           addCustomItem(guide.id, text);
           setNewQuestion("");
+          if (theme === "bon") {
+            try {
+              bonFeed();
+            } catch {
+              // fără audio — adăugarea rămâne doar vizuală
+            }
+          }
         }}
       >
         <input
@@ -424,6 +494,33 @@ function GuideEditor({ guide, isActive }: { guide: Guide; isActive: boolean }) {
           Adaugă
         </button>
       </form>
+
+      {bonExport && (
+        <BonExportOverlay
+          title={guide.title}
+          lines={[
+            {
+              label: "Intro + închidere",
+              value: `${bonMinutes(INTRO_MINUTES + OUTRO_MINUTES)} MIN`,
+            },
+            {
+              label: `Întrebări ${guide.items.length} buc`,
+              value: `${bonMinutes(guide.items.length * pace)} MIN`,
+            },
+            { label: "Total", value: formatMinutes(totalMinutes), grand: true },
+          ]}
+          code={bonCode(guide.id)}
+          saveLabel={
+            bonExport === "docx" ? "Salvează .docx" : "Salvează .md"
+          }
+          onSave={() =>
+            bonExport === "docx"
+              ? downloadDocx(guide, lang)
+              : downloadMarkdown(guide, lang)
+          }
+          onClose={() => setBonExport(null)}
+        />
+      )}
     </main>
   );
 }

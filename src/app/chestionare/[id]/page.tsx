@@ -34,6 +34,13 @@ import {
 import { formatMinutes, type GuideLanguage } from "@/lib/guide-export";
 import { lintSurvey } from "@/lib/survey-lint";
 import { LintPanel } from "@/components/LintPanel";
+import { useLoomTheme } from "@/components/ThemeProvider";
+import {
+  BonExportOverlay,
+  bonCode,
+  formatBonDate,
+} from "@/components/BonExportOverlay";
+import { bonFeed } from "@/lib/themeAudio";
 
 const VARIABLE_FIELDS = [
   { key: "category", label: "[category]", hint: "ex. aplicații de banking" },
@@ -79,9 +86,16 @@ function SurveyEditor({
 }) {
   const [newQuestion, setNewQuestion] = useState("");
   const [lang, setLang] = useState<GuideLanguage>("en");
+  const { theme } = useLoomTheme();
+  // Pe tema „bon" exportul trece prin imprimanta fiscală (overlay).
+  const [bonExport, setBonExport] = useState<"md" | "docx" | null>(null);
   const groups = groupSurveyItems(survey.items);
   const loi = surveyLoiMinutes(survey);
   const issues = lintSurvey(survey, lang);
+  const bonMinutes = (m: number) => m.toFixed(2).replace(".", ",");
+  /** Aceeași estimare per item ca surveyLoiMinutes, dar nerotunjită. */
+  const bonItemMinutes = (r: { attributes?: string[]; subStems?: string[] }) =>
+    0.5 + 0.1 * ((r.attributes?.length ?? 0) + (r.subStems?.length ?? 0));
 
   /** Re-check before export; errors require an explicit override. */
   const confirmExport = () => {
@@ -92,6 +106,16 @@ function SurveyEditor({
         .map((e) => `• ${e.message}`)
         .join("\n\n")}\n\nExporți oricum?`,
     );
+  };
+
+  const startExport = (format: "md" | "docx") => {
+    if (!confirmExport()) return;
+    if (theme === "bon") {
+      setBonExport(format);
+      return;
+    }
+    if (format === "md") downloadSurveyMarkdown(survey, lang);
+    else void downloadSurveyDocx(survey, lang);
   };
 
   let questionNumber = 0;
@@ -143,7 +167,7 @@ function SurveyEditor({
             ))}
           </div>
           <button
-            onClick={() => confirmExport() && downloadSurveyMarkdown(survey, lang)}
+            onClick={() => startExport("md")}
             disabled={survey.items.length === 0}
             className="inline-flex items-center gap-1.5 rounded-md border border-border px-2.5 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:border-ring hover:text-foreground disabled:cursor-not-allowed disabled:opacity-40"
           >
@@ -151,7 +175,7 @@ function SurveyEditor({
             Markdown
           </button>
           <button
-            onClick={() => confirmExport() && void downloadSurveyDocx(survey, lang)}
+            onClick={() => startExport("docx")}
             disabled={survey.items.length === 0}
             className="inline-flex items-center gap-1.5 rounded-md bg-indigo-9 px-3 py-1.5 text-sm font-medium text-white shadow-sm transition-colors hover:bg-indigo-10 disabled:cursor-not-allowed disabled:opacity-40"
           >
@@ -228,7 +252,23 @@ function SurveyEditor({
           </Link>
         </div>
       ) : (
-        <div className="mt-8 flex flex-col gap-6">
+        <>
+          {/* Imprimanta de deasupra bonului — vizibilă doar pe tema „bon". */}
+          <div className="bon-slot" aria-hidden>
+            <i />
+          </div>
+          <div className="bon-paper mt-8 flex flex-col gap-6">
+            <div className="bon-head" aria-hidden>
+              <p className="bh-firm">*** LOOM SRL · CUI RO123456 ***</p>
+              <p className="bh-sub">STUDII &amp; CAFEA · CASA 1</p>
+              <p className="bh-sub">
+                BON FISCAL NR. {bonCode(survey.id).slice(0, 4)} ·{" "}
+                {formatBonDate(survey.updatedAt)}
+              </p>
+              <p className="bh-title">
+                {survey.title || "Chestionar fără titlu"}
+              </p>
+            </div>
           {groups.map((group, gi) => (
             <section key={gi}>
               <h2 className="mb-2 text-xs font-bold uppercase tracking-wide text-slate-11">
@@ -245,7 +285,7 @@ function SurveyEditor({
                   return (
                     <li
                       key={item.id}
-                      className="flex items-start gap-2.5 rounded-lg border border-border bg-card p-3"
+                      className="bon-item flex items-start gap-2.5 rounded-lg border border-border bg-card p-3"
                     >
                       <span
                         aria-hidden
@@ -311,6 +351,9 @@ function SurveyEditor({
                           </div>
                         )}
                       </div>
+                      <span className="bon-price" aria-hidden>
+                        {bonMinutes(bonItemMinutes(r))}
+                      </span>
                       <div className="flex shrink-0 flex-col gap-0.5">
                         <button
                           onClick={() => moveSurveyItem(survey.id, item.id, -1)}
@@ -342,17 +385,41 @@ function SurveyEditor({
               </ol>
             </section>
           ))}
-        </div>
+            <div className="bon-total" aria-hidden>
+              <div className="br">
+                <span>Articole</span>
+                <i />
+                <span>{survey.items.length} BUC</span>
+              </div>
+              <div className="br grand">
+                <span>Total LOI</span>
+                <i />
+                <span>{formatMinutes(loi)}</span>
+              </div>
+            </div>
+            <div className="bon-barcode" aria-hidden>
+              <div className="bars" />
+              <p>{bonCode(survey.id)}</p>
+            </div>
+          </div>
+        </>
       )}
 
       <form
-        className="mt-6 flex gap-2"
+        className="bon-add mt-6 flex gap-2"
         onSubmit={(e) => {
           e.preventDefault();
           const text = newQuestion.trim();
           if (!text) return;
           addCustomSurveyItem(survey.id, text);
           setNewQuestion("");
+          if (theme === "bon") {
+            try {
+              bonFeed();
+            } catch {
+              // fără audio — adăugarea rămâne doar vizuală
+            }
+          }
         }}
       >
         <input
@@ -371,6 +438,26 @@ function SurveyEditor({
           Adaugă
         </button>
       </form>
+
+      {bonExport && (
+        <BonExportOverlay
+          title={survey.title}
+          lines={[
+            { label: "Articole", value: `${survey.items.length} BUC` },
+            { label: "Total LOI", value: formatMinutes(loi), grand: true },
+          ]}
+          code={bonCode(survey.id)}
+          saveLabel={
+            bonExport === "docx" ? "Salvează .docx" : "Salvează .md"
+          }
+          onSave={() =>
+            bonExport === "docx"
+              ? downloadSurveyDocx(survey, lang)
+              : downloadSurveyMarkdown(survey, lang)
+          }
+          onClose={() => setBonExport(null)}
+        />
+      )}
     </main>
   );
 }
