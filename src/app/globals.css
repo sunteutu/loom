@@ -664,6 +664,12 @@ html[data-theme="broderie"] .bq-alpha {
   color: rgba(143, 52, 35, 0.32);
   transform: rotate(-2deg);
 }
+/* pe desktop, sub el ar fi sidebar-ul fix (w-56) — sare după el */
+@media (min-width: 768px) {
+  html[data-theme="broderie"] .bq-alpha {
+    left: calc(14rem + 2.5%);
+  }
+}
 
 /* --- Bon fiscal: hârtie termică, doar cerneală și mono --- */
 html[data-theme="bon"] {

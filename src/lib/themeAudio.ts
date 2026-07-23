@@ -99,15 +99,18 @@ export function flapCascade() {
 }
 
 /** „Plop" ASMR pentru bulele de săpun, în spiritul tastaturii de iPhone:
-    moale, rotund, fără nimic strident. Un tuc de 6ms de zgomot prin
-    lowpass (pielița care cedează) + corpul sinus care cade iute în grav
-    (bula mai mare = plop mai adânc) + sub-octava abia audibilă care dă
-    rotunjime. Totul stă sub ~1.2kHz și sub 150ms. */
+    moale, rotund, fără nimic strident — dar fiecare mărime are vocea ei.
+    s ∈ 0..1 din diametrul bulei conduce tot: bula mică face un „pip"
+    scurt, luminos și discret; bula mare un „bloop" adânc, mai lung, cu
+    sub-octava plină. Micro-detune aleator ±4% ca două spargeri identice
+    să nu sune niciodată la fel. Totul rămâne sub ~1.8kHz și ~230ms. */
 export function bubblePop(size: number) {
   const c = audio();
   const t = c.currentTime;
-  // tuc-ul de atac: puf minuscul de zgomot, filtrat jos
-  const nDur = 0.006;
+  const s = (Math.min(Math.max(size, 30), 170) - 30) / 140; // 0 = mică, 1 = mare
+  const jitter = 1 + (Math.random() * 2 - 1) * 0.04;
+  // tuc-ul de atac: puf minuscul de zgomot — mai luminos la bulele mici
+  const nDur = 0.005 + s * 0.004;
   const buf = c.createBuffer(1, Math.ceil(c.sampleRate * nDur), c.sampleRate);
   const d = buf.getChannelData(0);
   for (let i = 0; i < d.length; i++) {
@@ -117,40 +120,43 @@ export function bubblePop(size: number) {
   noise.buffer = buf;
   const lp = c.createBiquadFilter();
   lp.type = "lowpass";
-  lp.frequency.value = 1200;
+  lp.frequency.value = 1800 - s * 900;
   const ng = c.createGain();
-  ng.gain.value = 0.12;
+  ng.gain.value = 0.09 + s * 0.06;
   noise.connect(lp);
   lp.connect(ng);
   ng.connect(c.destination);
   noise.start(t);
-  // corpul plopului: glisando sinus descendent, atac instant, coadă scurtă
-  const f0 = 640 - Math.min(size, 170) * 2.6;
+  // corpul plopului: glisando sinus descendent; pitch, durată și volum
+  // scalează toate cu mărimea
+  const f0 = (950 - s * 720) * jitter;
+  const bodyDur = 0.08 + s * 0.12;
   const osc = c.createOscillator();
   osc.type = "sine";
   osc.frequency.setValueAtTime(f0, t);
-  osc.frequency.exponentialRampToValueAtTime(Math.max(70, f0 * 0.3), t + 0.07);
+  osc.frequency.exponentialRampToValueAtTime(Math.max(65, f0 * 0.3), t + bodyDur * 0.55);
   const g = c.createGain();
   g.gain.setValueAtTime(0.0001, t);
-  g.gain.exponentialRampToValueAtTime(0.22, t + 0.006);
-  g.gain.exponentialRampToValueAtTime(0.0001, t + 0.13);
+  g.gain.exponentialRampToValueAtTime(0.16 + s * 0.1, t + 0.006);
+  g.gain.exponentialRampToValueAtTime(0.0001, t + bodyDur);
   osc.connect(g);
   g.connect(c.destination);
   osc.start(t);
-  osc.stop(t + 0.15);
-  // sub-octava: căldura de dedesubt, foarte discretă
+  osc.stop(t + bodyDur + 0.02);
+  // sub-octava: aproape absentă la bulele mici, plină la cele mari
+  const subGain = 0.02 + s * 0.13;
   const sub = c.createOscillator();
   sub.type = "sine";
   sub.frequency.setValueAtTime(f0 / 2, t);
-  sub.frequency.exponentialRampToValueAtTime(Math.max(50, f0 * 0.15), t + 0.09);
+  sub.frequency.exponentialRampToValueAtTime(Math.max(48, f0 * 0.15), t + bodyDur * 0.7);
   const sg = c.createGain();
   sg.gain.setValueAtTime(0.0001, t);
-  sg.gain.exponentialRampToValueAtTime(0.1, t + 0.01);
-  sg.gain.exponentialRampToValueAtTime(0.0001, t + 0.16);
+  sg.gain.exponentialRampToValueAtTime(subGain, t + 0.01);
+  sg.gain.exponentialRampToValueAtTime(0.0001, t + bodyDur + 0.03);
   sub.connect(sg);
   sg.connect(c.destination);
   sub.start(t);
-  sub.stop(t + 0.18);
+  sub.stop(t + bodyDur + 0.05);
 }
 
 /** Imprimanta termică (bon fiscal): zgomot alb cu poartă de ~28Hz (avans

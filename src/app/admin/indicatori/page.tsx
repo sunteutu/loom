@@ -530,7 +530,7 @@ function SurveyItemView({
   onToggle: () => void;
 }) {
   return (
-    <div className="rounded-lg border border-border bg-card p-3.5">
+    <div className="rounded-lg border border-border bg-card p-3.5 pt-6">
       <div className="flex items-center justify-between gap-2">
         <span className="inline-block rounded bg-indigo-3 px-1.5 py-0.5 text-xs font-semibold uppercase tracking-wide text-indigo-11">
           {item.type}

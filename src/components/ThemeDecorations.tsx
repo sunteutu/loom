@@ -692,6 +692,11 @@ function heart(g: SVGGElement, cx: number, cy: number, s: number, color: string)
 function buildSewingKit(layer: HTMLElement) {
   const W = window.innerWidth;
   const H = window.innerHeight;
+  // Pe desktop sidebar-ul (w-56 = 224px) acoperă marginea stângă a
+  // decorului fix — remapăm axa X pe zona de conținut, ca florile și
+  // trusa să nu moară sub meniu. Pe mobil sidebar-ul nu e fix, L = 0.
+  const L = window.matchMedia("(min-width: 768px)").matches ? 224 : 0;
+  const X = (f: number) => L + f * (W - L);
   const decorSvg = document.createElementNS(NS, "svg") as SVGSVGElement;
   decorSvg.setAttribute("width", String(W));
   decorSvg.setAttribute("height", String(H));
@@ -705,8 +710,8 @@ function buildSewingKit(layer: HTMLElement) {
 
   // ața care șerpuiește prin pagină, cu acul la capăt
   const threadPts = [
-    ...bezier({ x: 34, y: 96 }, { x: 150, y: H * 0.28 }, { x: 40, y: H * 0.44 }, { x: 120, y: H * 0.6 }, 24),
-    ...bezier({ x: 120, y: H * 0.6 }, { x: 190, y: H * 0.78 }, { x: W * 0.42, y: H * 0.96 }, { x: W * 0.78, y: H * 0.87 }, 30),
+    ...bezier({ x: L + 34, y: 96 }, { x: L + 150, y: H * 0.28 }, { x: L + 40, y: H * 0.44 }, { x: L + 120, y: H * 0.6 }, 24),
+    ...bezier({ x: L + 120, y: H * 0.6 }, { x: L + 190, y: H * 0.78 }, { x: X(0.42), y: H * 0.96 }, { x: X(0.78), y: H * 0.87 }, 30),
   ];
   const tg = document.createElementNS(NS, "g") as SVGGElement;
   tg.setAttribute("opacity", ".5");
@@ -716,16 +721,16 @@ function buildSewingKit(layer: HTMLElement) {
   const prev = threadPts[threadPts.length - 4];
   needle(tg, tip, Math.atan2(tip.y - prev.y, tip.x - prev.x));
   // nasturii cusuți
-  sewButton(dg, W * 0.05, H * 0.53, 13, "#8fb3e8", "#f2b705");
-  sewButton(dg, W * 0.955, H * 0.27, 10, "#b8452f", "#f4f1e8");
-  sewButton(dg, W * 0.9, H * 0.75, 15, "#f2b705", "#b8452f");
-  sewButton(dg, W * 0.035, H * 0.3, 9, "#5a8b4c", "#f4f1e8");
+  sewButton(dg, X(0.05), H * 0.53, 13, "#8fb3e8", "#f2b705");
+  sewButton(dg, X(0.955), H * 0.27, 10, "#b8452f", "#f4f1e8");
+  sewButton(dg, X(0.9), H * 0.75, 15, "#f2b705", "#b8452f");
+  sewButton(dg, X(0.035), H * 0.3, 9, "#5a8b4c", "#f4f1e8");
   // foarfecile și mosorelul
-  scissors(dg, W * 0.925, H * 0.115, 2.45);
-  scissors(dg, W * 0.045, H * 0.42, 0.8, 0.85);
-  scissors(dg, W * 0.95, H * 0.47, 3.9, 0.9);
-  scissors(dg, W * 0.68, H * 0.955, 5.5, 0.75);
-  spool(dg, W * 0.07, H * 0.66, "#b8452f");
+  scissors(dg, X(0.925), H * 0.115, 2.45);
+  scissors(dg, X(0.045), H * 0.42, 0.8, 0.85);
+  scissors(dg, X(0.95), H * 0.47, 3.9, 0.9);
+  scissors(dg, X(0.68), H * 0.955, 5.5, 0.75);
+  spool(dg, X(0.07), H * 0.66, "#b8452f");
   // al doilea fir, verde, coboară șerpuit pe marginea dreaptă
   const rightPts = [
     ...bezier({ x: W - 34, y: 110 }, { x: W - 150, y: H * 0.3 }, { x: W - 38, y: H * 0.52 }, { x: W - 120, y: H * 0.72 }, 26),
@@ -736,35 +741,35 @@ function buildSewingKit(layer: HTMLElement) {
   dg.appendChild(rg);
   runningStitch(rg, rightPts, "#4c7a43", 2);
   // mosorel albastru + nasture + noduri franțuzești pe dreapta
-  spool(dg, W * 0.952, H * 0.845, "#8fb3e8");
-  sewButton(dg, W * 0.97, H * 0.6, 11, "#4c7a43", "#f4f1e8");
-  knots(dg, W * 0.935, H * 0.55, 9, 22, "#f2b705");
-  heart(dg, W * 0.915, H * 0.35, 6, "#d9a5b5");
+  spool(dg, X(0.952), H * 0.845, "#8fb3e8");
+  sewButton(dg, X(0.97), H * 0.6, 11, "#4c7a43", "#f4f1e8");
+  knots(dg, X(0.935), H * 0.55, 9, 22, "#f2b705");
+  heart(dg, X(0.915), H * 0.35, 6, "#d9a5b5");
   // inimioare cross-stitch pale
-  heart(dg, W * 0.24, H * 0.045, 7, "#dba393");
-  heart(dg, W * 0.76, H * 0.05, 6, "#dba393");
-  heart(dg, W * 0.975, H * 0.5, 6, "#d9a5b5");
-  heart(dg, W * 0.55, H * 0.955, 7, "#dba393");
-  heart(dg, W * 0.015, H * 0.72, 5, "#d9a5b5");
+  heart(dg, X(0.24), H * 0.045, 7, "#dba393");
+  heart(dg, X(0.76), H * 0.05, 6, "#dba393");
+  heart(dg, X(0.975), H * 0.5, 6, "#d9a5b5");
+  heart(dg, X(0.55), H * 0.955, 7, "#dba393");
+  heart(dg, X(0.015), H * 0.72, 5, "#d9a5b5");
   // flori răzlețe, scăpate din buchete — umplu golurile dintre petice
-  daisy(dg, W * 0.18, H * 0.87, 11, 18, "#f4f1e8", "#e9a800", 5);
-  daisy(dg, W * 0.86, H * 0.13, 10, 16, "#aebfe4", "#f2b705", 5);
-  daisy(dg, W * 0.5, H * 0.06, 9, 14, "#e8798a", "#f2b705", 4);
-  daisy(dg, W * 0.03, H * 0.185, 10, 15, "#f4f1e8", "#e9a800", 5);
-  daisy(dg, W * 0.965, H * 0.925, 9, 14, "#aebfe4", "#e9a800", 4);
-  sunflower(dg, W * 0.33, H * 0.945, 26);
-  leaf(dg, W * 0.31, H * 0.975, -2.1, 34, "#4c7a43");
-  leaf(dg, W * 0.2, H * 0.9, 0.6, 28, "#5a8b4c");
-  leaf(dg, W * 0.875, H * 0.165, 2.4, 26, "#3f6d38");
+  daisy(dg, X(0.18), H * 0.87, 11, 18, "#f4f1e8", "#e9a800", 5);
+  daisy(dg, X(0.86), H * 0.13, 10, 16, "#aebfe4", "#f2b705", 5);
+  daisy(dg, X(0.5), H * 0.06, 9, 14, "#e8798a", "#f2b705", 4);
+  daisy(dg, X(0.03), H * 0.185, 10, 15, "#f4f1e8", "#e9a800", 5);
+  daisy(dg, X(0.965), H * 0.925, 9, 14, "#aebfe4", "#e9a800", 4);
+  sunflower(dg, X(0.33), H * 0.945, 26);
+  leaf(dg, X(0.31), H * 0.975, -2.1, 34, "#4c7a43");
+  leaf(dg, X(0.2), H * 0.9, 0.6, 28, "#5a8b4c");
+  leaf(dg, X(0.875), H * 0.165, 2.4, 26, "#3f6d38");
   // mărunțișuri de trusă în plus
-  sewButton(dg, W * 0.42, H * 0.035, 8, "#e8798a", "#f4f1e8");
-  sewButton(dg, W * 0.6, H * 0.965, 9, "#8fb3e8", "#b8452f");
-  spool(dg, W * 0.545, H * 0.05, "#5a8b4c");
-  knots(dg, W * 0.115, H * 0.115, 8, 16, "#c04a32");
-  knots(dg, W * 0.885, H * 0.885, 8, 18, "#5a8b4c");
-  heart(dg, W * 0.35, H * 0.05, 5, "#d9a5b5");
-  heart(dg, W * 0.655, H * 0.04, 6, "#dba393");
-  heart(dg, W * 0.08, H * 0.955, 6, "#d9a5b5");
+  sewButton(dg, X(0.42), H * 0.035, 8, "#e8798a", "#f4f1e8");
+  sewButton(dg, X(0.6), H * 0.965, 9, "#8fb3e8", "#b8452f");
+  spool(dg, X(0.545), H * 0.05, "#5a8b4c");
+  knots(dg, X(0.115), H * 0.115, 8, 16, "#c04a32");
+  knots(dg, X(0.885), H * 0.885, 8, 18, "#5a8b4c");
+  heart(dg, X(0.35), H * 0.05, 5, "#d9a5b5");
+  heart(dg, X(0.655), H * 0.04, 6, "#dba393");
+  heart(dg, X(0.08), H * 0.955, 6, "#d9a5b5");
 }
 
 const BOUQUET_SPECS = [
@@ -787,9 +792,17 @@ function BroderieDecor() {
   useEffect(() => {
     const layer = layerRef.current;
     if (!layer) return;
+    // procentele `left` se remapează pe zona de conținut (după sidebar-ul
+    // fix de pe desktop), altfel buchetele din stânga mor sub meniu
+    const W = window.innerWidth;
+    const L = window.matchMedia("(min-width: 768px)").matches ? 224 : 0;
     for (const sp of BOUQUET_SPECS) {
       const b = bouquet(sp.w, sp.h, sp.s, sp.r);
-      Object.assign(b.style, sp.css);
+      const css: Record<string, string> = { ...sp.css };
+      if (css.left) {
+        css.left = `${Math.round(L + (parseFloat(css.left) / 100) * (W - L))}px`;
+      }
+      Object.assign(b.style, css);
       layer.appendChild(b);
     }
     buildSewingKit(layer);
