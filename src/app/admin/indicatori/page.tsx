@@ -146,8 +146,8 @@ function IndicatoriContent() {
   const hasActiveFilters = query !== "" || selectedCats.size > 0;
 
   return (
-    <main className="mx-auto w-full max-w-5xl flex-1 px-8 pb-16">
-      <div className="sticky top-0 z-10 -mx-8 border-b border-border bg-background/95 px-8 pb-4 pt-8 backdrop-blur supports-[backdrop-filter]:bg-background/80">
+    <main className="mx-auto w-full max-w-5xl flex-1 px-4 sm:px-8 pb-16">
+      <div className="sticky top-14 z-10 -mx-4 border-b border-border bg-background/95 px-4 pb-4 pt-6 backdrop-blur supports-[backdrop-filter]:bg-background/80 md:top-0 sm:-mx-8 sm:px-8 sm:pt-8">
         <header className="mb-4">
           <h1 className="text-2xl font-semibold tracking-tight">Indicatori</h1>
           <p className="mt-1 text-base text-muted-foreground">

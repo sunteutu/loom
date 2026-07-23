@@ -11,6 +11,7 @@ import {
   Gamepad2,
   Gauge,
   Home,
+  Menu,
   Monitor,
   Moon,
   NotebookPen,
@@ -22,6 +23,7 @@ import {
   Tv,
   UserRound,
   Waypoints,
+  X,
 } from "lucide-react";
 import { getActiveGuide, useGuideStore } from "@/lib/guides";
 import { getActiveSurvey, useSurveyStore } from "@/lib/surveys";
@@ -142,32 +144,17 @@ function ThemeToggle() {
   );
 }
 
-export function Sidebar() {
-  const pathname = usePathname();
-  const guideStore = useGuideStore();
-  const surveyStore = useSurveyStore();
-  // localStorage only exists client-side; render the counts after mount to
-  // avoid a hydration mismatch (same pattern as ThemeToggle).
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []);
-  const badgeCounts: Record<string, number> = mounted
-    ? {
-        "/ghiduri": getActiveGuide(guideStore)?.items.length ?? 0,
-        "/chestionare": getActiveSurvey(surveyStore)?.items.length ?? 0,
-      }
-    : {};
-
-  if (HIDDEN_PREFIXES.some((p) => pathname.startsWith(p))) {
-    return null;
-  }
-
+function SidebarInner({
+  pathname,
+  badgeCounts,
+  onNavigate,
+}: {
+  pathname: string;
+  badgeCounts: Record<string, number>;
+  onNavigate?: () => void;
+}) {
   return (
-    <aside className="sticky top-0 flex h-screen w-56 shrink-0 flex-col border-r border-sidebar-border bg-sidebar text-sidebar-foreground">
-      <div className="flex items-center gap-2 px-4 py-4">
-        <FlaskConical className="h-5 w-5 text-sidebar-primary" aria-hidden />
-        <span className="text-base font-semibold tracking-tight">Loom</span>
-      </div>
-
+    <>
       <nav
         aria-label="Main"
         className="flex flex-1 flex-col gap-5 overflow-y-auto px-2 pb-4"
@@ -188,6 +175,7 @@ export function Sidebar() {
                 <Link
                   key={item.href}
                   href={item.href}
+                  onClick={onNavigate}
                   aria-current={active ? "page" : undefined}
                   className={`flex items-center gap-2.5 rounded-md px-2 py-1.5 text-base transition-colors ${
                     active
@@ -212,6 +200,7 @@ export function Sidebar() {
       <div className="flex flex-col gap-2 border-t border-sidebar-border px-3 py-3">
         <Link
           href="/profil"
+          onClick={onNavigate}
           aria-current={pathname.startsWith("/profil") ? "page" : undefined}
           className={`flex items-center gap-2.5 rounded-md px-2 py-1.5 text-base transition-colors ${
             pathname.startsWith("/profil")
@@ -224,6 +213,106 @@ export function Sidebar() {
         </Link>
         <ThemeToggle />
       </div>
-    </aside>
+    </>
+  );
+}
+
+export function Sidebar() {
+  const pathname = usePathname();
+  const guideStore = useGuideStore();
+  const surveyStore = useSurveyStore();
+  // localStorage only exists client-side; render the counts after mount to
+  // avoid a hydration mismatch (same pattern as ThemeToggle).
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+  const badgeCounts: Record<string, number> = mounted
+    ? {
+        "/ghiduri": getActiveGuide(guideStore)?.items.length ?? 0,
+        "/chestionare": getActiveSurvey(surveyStore)?.items.length ?? 0,
+      }
+    : {};
+
+  // Drawer-ul mobil: se închide la navigare (onNavigate pe linkuri), pe
+  // Escape, și blochează scroll-ul paginii cât e deschis.
+  const [open, setOpen] = useState(false);
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setOpen(false);
+    };
+    document.addEventListener("keydown", onKey);
+    const prev = document.documentElement.style.overflow;
+    document.documentElement.style.overflow = "hidden";
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.documentElement.style.overflow = prev;
+    };
+  }, [open]);
+
+  if (HIDDEN_PREFIXES.some((p) => pathname.startsWith(p))) {
+    return null;
+  }
+
+  return (
+    <>
+      {/* bara de sus, doar pe mobil */}
+      <header className="loom-topbar sticky top-0 z-40 flex h-14 items-center gap-2 border-b border-sidebar-border bg-sidebar px-4 text-sidebar-foreground md:hidden">
+        <Link href="/" className="flex items-center gap-2">
+          <FlaskConical className="h-5 w-5 text-sidebar-primary" aria-hidden />
+          <span className="text-base font-semibold tracking-tight">Loom</span>
+        </Link>
+        <button
+          onClick={() => setOpen(true)}
+          aria-label="Deschide meniul"
+          aria-expanded={open}
+          className="ml-auto flex h-10 w-10 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+        >
+          <Menu className="h-5 w-5" aria-hidden />
+        </button>
+      </header>
+
+      {/* drawer-ul mobil + backdrop */}
+      <div
+        onClick={() => setOpen(false)}
+        aria-hidden
+        className={`fixed inset-0 z-40 bg-black/45 backdrop-blur-[2px] transition-opacity duration-200 md:hidden ${
+          open ? "opacity-100" : "pointer-events-none opacity-0"
+        }`}
+      />
+      <aside
+        role="dialog"
+        aria-modal="true"
+        aria-label="Meniu"
+        className={`fixed inset-y-0 left-0 z-50 flex w-72 max-w-[85vw] flex-col border-r border-sidebar-border bg-sidebar text-sidebar-foreground shadow-2xl transition-transform duration-300 ease-out md:hidden ${
+          open ? "translate-x-0" : "-translate-x-full"
+        }`}
+      >
+        <div className="flex items-center gap-2 px-4 py-4">
+          <FlaskConical className="h-5 w-5 text-sidebar-primary" aria-hidden />
+          <span className="text-base font-semibold tracking-tight">Loom</span>
+          <button
+            onClick={() => setOpen(false)}
+            aria-label="Închide meniul"
+            className="ml-auto flex h-9 w-9 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+          >
+            <X className="h-5 w-5" aria-hidden />
+          </button>
+        </div>
+        <SidebarInner
+          pathname={pathname}
+          badgeCounts={badgeCounts}
+          onNavigate={() => setOpen(false)}
+        />
+      </aside>
+
+      {/* sidebar-ul de desktop */}
+      <aside className="sticky top-0 hidden h-screen w-56 shrink-0 flex-col border-r border-sidebar-border bg-sidebar text-sidebar-foreground md:flex">
+        <div className="flex items-center gap-2 px-4 py-4">
+          <FlaskConical className="h-5 w-5 text-sidebar-primary" aria-hidden />
+          <span className="text-base font-semibold tracking-tight">Loom</span>
+        </div>
+        <SidebarInner pathname={pathname} badgeCounts={badgeCounts} />
+      </aside>
+    </>
   );
 }

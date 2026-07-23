@@ -28,7 +28,7 @@ export default function ChestionarePage() {
   };
 
   return (
-    <main className="mx-auto w-full max-w-3xl flex-1 px-8 pb-16 pt-8">
+    <main className="mx-auto w-full max-w-3xl flex-1 px-4 sm:px-8 pb-16 pt-8">
       <header className="mb-6 flex items-end justify-between gap-4">
         <div>
           <h1 className="text-2xl font-semibold tracking-tight">Chestionare</h1>

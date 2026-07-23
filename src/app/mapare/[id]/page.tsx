@@ -136,7 +136,7 @@ export default function MapareWorkspacePage() {
 
   if (!doc) {
     return (
-      <main className="mx-auto w-full max-w-3xl flex-1 px-8 pt-16 text-center">
+      <main className="mx-auto w-full max-w-3xl flex-1 px-4 sm:px-8 pt-16 text-center">
         <p className="text-base text-muted-foreground">
           Maparea nu există (poate a fost ștearsă).
         </p>
@@ -419,7 +419,7 @@ function MappingWorkspace({ doc }: { doc: MappingDoc }) {
   // ── UI ───────────────────────────────────────────────────────────────────
 
   return (
-    <main className="mx-auto w-full max-w-3xl flex-1 px-8 pb-28 pt-8">
+    <main className="mx-auto w-full max-w-3xl flex-1 px-4 sm:px-8 pb-28 pt-8">
       <div className="mb-1 flex items-center justify-between gap-4">
         <Link
           href="/mapare"
@@ -710,7 +710,7 @@ function MappingWorkspace({ doc }: { doc: MappingDoc }) {
       {/* ── 4. Generate ──────────────────────────────────────────────── */}
       {hasRun && selectedCount > 0 && (
         <div className="fixed inset-x-0 bottom-0 z-20 border-t border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
-          <div className="mx-auto flex w-full max-w-3xl flex-wrap items-center gap-3 px-8 py-3">
+          <div className="mx-auto flex w-full max-w-3xl flex-wrap items-center gap-3 px-4 py-3 sm:px-8">
             <span className="text-sm text-muted-foreground">
               {selectedCount} întrebări din {groups.ordered.length} teme →
             </span>

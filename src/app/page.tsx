@@ -10,7 +10,7 @@ export default async function Home() {
   const { userId } = await auth();
 
   return (
-    <main className="mx-auto w-full max-w-4xl flex-1 px-8 pb-16 pt-8">
+    <main className="mx-auto w-full max-w-4xl flex-1 px-4 sm:px-8 pb-16 pt-8">
       {userId ? <HomeDashboard /> : <Landing />}
     </main>
   );

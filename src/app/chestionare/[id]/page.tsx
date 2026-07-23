@@ -55,7 +55,7 @@ export default function ChestionarPage() {
 
   if (!survey) {
     return (
-      <main className="mx-auto w-full max-w-3xl flex-1 px-8 pt-16 text-center">
+      <main className="mx-auto w-full max-w-3xl flex-1 px-4 sm:px-8 pt-16 text-center">
         <p className="text-base text-muted-foreground">
           Chestionarul nu există (poate a fost șters).
         </p>
@@ -121,8 +121,8 @@ function SurveyEditor({
   let questionNumber = 0;
 
   return (
-    <main className="mx-auto w-full max-w-3xl flex-1 px-8 pb-16 pt-8">
-      <div className="mb-1 flex items-center justify-between gap-4">
+    <main className="mx-auto w-full max-w-3xl flex-1 px-4 sm:px-8 pb-16 pt-8">
+      <div className="mb-1 flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
         <Link
           href="/chestionare"
           className="inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
@@ -130,7 +130,7 @@ function SurveyEditor({
           <ArrowLeft aria-hidden className="h-4 w-4" />
           Chestionare
         </Link>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           {!isActive && (
             <button
               onClick={() => setActiveSurvey(survey.id)}

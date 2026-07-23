@@ -84,7 +84,7 @@ export default function RootLayout({
               <DevIndicatorDock />
               <ScratchCanvas />
               <ThemeDecorations />
-              <div className="relative z-[1] flex min-h-screen">
+              <div className="relative z-[1] flex min-h-screen flex-col md:flex-row">
                 <Sidebar />
                 <div
                   id="main-content"

@@ -622,7 +622,9 @@ html[data-theme="broderie"] [class*="bg-card"] {
     var(--card);
   box-shadow: 0 10px 26px -14px rgba(25, 40, 78, 0.55);
 }
-/* sidebar-ul = petic mare de pânză, cu aceleași cusături */
+/* sidebar-ul = petic mare de pânză, cu aceleași cusături
+   (pe mobil, bara de sus și drawer-ul primesc același tratament) */
+html[data-theme="broderie"] .loom-topbar,
 html[data-theme="broderie"] aside[class*="bg-sidebar"] {
   border: 4px solid transparent;
   border-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='36' height='36'><rect width='36' height='36' fill='none'/><path d='M2 2 H34 V34 H2 Z' fill='none' stroke='%23703020' stroke-width='2.6' stroke-dasharray='6 5' stroke-linecap='round' opacity='.45' transform='translate(.7,.9)'/><path d='M2 2 H34 V34 H2 Z' fill='none' stroke='%23c04a32' stroke-width='2.6' stroke-dasharray='6 5' stroke-linecap='round'/></svg>")
@@ -1064,7 +1066,8 @@ html[data-theme="metal"].dark h1 {
     background-position: 100% 0;
   }
 }
-/* sidebar-ul = placă frezată */
+/* sidebar-ul = placă frezată (pe mobil și bara de sus + drawer-ul) */
+html[data-theme="metal"] .loom-topbar,
 html[data-theme="metal"] aside[class*="bg-sidebar"] {
   background-image: repeating-linear-gradient(
       0deg,
@@ -1078,6 +1081,7 @@ html[data-theme="metal"] aside[class*="bg-sidebar"] {
     inset 0 1px 0 rgba(255, 255, 255, 0.95),
     6px 0 24px -12px rgba(22, 27, 37, 0.6);
 }
+html[data-theme="metal"].dark .loom-topbar,
 html[data-theme="metal"].dark aside[class*="bg-sidebar"] {
   background-image: repeating-linear-gradient(
       0deg,
@@ -2841,6 +2845,162 @@ html[data-theme="vhs"] .loom-blob { opacity: 0.3; }
   :focus-visible {
     outline: 2px solid var(--ring);
     outline-offset: 2px;
+  }
+}
+
+/* ==================== Mobil (sub 768px) ====================
+   Optimizarea pentru telefon a tuturor temelor: hero-urile își strâng
+   padding-urile, decorul fix se retrage sau se micșorează ca să nu calce
+   peste conținut, iar gradientele „attachment: fixed" trec pe scroll
+   (iOS le ignoră oricum, iar pe Android produc jank la derulare). */
+@media (max-width: 767px) {
+  /* — fundalurile cu attachment fixed — */
+  html[data-theme="cyberdeck"] body,
+  html[data-theme="splitflap"] body,
+  html[data-theme="metal"] body,
+  html[data-theme="metal"].dark body {
+    background-attachment: scroll;
+  }
+
+  /* — bara de sus mobilă: fără artefactele de „placă laterală" — */
+  .loom-topbar {
+    border-right: none;
+  }
+  html[data-theme="metal"] .loom-topbar {
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.95),
+      0 6px 24px -12px rgba(22, 27, 37, 0.6);
+  }
+  html[data-theme="metal"].dark .loom-topbar {
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.14),
+      0 6px 28px -12px rgba(0, 0, 0, 0.85);
+  }
+
+  /* — hero-ul generic — */
+  .loom-hero {
+    padding-top: 18px;
+  }
+  .loom-hero h1 {
+    font-size: clamp(29px, 8.2vw, 40px);
+  }
+  .loom-hero > p {
+    font-size: 15.5px;
+  }
+  .loom-row .loom-btn {
+    flex: 1 1 auto;
+    justify-content: center;
+  }
+  .loom-cards {
+    gap: 14px;
+  }
+
+  /* — Retro Nostalgia: fereastra loom.exe respiră și pe îngust — */
+  html[data-theme="cyberdeck"] .loom-hero > * {
+    margin-left: 18px;
+    margin-right: 18px;
+  }
+  html[data-theme="cyberdeck"] .loom-hero {
+    box-shadow: 6px 6px 0 rgba(11, 82, 192, 0.28);
+  }
+  /* bulele mari consumă GPU (backdrop-filter) — rămân doar cele mici */
+  .bubble-3,
+  .bubble-8 {
+    display: none;
+  }
+
+  /* — Metal: placa frezată cu margini mai suple — */
+  html[data-theme="metal"] .loom-hero {
+    padding: 30px 20px 28px;
+  }
+
+  /* — Broderie: peticul de pânză se strânge, samplerul dispare — */
+  html[data-theme="broderie"] .loom-hero {
+    padding: 26px 18px 24px;
+  }
+  html[data-theme="broderie"] .bq-alpha {
+    display: none;
+  }
+
+  /* — Bon fiscal: bonul ocupă toată lățimea, ștampila se micșorează,
+     bonurile vechi de pe tejghea ar călca peste conținut — */
+  html[data-theme="bon"] .loom-hero {
+    padding: 84px 18px 28px;
+  }
+  html[data-theme="bon"] .loom-stamp {
+    top: 78px;
+    right: 10px;
+    font-size: 15px;
+    padding: 4px 10px;
+  }
+  html[data-theme="bon"] .loom-bon-head {
+    font-size: 9.5px;
+    letter-spacing: 0.08em;
+  }
+  html[data-theme="bon"] .old-bon {
+    display: none;
+  }
+
+  /* — Split-flap: tabloul de plecări pe un singur ecran de telefon — */
+  html[data-theme="splitflap"] .loom-hero {
+    padding: 58px 16px 26px;
+  }
+  html[data-theme="splitflap"] .loom-hero::before {
+    content: "LOOM AIR · PLECĂRI · GATE 07";
+    padding: 10px 14px;
+    font-size: 10.5px;
+    letter-spacing: 0.16em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .sf-moon {
+    top: 4%;
+    right: 7%;
+    width: 74px;
+    height: 74px;
+  }
+  .sf-ticker {
+    padding-bottom: calc(6px + env(safe-area-inset-bottom));
+  }
+
+  /* — VHS: root-ul scade puțin, iar OSD-ul REC coboară sub bara de sus — */
+  html[data-theme="vhs"] {
+    font-size: 19px;
+  }
+  /* sub bara de sus mobilă (h-14 = 3.5rem, iar rem-ul VHS e mărit) */
+  html[data-theme="vhs"] body::before {
+    top: calc(3.5rem + 8px);
+    right: 12px;
+    font-size: 17px;
+  }
+  html[data-theme="vhs"] .loom-hero h1 {
+    font-size: clamp(33px, 9.5vw, 44px);
+  }
+  html[data-theme="vhs"] .loom-btn {
+    font-size: 19px;
+    padding: 13px 20px;
+  }
+
+  /* — blobs: mai mici și cu blur mai ieftin pe GPU-uri de telefon — */
+  .loom-blob {
+    filter: blur(46px);
+    opacity: 0.38;
+  }
+  .loom-blob-a {
+    width: 320px;
+    height: 290px;
+    top: -110px;
+    right: -90px;
+  }
+  .loom-blob-b {
+    width: 300px;
+    height: 280px;
+    bottom: -120px;
+    left: -100px;
+  }
+  .loom-blob-c {
+    display: none;
   }
 }
 
