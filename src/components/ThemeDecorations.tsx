@@ -297,6 +297,10 @@ const BUBBLE_COUNT = 8;
 
 function CyberdeckDecor() {
   const layerRef = useRef<HTMLDivElement>(null);
+  // Post-it-ul plutește peste conținut (z 2); pe Indicatori bara sticky de
+  // căutare + filtre stă chiar sub el, așa că acolo nu-l afișăm deloc.
+  const pathname = usePathname();
+  const showNote = !pathname.startsWith("/admin");
 
   useEffect(() => {
     const respawnTimeouts: ReturnType<typeof setTimeout>[] = [];
@@ -387,9 +391,11 @@ function CyberdeckDecor() {
           <div key={i} className={`loom-bubble bubble-${i + 1}`} />
         ))}
       </div>
-      <div className="sticky-note" aria-hidden>
-        pretty girls love research ☕
-      </div>
+      {showNote && (
+        <div className="sticky-note" aria-hidden>
+          pretty girls love research ☕
+        </div>
+      )}
     </>
   );
 }
