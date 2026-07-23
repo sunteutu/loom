@@ -431,10 +431,10 @@ function QualSection({ indicator }: { indicator: Indicator }) {
         <button
           onClick={toggleAll}
           aria-pressed={allAdded}
-          className={`inline-flex items-center gap-1 rounded-md border px-2 py-1 text-xs font-medium transition-colors ${
+          className={`inline-flex items-center gap-1 rounded-md border px-2.5 py-1.5 text-xs font-semibold transition-colors ${
             allAdded
               ? "border-indigo-6 bg-indigo-3 text-indigo-11 hover:border-red-9/40 hover:bg-red-3 hover:text-red-11"
-              : "border-border text-muted-foreground hover:border-ring hover:text-foreground"
+              : "border-transparent bg-indigo-9 text-primary-foreground shadow-sm hover:bg-indigo-10"
           }`}
         >
           {allAdded ? (
@@ -476,10 +476,10 @@ function QualSection({ indicator }: { indicator: Indicator }) {
                     ? `Scoate întrebarea ${i + 1} din ghid`
                     : `Adaugă întrebarea ${i + 1} în ghid`
                 }
-                className={`mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-md border transition-colors ${
+                className={`mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-md border transition-colors ${
                   added
-                    ? "border-indigo-9 bg-indigo-9 text-white hover:bg-indigo-10"
-                    : "border-border text-muted-foreground hover:border-ring hover:text-foreground"
+                    ? "border-indigo-6 bg-indigo-3 text-indigo-11 hover:border-red-9/40 hover:bg-red-3 hover:text-red-11"
+                    : "border-transparent bg-indigo-9 text-primary-foreground shadow-sm hover:bg-indigo-10"
                 }`}
               >
                 {added ? (
@@ -543,10 +543,10 @@ function SurveyItemView({
               ? "Scoate itemul din chestionar"
               : "Adaugă itemul în chestionar"
           }
-          className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-md border transition-colors ${
+          className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-md border transition-colors ${
             added
-              ? "border-indigo-9 bg-indigo-9 text-white hover:bg-indigo-10"
-              : "border-border text-muted-foreground hover:border-ring hover:text-foreground"
+              ? "border-indigo-6 bg-indigo-3 text-indigo-11 hover:border-red-9/40 hover:bg-red-3 hover:text-red-11"
+              : "border-transparent bg-indigo-9 text-primary-foreground shadow-sm hover:bg-indigo-10"
           }`}
         >
           {added ? (
