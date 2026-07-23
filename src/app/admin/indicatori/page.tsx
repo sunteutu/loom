@@ -146,7 +146,7 @@ function IndicatoriContent() {
   const hasActiveFilters = query !== "" || selectedCats.size > 0;
 
   return (
-    <main className="mx-auto w-full max-w-5xl flex-1 px-4 sm:px-8 pb-16">
+    <main className="mx-auto w-full max-w-6xl flex-1 px-4 sm:px-8 pb-16">
       <div className="sticky top-14 z-10 -mx-4 border-b border-border bg-background/95 px-4 pb-4 pt-6 backdrop-blur supports-[backdrop-filter]:bg-background/80 md:top-0 sm:-mx-8 sm:px-8 sm:pt-8">
         <header className="mb-4">
           <h1 className="text-2xl font-semibold tracking-tight">Indicatori</h1>
@@ -324,7 +324,7 @@ function IndicatoriContent() {
                     <li key={ind.id}>
                       <button
                         onClick={() => setSelected(ind)}
-                        className="flex h-full w-full flex-col rounded-xl border border-border bg-card p-4 text-left transition-colors hover:border-ring/60 hover:bg-slate-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40"
+                        className="flex h-full w-full flex-col rounded-xl border border-border bg-card p-5 pb-9 text-left transition-colors hover:border-ring/60 hover:bg-slate-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40"
                       >
                         <h3 className="text-base font-semibold leading-snug">
                           <Highlight text={ind.name} terms={terms} />

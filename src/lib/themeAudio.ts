@@ -7,12 +7,43 @@ let ctx: AudioContext | null = null;
 
 function audio(): AudioContext {
   if (!ctx) {
+    // iOS tratează Web Audio ca „ambient" și îl amuțește cu switch-ul pe
+    // silent; sesiunea „playback" îl scoate de sub switch (Safari 16.4+).
+    type AudioSessionNavigator = Navigator & { audioSession?: { type: string } };
+    const nav = navigator as AudioSessionNavigator;
+    if (nav.audioSession) nav.audioSession.type = "playback";
     type LegacyWindow = Window & { webkitAudioContext?: typeof AudioContext };
     const Ctor = window.AudioContext ?? (window as LegacyWindow).webkitAudioContext;
     ctx = new Ctor!();
   }
   if (ctx.state === "suspended") void ctx.resume();
+  // Un context suspendat pune sunetele în coadă și le varsă pe toate la
+  // primul gest — posibil pe cu totul altă pagină. Mai bine deloc: aruncăm,
+  // iar call site-urile (toate în try/catch) renunță la sunetul respectiv.
+  if (ctx.state !== "running") throw new Error("AudioContext locked");
   return ctx;
+}
+
+/** iOS pornește AudioContext-ul doar sincron, în interiorul unui gest.
+    Sunetele de schimbare de temă pleacă însă din efecte (post-gest), așa
+    că deblocăm contextul la primul tap/click de oriunde din pagină — după
+    aceea apelurile din efecte găsesc contextul deja „running". */
+export function installAudioUnlock(): () => void {
+  const unlock = () => {
+    try {
+      audio();
+    } catch {
+      // browser fără Web Audio — rămânem fără sunet
+    }
+    if (ctx?.state === "running") remove();
+  };
+  const remove = () => {
+    window.removeEventListener("pointerdown", unlock);
+    window.removeEventListener("touchend", unlock);
+  };
+  window.addEventListener("pointerdown", unlock, { passive: true });
+  window.addEventListener("touchend", unlock, { passive: true });
+  return remove;
 }
 
 /** Un clack de plăcuță split-flap: plesnet de zgomot prin bandpass +

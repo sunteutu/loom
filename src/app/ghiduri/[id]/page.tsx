@@ -40,7 +40,6 @@ import {
   bonCode,
   formatBonDate,
 } from "@/components/BonExportOverlay";
-import { bonFeed } from "@/lib/themeAudio";
 import {
   downloadDocx,
   downloadMarkdown,
@@ -469,13 +468,6 @@ function GuideEditor({ guide, isActive }: { guide: Guide; isActive: boolean }) {
           if (!text) return;
           addCustomItem(guide.id, text);
           setNewQuestion("");
-          if (theme === "bon") {
-            try {
-              bonFeed();
-            } catch {
-              // fără audio — adăugarea rămâne doar vizuală
-            }
-          }
         }}
       >
         <input

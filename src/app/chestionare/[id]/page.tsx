@@ -40,7 +40,6 @@ import {
   bonCode,
   formatBonDate,
 } from "@/components/BonExportOverlay";
-import { bonFeed } from "@/lib/themeAudio";
 
 const VARIABLE_FIELDS = [
   { key: "category", label: "[category]", hint: "ex. aplicații de banking" },
@@ -413,13 +412,6 @@ function SurveyEditor({
           if (!text) return;
           addCustomSurveyItem(survey.id, text);
           setNewQuestion("");
-          if (theme === "bon") {
-            try {
-              bonFeed();
-            } catch {
-              // fără audio — adăugarea rămâne doar vizuală
-            }
-          }
         }}
       >
         <input

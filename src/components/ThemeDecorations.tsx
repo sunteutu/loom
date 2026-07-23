@@ -9,6 +9,7 @@ import {
   bubblePop,
   clackOnce,
   flapCascade,
+  installAudioUnlock,
 } from "@/lib/themeAudio";
 
 /** Per-theme ambient decorations ported from mockups/teme.html:
@@ -19,23 +20,36 @@ import {
     gets old receipts. Theme switches also play their signature sound. */
 export function ThemeDecorations() {
   const { theme } = useLoomTheme();
+  const pathname = usePathname();
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
 
-  // Signature sound on user-initiated theme switches only (never on load —
-  // the AudioContext needs a prior gesture anyway).
+  // Pe mobil (iOS) contextul audio trebuie pornit sincron într-un gest;
+  // primul tap de oriunde îl deblochează pentru sunetele din efecte.
+  useEffect(() => installAudioUnlock(), []);
+
+  // Signature sound on user-initiated theme switches only. Tema se poate
+  // schimba și fără gest — ThemeSync aplică profilul din Convex la load —
+  // așa că cerem activare tranzientă (un click/tap în urmă cu câteva
+  // secunde), altfel refresh-ul cu profil desincronizat pornea imprimanta.
+  // Bonul e zgomotos și lung — sună doar pe Home; la export are overlay-ul.
   const prevTheme = useRef<LoomTheme | null>(null);
   useEffect(() => {
-    if (prevTheme.current !== null && prevTheme.current !== theme) {
+    const userInitiated = navigator.userActivation?.isActive ?? false;
+    if (
+      prevTheme.current !== null &&
+      prevTheme.current !== theme &&
+      userInitiated
+    ) {
       try {
         if (theme === "splitflap") flapCascade();
-        else if (theme === "bon") bonPrint();
+        else if (theme === "bon" && pathname === "/") bonPrint();
       } catch {
         // audio blocked or unavailable — decor rămâne vizual
       }
     }
     prevTheme.current = theme;
-  }, [theme]);
+  }, [theme, pathname]);
 
   if (!mounted) return null;
   if (theme === "splitflap") return <SplitflapDecor />;
@@ -76,7 +90,12 @@ const FLAP_ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZĂÎȘȚÂ";
 function useFlapTitle() {
   const pathname = usePathname();
   useEffect(() => {
-    const h1 = document.querySelector<HTMLElement>("main h1");
+    // Home ține în DOM ambele variante (clasic + tematic) și h1-ul clasic,
+    // ascuns cu CSS, e primul — plăcuțele trebuie să se atașeze pe h1-ul
+    // efectiv vizibil, altfel flip-ul rulează pe titlul invizibil.
+    const h1 = Array.from(
+      document.querySelectorAll<HTMLElement>("main h1")
+    ).find((el) => el.getClientRects().length > 0);
     if (!h1) return;
     const original = h1.textContent ?? "";
     if (!original.trim()) return;
@@ -721,6 +740,25 @@ function buildSewingKit(layer: HTMLElement) {
   heart(dg, W * 0.975, H * 0.5, 6, "#d9a5b5");
   heart(dg, W * 0.55, H * 0.955, 7, "#dba393");
   heart(dg, W * 0.015, H * 0.72, 5, "#d9a5b5");
+  // flori răzlețe, scăpate din buchete — umplu golurile dintre petice
+  daisy(dg, W * 0.18, H * 0.87, 11, 18, "#f4f1e8", "#e9a800", 5);
+  daisy(dg, W * 0.86, H * 0.13, 10, 16, "#aebfe4", "#f2b705", 5);
+  daisy(dg, W * 0.5, H * 0.06, 9, 14, "#e8798a", "#f2b705", 4);
+  daisy(dg, W * 0.03, H * 0.185, 10, 15, "#f4f1e8", "#e9a800", 5);
+  daisy(dg, W * 0.965, H * 0.925, 9, 14, "#aebfe4", "#e9a800", 4);
+  sunflower(dg, W * 0.33, H * 0.945, 26);
+  leaf(dg, W * 0.31, H * 0.975, -2.1, 34, "#4c7a43");
+  leaf(dg, W * 0.2, H * 0.9, 0.6, 28, "#5a8b4c");
+  leaf(dg, W * 0.875, H * 0.165, 2.4, 26, "#3f6d38");
+  // mărunțișuri de trusă în plus
+  sewButton(dg, W * 0.42, H * 0.035, 8, "#e8798a", "#f4f1e8");
+  sewButton(dg, W * 0.6, H * 0.965, 9, "#8fb3e8", "#b8452f");
+  spool(dg, W * 0.545, H * 0.05, "#5a8b4c");
+  knots(dg, W * 0.115, H * 0.115, 8, 16, "#c04a32");
+  knots(dg, W * 0.885, H * 0.885, 8, 18, "#5a8b4c");
+  heart(dg, W * 0.35, H * 0.05, 5, "#d9a5b5");
+  heart(dg, W * 0.655, H * 0.04, 6, "#dba393");
+  heart(dg, W * 0.08, H * 0.955, 6, "#d9a5b5");
 }
 
 const BOUQUET_SPECS = [
@@ -728,6 +766,11 @@ const BOUQUET_SPECS = [
   { css: { top: "46%", right: "2%" }, w: 240, h: 240, s: 1.0, r: 14 },
   { css: { bottom: "6%", left: "6%" }, w: 210, h: 210, s: 0.85, r: 5 },
   { css: { top: "12%", right: "16%" }, w: 150, h: 150, s: 0.6, r: -16 },
+  { css: { top: "30%", left: "36%" }, w: 190, h: 190, s: 0.75, r: 10 },
+  { css: { bottom: "16%", right: "23%" }, w: 200, h: 200, s: 0.8, r: -12 },
+  { css: { top: "66%", left: "24%" }, w: 160, h: 160, s: 0.6, r: 20 },
+  { css: { bottom: "2%", right: "42%" }, w: 170, h: 170, s: 0.65, r: -5 },
+  { css: { top: "5%", left: "47%" }, w: 140, h: 140, s: 0.5, r: 8 },
 ] as const;
 
 function BroderieDecor() {
