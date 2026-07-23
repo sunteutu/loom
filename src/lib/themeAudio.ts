@@ -312,6 +312,118 @@ export function polishSound() {
   o.stop(t + 0.6);
 }
 
+/** Lovitura de tracking (VHS): banda „prinde" și „scapă" semnalul — trei
+    rafale inegale de zgomot printr-un bandpass care coboară (smear-ul
+    analog), încheiate cu un buf jos de transport. */
+export function vhsTracking() {
+  const c = audio();
+  const t0 = c.currentTime;
+  const dur = 0.55;
+  const buf = c.createBuffer(1, Math.ceil(c.sampleRate * dur), c.sampleRate);
+  const d = buf.getChannelData(0);
+  const bursts: Array<[number, number, number]> = [
+    [0, 0.14, 1],
+    [0.18, 0.3, 0.65],
+    [0.34, 0.52, 0.85],
+  ];
+  for (let i = 0; i < d.length; i++) {
+    const t = i / c.sampleRate;
+    let env = 0.08;
+    for (const [a, b, v] of bursts) if (t >= a && t < b) env = v;
+    d[i] = (Math.random() * 2 - 1) * env * (1 - (t / dur) * 0.35);
+  }
+  const src = c.createBufferSource();
+  src.buffer = buf;
+  const bp = c.createBiquadFilter();
+  bp.type = "bandpass";
+  bp.Q.value = 0.7;
+  bp.frequency.setValueAtTime(2600, t0);
+  bp.frequency.exponentialRampToValueAtTime(850, t0 + dur);
+  const g = c.createGain();
+  g.gain.setValueAtTime(0.0001, t0);
+  g.gain.exponentialRampToValueAtTime(0.13, t0 + 0.02);
+  g.gain.setValueAtTime(0.13, t0 + dur - 0.08);
+  g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+  src.connect(bp);
+  bp.connect(g);
+  g.connect(c.destination);
+  src.start(t0);
+  // capul de bandă se reașază: tranzient jos, scurt
+  const osc = c.createOscillator();
+  osc.type = "sine";
+  osc.frequency.setValueAtTime(90, t0 + dur - 0.05);
+  osc.frequency.exponentialRampToValueAtTime(48, t0 + dur + 0.08);
+  const og = c.createGain();
+  og.gain.setValueAtTime(0.0001, t0 + dur - 0.05);
+  og.gain.exponentialRampToValueAtTime(0.12, t0 + dur - 0.03);
+  og.gain.exponentialRampToValueAtTime(0.0001, t0 + dur + 0.1);
+  osc.connect(og);
+  og.connect(c.destination);
+  osc.start(t0 + dur - 0.05);
+  osc.stop(t0 + dur + 0.12);
+}
+
+/** Butonul mecanic al video-ului (pauză): un clic mat de plastic + corpul
+    jos al mecanismului — mai înfundat decât clack-ul de split-flap. */
+export function vcrClunk() {
+  const c = audio();
+  const t = c.currentTime;
+  const nDur = 0.014;
+  const buf = c.createBuffer(1, Math.ceil(c.sampleRate * nDur), c.sampleRate);
+  const d = buf.getChannelData(0);
+  for (let i = 0; i < d.length; i++) {
+    d[i] = (Math.random() * 2 - 1) * (1 - i / d.length);
+  }
+  const noise = c.createBufferSource();
+  noise.buffer = buf;
+  const lp = c.createBiquadFilter();
+  lp.type = "lowpass";
+  lp.frequency.value = 1400;
+  const ng = c.createGain();
+  ng.gain.value = 0.2;
+  noise.connect(lp);
+  lp.connect(ng);
+  ng.connect(c.destination);
+  noise.start(t);
+  const osc = c.createOscillator();
+  osc.type = "triangle";
+  osc.frequency.setValueAtTime(120, t);
+  osc.frequency.exponentialRampToValueAtTime(55, t + 0.09);
+  const og = c.createGain();
+  og.gain.setValueAtTime(0.24, t);
+  og.gain.exponentialRampToValueAtTime(0.0001, t + 0.1);
+  osc.connect(og);
+  og.connect(c.destination);
+  osc.start(t);
+  osc.stop(t + 0.12);
+}
+
+/** Ața trasă prin pânză (broderie): un fâșâit moale — zgomot prin bandpass
+    care urcă ușor, cu atac și coadă blânde. Discret, ca la bule. */
+export function stitchPull() {
+  const c = audio();
+  const t = c.currentTime;
+  const dur = 0.22 + Math.random() * 0.1;
+  const buf = c.createBuffer(1, Math.ceil(c.sampleRate * dur), c.sampleRate);
+  const d = buf.getChannelData(0);
+  for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+  const src = c.createBufferSource();
+  src.buffer = buf;
+  const bp = c.createBiquadFilter();
+  bp.type = "bandpass";
+  bp.Q.value = 1.3;
+  bp.frequency.setValueAtTime(750 + Math.random() * 250, t);
+  bp.frequency.exponentialRampToValueAtTime(2100, t + dur);
+  const g = c.createGain();
+  g.gain.setValueAtTime(0.0001, t);
+  g.gain.exponentialRampToValueAtTime(0.055, t + dur * 0.35);
+  g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+  src.connect(bp);
+  bp.connect(g);
+  g.connect(c.destination);
+  src.start(t);
+}
+
 /** Avans scurt de hârtie termică (un articol nou pe bon): aceeași
     imprimantă ca bonPrint, dar ~0.3s și fără ghilotină. */
 export function bonFeed() {

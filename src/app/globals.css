@@ -285,25 +285,121 @@ html[data-theme="vhs"] body::after {
     ),
     radial-gradient(ellipse at center, transparent 62%, rgba(0, 0, 0, 0.38));
 }
-html[data-theme="vhs"] body::before {
-  content: "● REC  SP 0:00:14";
+/* OSD-ul „● REC" e un buton desenat de VhsDecor: contorul numără live cât
+   „înregistrează" caseta, iar clickul comută pe ⏸ PAUSE */
+html[data-theme="vhs"] .vhs-rec {
   position: fixed;
   top: 14px;
   right: 20px;
   z-index: 91;
   font-family: var(--font-vhs);
   font-size: 20px;
+  line-height: 1;
   color: #ffffff;
   text-shadow:
     0 0 6px rgba(255, 45, 120, 0.8),
     1px 0 0 rgba(255, 0, 60, 0.6),
     -1px 0 0 rgba(0, 255, 255, 0.6);
   animation: vhs-blink 1.6s steps(2, start) infinite;
-  pointer-events: none;
+  background: none;
+  border: 0;
+  padding: 4px 2px;
+  cursor: pointer;
 }
 @keyframes vhs-blink {
   50% {
     opacity: 0.35;
+  }
+}
+/* — banda de tracking: la click pe fundal, semnalul „scapă" și o bandă de
+   zgomot rulează pe ecran, ca la butonul de tracking al video-ului.
+   steps() o face să SARĂ pe verticală, nu să gliseze. */
+.vhs-track {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 84px;
+  z-index: 89;
+  pointer-events: none;
+  background:
+    repeating-linear-gradient(
+      0deg,
+      rgba(255, 255, 255, 0.16) 0 2px,
+      rgba(0, 0, 0, 0.55) 2px 5px,
+      rgba(255, 255, 255, 0.07) 5px 7px,
+      rgba(0, 0, 0, 0.4) 7px 11px
+    ),
+    linear-gradient(
+      90deg,
+      rgba(255, 0, 90, 0.14),
+      transparent 30%,
+      transparent 70%,
+      rgba(0, 229, 255, 0.14)
+    );
+  border-top: 2px solid rgba(0, 229, 255, 0.35);
+  border-bottom: 2px solid rgba(255, 0, 90, 0.35);
+  backdrop-filter: blur(3px) saturate(0.2) contrast(1.5);
+  animation: vhs-track-roll 0.62s steps(22, end) forwards;
+}
+@keyframes vhs-track-roll {
+  0% {
+    transform: translateY(-90px) skewX(0deg);
+  }
+  30% {
+    transform: translateY(26vh) skewX(-1.2deg);
+  }
+  55% {
+    transform: translateY(52vh) skewX(0.9deg);
+  }
+  100% {
+    transform: translateY(105vh) skewX(0deg);
+  }
+}
+/* — pauză: imaginea tremură pe loc, iar la baza ecranului stă bara de
+   zgomot a benzii oprite (clasa vine pe <html> din VhsDecor) — */
+html.vhs-paused main {
+  animation: vhs-pause-jit 0.22s steps(1, end) infinite;
+}
+@keyframes vhs-pause-jit {
+  0%,
+  100% {
+    transform: translateY(0);
+    filter: none;
+  }
+  50% {
+    transform: translateY(2px);
+    filter: brightness(1.06);
+  }
+}
+.vhs-pausebar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 46px;
+  z-index: 89;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(255, 255, 255, 0.5) 0 3px,
+    rgba(20, 20, 25, 0.85) 3px 6px,
+    rgba(255, 255, 255, 0.28) 6px 8px,
+    rgba(0, 0, 0, 0.7) 8px 13px
+  );
+  filter: saturate(0);
+  animation: vhs-pausebar-jit 0.18s steps(1, end) infinite;
+}
+@keyframes vhs-pausebar-jit {
+  0%,
+  100% {
+    transform: translateY(0) scaleY(1);
+  }
+  33% {
+    transform: translateY(-3px) scaleY(1.12);
+  }
+  66% {
+    transform: translateY(2px) scaleY(0.94);
   }
 }
 /* — glitch pe titluri: două animații independente pe proprietăți diferite —
@@ -443,7 +539,7 @@ html[data-theme="vhs"] .loom-card p {
 html[data-theme="vhs"] .loom-badge {
   font-size: 17px;
 }
-html[data-theme="vhs"] body::before {
+html[data-theme="vhs"] .vhs-rec {
   font-size: 24px;
 }
 
@@ -652,6 +748,14 @@ html[data-theme="broderie"] [class*="rounded-2xl"] {
 .loom-bq {
   position: absolute;
   pointer-events: none;
+}
+/* motivele cusute la click se destramă lin când pânza se aglomerează */
+.loom-sew {
+  transition: opacity 0.9s ease;
+}
+/* împunsăturile lăsate de acul care urmărește cursorul se șterg la fel */
+.sew-dash {
+  transition: opacity 1.2s ease;
 }
 html[data-theme="broderie"] .bq-alpha {
   position: absolute;
@@ -2975,7 +3079,7 @@ html[data-theme="vhs"] .loom-blob { opacity: 0.3; }
     font-size: 19px;
   }
   /* sub bara de sus mobilă (h-14 = 3.5rem, iar rem-ul VHS e mărit) */
-  html[data-theme="vhs"] body::before {
+  html[data-theme="vhs"] .vhs-rec {
     top: calc(3.5rem + 8px);
     right: 12px;
     font-size: 17px;

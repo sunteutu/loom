@@ -10,6 +10,9 @@ import {
   clackOnce,
   flapCascade,
   installAudioUnlock,
+  stitchPull,
+  vcrClunk,
+  vhsTracking,
 } from "@/lib/themeAudio";
 
 /** Per-theme ambient decorations ported from mockups/teme.html:
@@ -72,11 +75,84 @@ function Blobs() {
   );
 }
 
+/* ————— VHS: caseta înregistrează live, tracking la click, pauză ————— */
+
+function formatTape(s: number) {
+  const h = Math.floor(s / 3600);
+  const m = Math.floor((s % 3600) / 60);
+  return `${h}:${String(m).padStart(2, "0")}:${String(s % 60).padStart(2, "0")}`;
+}
+
 function VhsDecor() {
+  const [elapsed, setElapsed] = useState(0);
+  const [paused, setPaused] = useState(false);
+
+  // caseta „înregistrează" cât timp e tema activă; pauza oprește banda,
+  // deci și contorul
+  useEffect(() => {
+    if (paused) return;
+    const id = setInterval(() => setElapsed((s) => s + 1), 1000);
+    return () => clearInterval(id);
+  }, [paused]);
+
+  // starea de pauză stă pe <html>, ca CSS-ul să poată tremura <main>-ul
+  // fără prop drilling prin layout
+  useEffect(() => {
+    document.documentElement.classList.toggle("vhs-paused", paused);
+    return () => document.documentElement.classList.remove("vhs-paused");
+  }, [paused]);
+
+  // click pe fundal liber = lovitura de tracking: o bandă de zgomot
+  // rulează pe ecran, cu burst-ul de semnal rupt pe fundal sonor
+  useEffect(() => {
+    const timeouts: ReturnType<typeof setTimeout>[] = [];
+    const onClick = (e: MouseEvent) => {
+      if (
+        e.target instanceof Element &&
+        e.target.closest("button, a, input, textarea, select, label")
+      ) {
+        return;
+      }
+      const band = document.createElement("div");
+      band.className = "vhs-track";
+      document.body.appendChild(band);
+      timeouts.push(setTimeout(() => band.remove(), 750));
+      try {
+        vhsTracking();
+      } catch {
+        // fără audio
+      }
+    };
+    document.addEventListener("click", onClick);
+    return () => {
+      document.removeEventListener("click", onClick);
+      timeouts.forEach(clearTimeout);
+      document.querySelectorAll(".vhs-track").forEach((el) => el.remove());
+    };
+  }, []);
+
   return (
-    <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden" aria-hidden>
-      <Blobs />
-    </div>
+    <>
+      <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden" aria-hidden>
+        <Blobs />
+      </div>
+      <button
+        type="button"
+        className="vhs-rec"
+        aria-label={paused ? "Reia caseta" : "Pune caseta pe pauză"}
+        onClick={() => {
+          setPaused((p) => !p);
+          try {
+            vcrClunk();
+          } catch {
+            // fără audio
+          }
+        }}
+      >
+        {paused ? "⏸ PAUSE" : `● REC  SP ${formatTape(elapsed)}`}
+      </button>
+      {paused && <div className="vhs-pausebar" aria-hidden />}
+    </>
   );
 }
 
@@ -784,8 +860,267 @@ const BOUQUET_SPECS = [
   { css: { top: "5%", left: "47%" }, w: 140, h: 140, s: 0.5, r: 8 },
 ] as const;
 
+/* motivele care se pot coase la click — vocabularul vizual al buchetelor */
+const SEW_DAISIES = [
+  { petal: "#f4f1e8", center: "#e9a800" },
+  { petal: "#aebfe4", center: "#f2b705" },
+  { petal: "#e8798a", center: "#f2b705" },
+] as const;
+const SEW_KNOT_COLORS = ["#f2b705", "#b8452f", "#5a8b4c", "#8fb3e8"] as const;
+
+/** Coase în punctul dat, fir cu fir, un mic motiv aleator: elementele SVG
+    apar în ordinea împunsăturilor, ca și cum acul chiar ar lucra. */
+function sewAt(
+  layer: HTMLElement,
+  x: number,
+  y: number,
+  later: (fn: () => void, ms: number) => void
+) {
+  const S = 150;
+  const svg = document.createElementNS(NS, "svg") as SVGSVGElement;
+  svg.setAttribute("width", String(S));
+  svg.setAttribute("height", String(S));
+  svg.setAttribute("viewBox", `0 0 ${S} ${S}`);
+  svg.classList.add("loom-bq", "loom-sew");
+  svg.style.left = `${Math.round(x - S / 2)}px`;
+  svg.style.top = `${Math.round(y - S / 2)}px`;
+  const g = document.createElementNS(NS, "g") as SVGGElement;
+  g.setAttribute("transform", `rotate(${rnd(-14, 14).toFixed(1)} ${S / 2} ${S / 2})`);
+  svg.appendChild(g);
+
+  const c = S / 2;
+  const kind = Math.random();
+  if (kind < 0.34) {
+    const d = SEW_DAISIES[(Math.random() * SEW_DAISIES.length) | 0];
+    daisy(g, c, c, 9 + ((Math.random() * 4) | 0), rnd(15, 22), d.petal, d.center, rnd(4, 6));
+  } else if (kind < 0.52) {
+    sunflower(g, c, c, rnd(20, 27));
+  } else if (kind < 0.76) {
+    heart(g, c, c, rnd(5, 7), Math.random() < 0.5 ? "#d9a5b5" : "#dba393");
+  } else {
+    const col = SEW_KNOT_COLORS[(Math.random() * SEW_KNOT_COLORS.length) | 0];
+    knots(g, c, c, rnd(7, 10), 18 + ((Math.random() * 10) | 0), col);
+    leaf(g, c + rnd(8, 14), c + rnd(6, 12), rnd(0.3, 1.2), rnd(20, 28), "#4c7a43");
+  }
+
+  const parts = Array.from(g.children) as SVGElement[];
+  for (const el of parts) el.style.visibility = "hidden";
+  layer.appendChild(svg);
+  const step = Math.max(8, Math.min(22, 900 / parts.length));
+  parts.forEach((el, i) => later(() => (el.style.visibility = ""), i * step));
+  try {
+    stitchPull();
+    later(() => {
+      try {
+        stitchPull();
+      } catch {
+        // fără audio
+      }
+    }, (parts.length * step) / 2);
+  } catch {
+    // fără audio
+  }
+
+  // pânza nu se aglomerează: peste 14 motive cusute, cel mai vechi se
+  // destramă (fade prin .loom-sew, apoi iese din DOM)
+  const sewn = layer.querySelectorAll<SVGElement>(".loom-sew");
+  if (sewn.length > 14) {
+    const old = sewn[0];
+    old.style.opacity = "0";
+    later(() => old.remove(), 950);
+  }
+}
+
 function BroderieDecor() {
   const layerRef = useRef<HTMLDivElement>(null);
+
+  // acul se scoate din trusă cu dublu-click; cât e afară, cusutul la un
+  // click e suspendat (ref-ul ține starea la zi pentru listenerul stabil)
+  const [needleOn, setNeedleOn] = useState(false);
+  const needleOnRef = useRef(false);
+  useEffect(() => {
+    needleOnRef.current = needleOn;
+  }, [needleOn]);
+
+  // acul urmărește leneș cursorul, trăgând după el un fir și lăsând un
+  // running stitch care se destramă după câteva secunde — pagina devine
+  // pânza pe care coși în timp ce navighezi. Doar cu pointer fin: pe
+  // touch nu există cursor de urmărit.
+  useEffect(() => {
+    if (!needleOn) return;
+    if (!window.matchMedia("(pointer: fine)").matches) return;
+    const layer = layerRef.current;
+    if (!layer) return;
+    try {
+      stitchPull(); // acul iese din trusă cu un mic fâșâit de fir
+    } catch {
+      // fără audio
+    }
+
+    // stratul urmei: fără viewBox, ca unitățile SVG să fie px de viewport
+    const trail = document.createElementNS(NS, "svg") as SVGSVGElement;
+    trail.classList.add("loom-bq");
+    Object.assign(trail.style, { left: "0", top: "0", width: "100%", height: "100%" });
+    layer.appendChild(trail);
+    const dashes = document.createElementNS(NS, "g") as SVGGElement;
+    trail.appendChild(dashes);
+    const threadEl = document.createElementNS(NS, "path");
+    threadEl.setAttribute("stroke", "#b8452f");
+    threadEl.setAttribute("stroke-width", "1.8");
+    threadEl.setAttribute("fill", "none");
+    threadEl.setAttribute("stroke-linecap", "round");
+    threadEl.setAttribute("opacity", "0.55");
+    trail.appendChild(threadEl);
+
+    // acul: desenat o dată culcat (vârful la 70,18), apoi doar transformat
+    const needleSvg = document.createElementNS(NS, "svg") as SVGSVGElement;
+    needleSvg.setAttribute("width", "90");
+    needleSvg.setAttribute("height", "36");
+    needleSvg.setAttribute("viewBox", "0 0 90 36");
+    needleSvg.classList.add("loom-bq");
+    Object.assign(needleSvg.style, {
+      left: "0",
+      top: "0",
+      transformOrigin: "70px 18px",
+      willChange: "transform",
+      visibility: "hidden",
+    });
+    const ng = document.createElementNS(NS, "g") as SVGGElement;
+    needleSvg.appendChild(ng);
+    needle(ng, { x: 18, y: 18 }, 0);
+    layer.appendChild(needleSvg);
+
+    const pos = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+    const target = { ...pos };
+    let last = { ...pos }; // ultima împunsătură
+    let ang = 0;
+    let seen = false;
+    const timeouts: ReturnType<typeof setTimeout>[] = [];
+
+    const onMove = (e: PointerEvent) => {
+      target.x = e.clientX;
+      target.y = e.clientY;
+      if (!seen) {
+        // acul apare direct sub cursor, nu vine în fugă din centru
+        seen = true;
+        pos.x = target.x;
+        pos.y = target.y;
+        last = { x: target.x, y: target.y };
+        needleSvg.style.visibility = "";
+      }
+    };
+
+    let raf = 0;
+    const tick = () => {
+      raf = requestAnimationFrame(tick);
+      if (!seen) return;
+      const dx = target.x - pos.x;
+      const dy = target.y - pos.y;
+      pos.x += dx * 0.11;
+      pos.y += dy * 0.11;
+      if (Math.hypot(dx, dy) > 2) {
+        // unghiul se rotește pe drumul scurt, fără salturi la ±π
+        let diff = Math.atan2(dy, dx) - ang;
+        while (diff > Math.PI) diff -= 2 * Math.PI;
+        while (diff < -Math.PI) diff += 2 * Math.PI;
+        ang += diff * 0.18;
+      }
+      needleSvg.style.transform = `translate(${pos.x - 70}px, ${pos.y - 18}px) rotate(${ang}rad)`;
+      // împunsătura: la fiecare ~30px o liniuță de 55% din pas, cu golul
+      // dinaintea acului — același ritm ca runningStitch()
+      if (Math.hypot(pos.x - last.x, pos.y - last.y) > 30) {
+        const g = document.createElementNS(NS, "g") as SVGGElement;
+        g.setAttribute("class", "sew-dash");
+        strand(
+          g,
+          last.x,
+          last.y,
+          last.x + (pos.x - last.x) * 0.55,
+          last.y + (pos.y - last.y) * 0.55,
+          "#b8452f",
+          2
+        );
+        dashes.appendChild(g);
+        last = { x: pos.x, y: pos.y };
+        timeouts.push(setTimeout(() => (g.style.opacity = "0"), 3200));
+        timeouts.push(setTimeout(() => g.remove(), 4500));
+        while (dashes.childElementCount > 90) dashes.firstElementChild?.remove();
+      }
+      // firul moale dintre urechea acului (vârf − 56·dir) și ultima împunsătură
+      const ex = pos.x - Math.cos(ang) * 56;
+      const ey = pos.y - Math.sin(ang) * 56;
+      const mx = (ex + last.x) / 2;
+      const my = (ey + last.y) / 2 + 14;
+      threadEl.setAttribute("d", `M${last.x} ${last.y} Q${mx} ${my} ${ex} ${ey}`);
+    };
+    raf = requestAnimationFrame(tick);
+    window.addEventListener("pointermove", onMove, { passive: true });
+    return () => {
+      cancelAnimationFrame(raf);
+      window.removeEventListener("pointermove", onMove);
+      timeouts.forEach(clearTimeout);
+      trail.remove();
+      needleSvg.remove();
+    };
+  }, [needleOn]);
+
+  // pânza liberă ascultă pe număr de clickuri: UN click coase un motiv —
+  // amânat o idee, ca să nu „fure" primul click al unui dublu-click —,
+  // DUBLU-click scoate/pune la loc acul (cât e acul afară nu se coase la
+  // un click), iar TRIPLU-click destramă tot ce ai cusut tu, cu ac cu
+  // tot; rămâne doar broderia default a temei.
+  useEffect(() => {
+    const layer = layerRef.current;
+    if (!layer) return;
+    const timeouts: ReturnType<typeof setTimeout>[] = [];
+    const cancelled = { current: false };
+    const later = (fn: () => void, ms: number) => {
+      timeouts.push(
+        setTimeout(() => {
+          if (!cancelled.current) fn();
+        }, ms)
+      );
+    };
+    let pending: ReturnType<typeof setTimeout> | null = null;
+    const onClick = (e: MouseEvent) => {
+      if (
+        e.target instanceof Element &&
+        e.target.closest("button, a, input, textarea, select, label, nav, aside")
+      ) {
+        return;
+      }
+      // fiecare click în plus anulează acțiunea programată de precedentul
+      if (pending) {
+        clearTimeout(pending);
+        pending = null;
+      }
+      if (e.detail === 1) {
+        if (needleOnRef.current) return;
+        const { clientX, clientY } = e;
+        pending = setTimeout(() => {
+          if (!cancelled.current) sewAt(layer, clientX, clientY, later);
+        }, 280);
+        timeouts.push(pending);
+      } else if (e.detail === 2) {
+        pending = setTimeout(() => {
+          if (!cancelled.current) setNeedleOn((v) => !v);
+        }, 280);
+        timeouts.push(pending);
+      } else {
+        setNeedleOn(false);
+        for (const el of layer.querySelectorAll<SVGElement>(".loom-sew")) {
+          el.style.opacity = "0";
+          later(() => el.remove(), 950);
+        }
+      }
+    };
+    document.addEventListener("click", onClick);
+    return () => {
+      cancelled.current = true;
+      document.removeEventListener("click", onClick);
+      timeouts.forEach(clearTimeout);
+    };
+  }, []);
 
   // Buchetele și trusa sunt cusute imperativ (sute de fire cu jitter),
   // așa că se generează după mount într-un container fără copii React.
