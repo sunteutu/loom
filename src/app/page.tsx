@@ -2,6 +2,7 @@ import { auth } from "@clerk/nextjs/server";
 import { SignInButton, SignUpButton } from "@clerk/nextjs";
 import { FlaskConical } from "lucide-react";
 import { HomeDashboard } from "@/components/HomeDashboard";
+import { MAPARE_ENABLED } from "@/lib/flags";
 import { HomeHero } from "@/components/HomeHero";
 import { VadimCitat } from "@/components/VadimCitat";
 import { VadimStiri } from "@/components/VadimStiri";
@@ -67,16 +68,19 @@ function Landing() {
 
         <section aria-label="Ce face loom" className="mt-14">
           <div className="loom-cards">
-            <div className="loom-card bg-card">
-              <div className="loom-chip">🗺️</div>
-              <h3>Mapare</h3>
-              <p>
-                Lipește întrebările stakeholderilor și mapează-le pe indicatori.
-              </p>
-              <div className="loom-card-meta">
-                <span className="loom-badge loom-badge-warm">calitativ</span>
+            {MAPARE_ENABLED && (
+              <div className="loom-card bg-card">
+                <div className="loom-chip">🗺️</div>
+                <h3>Mapare</h3>
+                <p>
+                  Lipește întrebările stakeholderilor și mapează-le pe
+                  indicatori.
+                </p>
+                <div className="loom-card-meta">
+                  <span className="loom-badge loom-badge-warm">calitativ</span>
+                </div>
               </div>
-            </div>
+            )}
             <div className="loom-card bg-card">
               <div className="loom-chip alt">🎙️</div>
               <h3>Ghiduri</h3>

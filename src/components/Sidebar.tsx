@@ -26,6 +26,7 @@ import {
   Waypoints,
   X,
 } from "lucide-react";
+import { MAPARE_ENABLED } from "@/lib/flags";
 import { getActiveGuide, useGuideStore } from "@/lib/guides";
 import { getActiveSurvey, useSurveyStore } from "@/lib/surveys";
 import { useLoomTheme } from "@/components/ThemeProvider";
@@ -42,7 +43,9 @@ const sections: {
   {
     label: "Research",
     items: [
-      { href: "/mapare", label: "Mapare", icon: Waypoints },
+      ...(MAPARE_ENABLED
+        ? [{ href: "/mapare", label: "Mapare", icon: Waypoints }]
+        : []),
       { href: "/ghiduri", label: "Ghiduri", icon: NotebookPen },
       { href: "/chestionare", label: "Chestionare", icon: ClipboardList },
     ],

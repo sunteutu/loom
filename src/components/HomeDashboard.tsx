@@ -13,6 +13,7 @@ import {
 import { HomeHero } from "@/components/HomeHero";
 import { VadimCitat } from "@/components/VadimCitat";
 import { VadimStiri } from "@/components/VadimStiri";
+import { MAPARE_ENABLED } from "@/lib/flags";
 import { createGuide, useGuideStore, type Guide } from "@/lib/guides";
 import { createSurvey, useSurveyStore, type SurveyDoc } from "@/lib/surveys";
 
@@ -62,12 +63,14 @@ export function HomeDashboard() {
 
         <section aria-label="Începe ceva nou" className="mb-10">
           <div className="grid gap-3 sm:grid-cols-3">
-            <QuickAction
-              icon={Waypoints}
-              title="Mapare nouă"
-              description="Pornește de la întrebările stakeholderilor"
-              onClick={() => router.push("/mapare")}
-            />
+            {MAPARE_ENABLED && (
+              <QuickAction
+                icon={Waypoints}
+                title="Mapare nouă"
+                description="Pornește de la întrebările stakeholderilor"
+                onClick={() => router.push("/mapare")}
+              />
+            )}
             <QuickAction
               icon={NotebookPen}
               title="Ghid nou"
@@ -97,13 +100,26 @@ export function HomeDashboard() {
         </header>
 
         <HomeHero>
-          <button
-            onClick={() => router.push("/mapare")}
-            className="loom-btn loom-btn-primary bg-indigo-9"
-          >
-            ＋ Mapare nouă
-            <span className="loom-vadim-only">, să tremure piața</span>
-          </button>
+          {MAPARE_ENABLED ? (
+            <button
+              onClick={() => router.push("/mapare")}
+              className="loom-btn loom-btn-primary bg-indigo-9"
+            >
+              ＋ Mapare nouă
+              <span className="loom-vadim-only">, să tremure piața</span>
+            </button>
+          ) : (
+            <button
+              onClick={() => {
+                const guide = createGuide();
+                router.push(`/ghiduri/${guide.id}`);
+              }}
+              className="loom-btn loom-btn-primary bg-indigo-9"
+            >
+              ＋ Ghid nou
+              <span className="loom-vadim-only">, să tremure piața</span>
+            </button>
+          )}
           <Link href="/ghiduri" className="loom-btn loom-btn-secondary">
             <span className="loom-not-vadim">Vezi ghidurile</span>
             <span className="loom-vadim-only">Arhiva de ghiduri a neamului</span>
@@ -115,16 +131,19 @@ export function HomeDashboard() {
             Quick links
           </h2>
           <div className="loom-cards">
-            <Link href="/mapare" className="loom-card bg-card">
-              <div className="loom-chip">🗺️</div>
-              <h3>Mapare</h3>
-              <p>
-                Lipește întrebările stakeholderilor și mapează-le pe indicatori.
-              </p>
-              <div className="loom-card-meta">
-                <span className="loom-badge loom-badge-warm">start aici</span>
-              </div>
-            </Link>
+            {MAPARE_ENABLED && (
+              <Link href="/mapare" className="loom-card bg-card">
+                <div className="loom-chip">🗺️</div>
+                <h3>Mapare</h3>
+                <p>
+                  Lipește întrebările stakeholderilor și mapează-le pe
+                  indicatori.
+                </p>
+                <div className="loom-card-meta">
+                  <span className="loom-badge loom-badge-warm">start aici</span>
+                </div>
+              </Link>
+            )}
             <Link href="/ghiduri" className="loom-card bg-card">
               <div className="loom-chip alt">🎙️</div>
               <h3>Ghiduri</h3>

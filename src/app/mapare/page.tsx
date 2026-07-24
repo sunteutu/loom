@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { notFound, useRouter } from "next/navigation";
+import { MAPARE_ENABLED } from "@/lib/flags";
 import { Plus, Trash2, Waypoints } from "lucide-react";
 import {
   createMapping,
@@ -20,6 +21,9 @@ function formatDate(timestamp: number): string {
 export default function MaparePage() {
   const store = useMappingStore();
   const router = useRouter();
+
+  // Mapare încă nu e funcțională: pe live pagina nu există.
+  if (!MAPARE_ENABLED) notFound();
 
   const handleCreate = () => {
     const doc = createMapping();

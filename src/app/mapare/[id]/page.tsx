@@ -2,7 +2,8 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
-import { useParams, useRouter } from "next/navigation";
+import { notFound, useParams, useRouter } from "next/navigation";
+import { MAPARE_ENABLED } from "@/lib/flags";
 import {
   ArrowLeft,
   ChevronDown,
@@ -131,6 +132,9 @@ function catalogQuestionText(
 
 export default function MapareWorkspacePage() {
   const { id } = useParams<{ id: string }>();
+
+  // Mapare încă nu e funcțională: pe live pagina nu există.
+  if (!MAPARE_ENABLED) notFound();
   const store = useMappingStore();
   const doc = store.mappings.find((m) => m.id === id);
 

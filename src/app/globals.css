@@ -1477,6 +1477,8 @@ html[data-theme="vadim"] [class*="bg-card"] {
 }
 html[data-theme="vadim"] [class*="bg-indigo-9"] {
   box-shadow: 0 0 16px rgba(255, 210, 63, 0.3);
+  /* accentul temei e galben — text-white ar fi ilizibil pe el */
+  color: #1c1828;
 }
 
 /* — decorul Tribunul 3000 (VadimDecor): laser tricolor, scântei de cursor,
@@ -1495,6 +1497,13 @@ html[data-theme="vadim"] [class*="bg-indigo-9"] {
 /* Elodia, în capătul săgeții: sticker decupat pe conturul blănii (alpha
    din Vision), cu ambele urechi — lipit de baza cursorului, vârful rămâne
    liber pentru click */
+/* medalionul urmează doar cursoarele adevărate — pe touch nu există
+   săgeată de urmărit, deci nu apare deloc */
+@media (pointer: coarse) {
+  .vadim-elodia-cursor {
+    display: none;
+  }
+}
 .vadim-elodia-cursor {
   position: fixed;
   left: 0;
