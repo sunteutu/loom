@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import {
@@ -91,6 +91,11 @@ function SurveyEditor({
   const [bonExport, setBonExport] = useState<"md" | "docx" | null>(null);
   // Pe „Tribunul 3000" trece pe la Biroul de Export: aprobare sau ceartă.
   const [vadimExport, setVadimExport] = useState<"md" | "docx" | null>(null);
+  // Tot pe Vadim, controalele de export coboară din toolbar în secțiunea
+  // „Biroul de Export" de sub chestionar. Gate pe mounted: SSR-ul nu știe tema.
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+  const vadim = mounted && theme === "vadim";
   const groups = groupSurveyItems(survey.items);
   const loi = surveyLoiMinutes(survey);
   const issues = lintSurvey(survey, lang);
@@ -128,16 +133,9 @@ function SurveyEditor({
 
   let questionNumber = 0;
 
-  return (
-    <main className="mx-auto w-full max-w-3xl flex-1 px-4 sm:px-8 pb-16 pt-8">
-      <div className="mb-1 flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
-        <Link
-          href="/chestionare"
-          className="inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
-        >
-          <ArrowLeft aria-hidden className="h-4 w-4" />
-          Chestionare
-        </Link>
+  // Controalele de export apar o singură dată: în toolbar pe temele
+  // obișnuite, sau jos la „Biroul de Export" pe Tribunul 3000.
+  const exportControls = (
         <div className="flex flex-wrap items-center gap-2">
           {!isActive && (
             <button
@@ -191,6 +189,19 @@ function SurveyEditor({
             Word / Pages (.docx)
           </button>
         </div>
+  );
+
+  return (
+    <main className="mx-auto w-full max-w-3xl flex-1 px-4 sm:px-8 pb-16 pt-8">
+      <div className="mb-1 flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
+        <Link
+          href="/chestionare"
+          className="inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+        >
+          <ArrowLeft aria-hidden className="h-4 w-4" />
+          Chestionare
+        </Link>
+        {!vadim && exportControls}
       </div>
 
       <input
@@ -439,6 +450,48 @@ function SurveyEditor({
           Adaugă
         </button>
       </form>
+
+      {/* Pe Tribunul 3000, exportul se face jos, la ghișeu: Funcționarul-șef
+          te așteaptă cu dosarul pregătit și cu stiloul de aur în buzunar. */}
+      {vadim && (
+        <section className="vadim-birou" aria-label="Biroul de Export">
+          <div className="vb-text">
+            <h4>BIROUL DE EXPORT</h4>
+            <p>
+              Tribunul semnează doar ce e fără cusur — stiloul de aur iese din
+              buzunar numai la chestionarele impecabile. Șpagă nu primește, nu
+              insistați: la ghișeul acesta merg doar datele curate.
+            </p>
+            {exportControls}
+          </div>
+          <figure className="vb-foto" aria-hidden>
+            <svg className="lv-doodle lv-boil vb-bifa" viewBox="0 0 100 100">
+              <path d="M14 54 L40 80 L88 20" />
+            </svg>
+            <svg
+              className="lv-doodle lv-boil3"
+              style={{ right: -18, bottom: "26%", width: 42, height: 42, color: "#ffd23f" }}
+              viewBox="0 0 100 100"
+            >
+              <path d="M50 4 L58 42 L96 50 L58 58 L50 96 L42 58 L4 50 L42 42 Z" />
+            </svg>
+            <span className="vb-rama">
+              <span className="vadim-lumina" />
+              <span
+                className="vadim-clipici"
+                style={{ right: "14%", top: "14%", "--cc": "#5cb2ff", "--cdelay": "2.8s", "--cs": "13px" } as React.CSSProperties}
+              >
+                ✦
+              </span>
+            </span>
+            <span className="vb-caption">
+              <b>Funcționarul-șef</b>
+              Vă așteaptă cu dosarul pregătit. Nu primește șpagă — doar date
+              curate.
+            </span>
+          </figure>
+        </section>
+      )}
 
       {bonExport && (
         <BonExportOverlay
