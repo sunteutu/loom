@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { goarnaFanfara } from "@/lib/themeAudio";
 
 /** Hero-ul de pe Home, portat din mockups/teme.html: același markup pe toate
     temele, iar CSS-ul din globals.css îl „îmbracă" per temă — fereastră retro
@@ -21,9 +22,58 @@ export function HomeHero({ children }: { children?: React.ReactNode }) {
     }
   }, []);
 
+  // data gazetei din frontispiciul „CERCETAREA MARE" (Tribunul 3000) —
+  // tot după mount, ca bonul: serverul nu are ziua clientului
+  const gazetaDataRef = useRef<HTMLSpanElement>(null);
+  useEffect(() => {
+    const luni = [
+      "ianuarie", "februarie", "martie", "aprilie", "mai", "iunie",
+      "iulie", "august", "septembrie", "octombrie", "noiembrie", "decembrie",
+    ];
+    const d = new Date();
+    if (gazetaDataRef.current) {
+      gazetaDataRef.current.textContent = `${d.getDate()} ${luni[d.getMonth()]} ${d.getFullYear()}`;
+    }
+  }, []);
+
   return (
     <>
       <div className="loom-slot" aria-hidden />
+
+      {/* Frontispiciul gazetei — vizibil doar pe Tribunul 3000 (CSS). */}
+      <header className="loom-vadim-frontispiciu">
+        <p className="lvf-supra">
+          Organ oficial al cercetării făcute ca la carte · apare când vrea
+          Tribunul
+        </p>
+        <p className="lvf-titlu">CERCETAREA MARE</p>
+        <p className="lvf-deviza">
+          „Cine nu folosește indicatori standardizați nu merită nici
+          respondenți!”
+        </p>
+        <div className="lvf-caseta">
+          <span>Anul 3000 · Nr. 1</span>
+          <span ref={gazetaDataRef}>— · —</span>
+          <button
+            type="button"
+            className="lvf-goarna"
+            title="Sună adunarea"
+            aria-label="Sună adunarea"
+            onClick={() => {
+              try {
+                goarnaFanfara();
+              } catch {
+                // fără audio — goarna rămâne decorativă
+              }
+            }}
+          >
+            📯
+          </button>
+          <span>Director fondator: TRIBUNUL</span>
+          <span>Prețul: 2 lei · gratuit pentru patrioți</span>
+        </div>
+      </header>
+
       <section className="loom-hero">
         <div className="loom-win" aria-hidden>
           loom.exe
@@ -60,7 +110,57 @@ export function HomeHero({ children }: { children?: React.ReactNode }) {
           așează în ghid de interviu sau chestionar — cu timing, verificări de
           calitate și export direct în Word.
         </p>
+
+        {/* Tribunul 3000 înlocuiește copy-ul, nu doar haina: manșeta de gazetă
+            are alt titlu și alt șapou. Variantele stau ambele în DOM (ca
+            home-when-classic/home-when-themed) și CSS-ul le comută pe temă. */}
+        <span className="loom-vadim-breton">
+          Ediție specială · Cercetare de piață
+        </span>
+        <h1 className="loom-vadim-h1">
+          S-a terminat cu studiile făcute <em>după ureche</em>, domnilor!
+        </h1>
+        <p className="loom-vadim-sapou">
+          Alegi indicatorii din catalogul standard, iar Marian îi așează în
+          ghid de interviu sau chestionar — cu timing, verificări de calitate
+          și export în Word, ca la carte. Cine lucrează altfel, să poftească la
+          tribună și să explice poporului de ce.
+        </p>
+
         <div className="loom-row">{children}</div>
+
+        <p className="loom-vadim-nb" aria-hidden>
+          N.B. Elodia a aprobat macheta. — T.
+        </p>
+        <figure className="loom-vadim-foto" aria-hidden>
+          <span className="lv-stamp">Aprobat de Tribun</span>
+          <svg className="lv-doodle lv-boil lv-fulger" viewBox="0 0 100 100">
+            <path d="M58 6 L34 48 L52 48 L30 94 L74 40 L54 40 L76 6 Z" />
+          </svg>
+          <svg className="lv-doodle lv-boil2 lv-stea" viewBox="0 0 100 100">
+            <path d="M50 4 L58 42 L96 50 L58 58 L50 96 L42 58 L4 50 L42 42 Z" />
+          </svg>
+          <span className="lv-rama">
+            <span className="vadim-lumina" />
+            <span
+              className="vadim-clipici"
+              style={{ left: "12%", top: "14%", "--cc": "#ffd23f", "--cdelay": "1.1s" } as React.CSSProperties}
+            >
+              ✦
+            </span>
+            <span
+              className="vadim-clipici"
+              style={{ right: "13%", bottom: "16%", "--cc": "#ff5ad1", "--cdelay": "3.6s", "--cs": "12px" } as React.CSSProperties}
+            >
+              ✦
+            </span>
+          </span>
+          <span className="lv-caption">
+            <b>Foto: redacția</b>
+            Tribunul semnează personal fiecare chestionar făcut ca la carte:
+            semnificativ statistic, p&nbsp;&lt;&nbsp;0,05, să audă toată țara!
+          </span>
+        </figure>
 
         <div className="loom-bon-rows" aria-hidden>
           <div className="br">

@@ -11,6 +11,8 @@ import {
   Waypoints,
 } from "lucide-react";
 import { HomeHero } from "@/components/HomeHero";
+import { VadimCitat } from "@/components/VadimCitat";
+import { VadimStiri } from "@/components/VadimStiri";
 import { createGuide, useGuideStore, type Guide } from "@/lib/guides";
 import { createSurvey, useSurveyStore, type SurveyDoc } from "@/lib/surveys";
 
@@ -100,9 +102,11 @@ export function HomeDashboard() {
             className="loom-btn loom-btn-primary bg-indigo-9"
           >
             ＋ Mapare nouă
+            <span className="loom-vadim-only">, să tremure piața</span>
           </button>
           <Link href="/ghiduri" className="loom-btn loom-btn-secondary">
-            Vezi ghidurile
+            <span className="loom-not-vadim">Vezi ghidurile</span>
+            <span className="loom-vadim-only">Arhiva de ghiduri a neamului</span>
           </Link>
         </HomeHero>
 
@@ -151,6 +155,9 @@ export function HomeDashboard() {
             </Link>
           </div>
         </section>
+
+        <VadimStiri />
+        <VadimCitat />
       </div>
 
       <section aria-label="Studiile mele">

@@ -453,3 +453,150 @@ export function bonFeed() {
   src.start(t0);
 }
 
+
+/** Goarna Tribunului (tema Tribunul 3000): patru note de fanfară pe
+    armonice de square — scurte și demne, ca la deschiderea ședinței. */
+export function goarnaFanfara() {
+  const c = audio();
+  const t0 = c.currentTime;
+  const note: Array<[number, number]> = [
+    [0, 392],
+    [0.16, 523],
+    [0.32, 659],
+    [0.5, 784],
+  ];
+  for (const [st, f] of note) {
+    const t = t0 + st;
+    const durata = st === 0.5 ? 0.5 : 0.17;
+    for (const [mult, vol] of [
+      [1, 0.11],
+      [2, 0.045],
+      [3, 0.02],
+    ]) {
+      const o = c.createOscillator();
+      o.type = "square";
+      o.frequency.value = f * mult;
+      const g = c.createGain();
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.exponentialRampToValueAtTime(vol, t + 0.02);
+      g.gain.setValueAtTime(vol, t + durata - 0.05);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + durata);
+      const lp = c.createBiquadFilter();
+      lp.type = "lowpass";
+      lp.frequency.value = 3200;
+      o.connect(lp);
+      lp.connect(g);
+      g.connect(c.destination);
+      o.start(t);
+      o.stop(t + durata + 0.03);
+    }
+  }
+}
+
+/** Arpegiu de aprobare (dialogul de export reușit al Tribunului):
+    Do-Mi-Sol-Do pe sinusuri scurte, festive dar demne. */
+export function fanfaraAprobare() {
+  const c = audio();
+  const t0 = c.currentTime;
+  const note: Array<[number, number]> = [
+    [0, 523.25],
+    [0.09, 659.25],
+    [0.18, 783.99],
+    [0.27, 1046.5],
+  ];
+  for (const [st, f] of note) {
+    const t = t0 + st;
+    const o = c.createOscillator();
+    o.type = "sine";
+    o.frequency.value = f;
+    const g = c.createGain();
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(0.14, t + 0.015);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + 0.3);
+    o.connect(g);
+    g.connect(c.destination);
+    o.start(t);
+    o.stop(t + 0.32);
+  }
+}
+
+/** Mormăitul de tunet al ceartei (export cu boacăne): două trepte joase
+    de sawtooth prin lowpass — sentința cade greu. */
+export function tunetCearta() {
+  const c = audio();
+  const t0 = c.currentTime;
+  const trepte: Array<[number, number]> = [
+    [0, 130],
+    [0.22, 87],
+  ];
+  for (const [st, f] of trepte) {
+    const t = t0 + st;
+    const o = c.createOscillator();
+    o.type = "sawtooth";
+    o.frequency.setValueAtTime(f, t);
+    o.frequency.exponentialRampToValueAtTime(f * 0.8, t + 0.24);
+    const lp = c.createBiquadFilter();
+    lp.type = "lowpass";
+    lp.frequency.value = 600;
+    const g = c.createGain();
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(0.16, t + 0.02);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + 0.26);
+    o.connect(lp);
+    lp.connect(g);
+    g.connect(c.destination);
+    o.start(t);
+    o.stop(t + 0.28);
+  }
+}
+
+/** „Ham! Ham!" — cățelul Elodia latră de două ori, cu pauză clară între
+    lătrături. Fiecare „ham" are contur de yip: pitch-ul sare scurt în sus,
+    apoi cade — sawtooth prin lowpass + un puf de zgomot bandpass. */
+export function hamElodia() {
+  const c = audio();
+  const t0 = c.currentTime;
+  const silabe: Array<[number, number, number]> = [
+    [0, 820, 0.14],
+    [0.32, 750, 0.16],
+  ];
+  for (const [st, f0, dur] of silabe) {
+    const t = t0 + st;
+    const osc = c.createOscillator();
+    osc.type = "sawtooth";
+    osc.frequency.setValueAtTime(f0 * 0.55, t);
+    osc.frequency.exponentialRampToValueAtTime(f0, t + 0.018);
+    osc.frequency.exponentialRampToValueAtTime(f0 * 0.3, t + dur);
+    const lp = c.createBiquadFilter();
+    lp.type = "lowpass";
+    lp.frequency.value = 1900;
+    lp.Q.value = 1.2;
+    const g = c.createGain();
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(0.42, t + 0.014);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    osc.connect(lp);
+    lp.connect(g);
+    g.connect(c.destination);
+    osc.start(t);
+    osc.stop(t + dur + 0.02);
+    const nd = 0.05;
+    const buf = c.createBuffer(1, Math.ceil(c.sampleRate * nd), c.sampleRate);
+    const d = buf.getChannelData(0);
+    for (let i = 0; i < d.length; i++) {
+      d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / d.length, 1.8);
+    }
+    const noise = c.createBufferSource();
+    noise.buffer = buf;
+    const bp = c.createBiquadFilter();
+    bp.type = "bandpass";
+    bp.frequency.value = 1100;
+    bp.Q.value = 0.9;
+    const ng = c.createGain();
+    ng.gain.value = 0.16;
+    noise.connect(bp);
+    bp.connect(ng);
+    ng.connect(c.destination);
+    noise.start(t);
+  }
+}

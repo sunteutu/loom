@@ -9,6 +9,8 @@ import {
   bubblePop,
   clackOnce,
   flapCascade,
+  goarnaFanfara,
+  hamElodia,
   installAudioUnlock,
   stitchPull,
   vcrClunk,
@@ -47,6 +49,7 @@ export function ThemeDecorations() {
       try {
         if (theme === "splitflap") flapCascade();
         else if (theme === "bon" && pathname === "/") bonPrint();
+        else if (theme === "vadim") goarnaFanfara();
       } catch {
         // audio blocked or unavailable — decor rămâne vizual
       }
@@ -60,7 +63,124 @@ export function ThemeDecorations() {
   if (theme === "cyberdeck") return <CyberdeckDecor />;
   if (theme === "bon") return <BonDecor />;
   if (theme === "vhs") return <VhsDecor />;
+  if (theme === "vadim") return <VadimDecor pathname={pathname} />;
   return null;
+}
+
+/* ————— Tribunul 3000: laser tricolor, scântei de cursor și colajul de
+   fundal — poze-sticker duoton cu bule de replici, per pagină. Elodia
+   (Chestionare) e clicabilă, cu sunet. ————— */
+
+type CutoutStyle = React.CSSProperties & Record<string, string>;
+
+function VadimDecor({ pathname }: { pathname: string }) {
+  // scânteile ✦/⚡/★ sar din mișcarea cursorului — versiunea „turbată”:
+  // mai dese (40ms), mai mari (16–34px) și aruncate în direcții aleatorii,
+  // cu rotații sălbatice, prin variabilele --dx/--dy/--rot/--sc
+  useEffect(() => {
+    if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    // culori la saturație maximă, scânteile rămân opace aproape tot zborul
+    const culori = ["#00a3ff", "#ff2ec4", "#8ae32c", "#ffc800", "#ff8a2a", "#8c5bff"];
+    const timeouts: ReturnType<typeof setTimeout>[] = [];
+    let ultim = 0;
+    const onMove = (e: PointerEvent) => {
+      const acum = performance.now();
+      if (acum - ultim < 35) return;
+      ultim = acum;
+      const s = document.createElement("span");
+      s.className = "vadim-scanteie";
+      const zar = Math.random();
+      s.textContent = zar < 0.3 ? "⚡" : zar < 0.45 ? "★" : "✦";
+      s.style.left = `${e.clientX + (Math.random() - 0.5) * 14}px`;
+      s.style.top = `${e.clientY + (Math.random() - 0.5) * 14}px`;
+      s.style.fontSize = `${16 + Math.random() * 14}px`;
+      s.style.color = culori[(Math.random() * culori.length) | 0];
+      s.style.textShadow = "0 0 12px currentColor";
+      s.style.setProperty("--dx", `${(Math.random() - 0.5) * 44}px`);
+      s.style.setProperty("--dy", `${-45 - Math.random() * 50}px`);
+      s.style.setProperty("--rot", `${20 + (Math.random() - 0.5) * 90}deg`);
+      s.style.setProperty("--sc", `${1.1 + Math.random() * 0.4}`);
+      document.body.appendChild(s);
+      timeouts.push(setTimeout(() => s.remove(), 1030));
+    };
+    addEventListener("pointermove", onMove, { passive: true });
+    return () => {
+      removeEventListener("pointermove", onMove);
+      timeouts.forEach(clearTimeout);
+      document.querySelectorAll(".vadim-scanteie").forEach((el) => el.remove());
+    };
+  }, []);
+
+  // Elodia se ține de coada săgeții: medalionul urmează cursorul, decalat
+  // spre baza săgeții (dreapta-jos față de vârf), doar pe pointer fin
+  const elodiaRef = useRef<HTMLSpanElement>(null);
+  useEffect(() => {
+    if (!matchMedia("(pointer: fine)").matches) return;
+    const onMove = (e: PointerEvent) => {
+      const el = elodiaRef.current;
+      if (!el) return;
+      el.style.transform = `translate(${e.clientX + 12}px, ${e.clientY + 18}px)`;
+      el.style.opacity = "1";
+    };
+    addEventListener("pointermove", onMove, { passive: true });
+    return () => removeEventListener("pointermove", onMove);
+  }, []);
+
+  const onHome = pathname === "/";
+  const onChestionare = pathname.startsWith("/chestionare");
+
+  return (
+    <>
+      <div className="vadim-tricolor" aria-hidden />
+      <span ref={elodiaRef} className="vadim-elodia-cursor" aria-hidden />
+
+      {/* filigranul tipografiei: meme-ul doar-contur, în derivă lentă prin
+          cerul de date — pe TOATE paginile temei */}
+      <div className="vadim-filigran" aria-hidden>
+        <span
+          style={{ top: "28%", "--fd": "90s", "--fs": "24vw", animationDelay: "-30s" } as CutoutStyle}
+        >
+          PITICĂ NENOROCITĂ!
+        </span>
+      </div>
+
+      {onChestionare && (
+        <button
+          type="button"
+          className="vadim-cutout interactiv ton-magenta"
+          title="Cabinetul Elodia — click: Ham!"
+          aria-label="Elodia latră"
+          onClick={() => {
+            try {
+              hamElodia();
+            } catch {
+              // fără audio
+            }
+          }}
+          style={{ "--rot": "3deg", "--dur": "16s", right: "18px", bottom: "24px", width: "min(15vw, 210px)" } as CutoutStyle}
+        >
+          <svg
+            className="lv-doodle contur lv-boil"
+            style={{ left: -20, bottom: -16, width: 46, height: 46, color: "#ff5ad1" }}
+            viewBox="0 0 100 100"
+            aria-hidden
+          >
+            <path d="M50 88 C20 66 6 44 18 28 C28 14 46 18 50 32 C54 18 72 14 82 28 C94 44 80 66 50 88 Z" />
+          </svg>
+          <img src="/themes/vadim/tribun-elodia.jpg" alt="" />
+          <span
+            className="vadim-clipici"
+            style={{ right: "12%", top: "14%", "--cc": "#ff5ad1", "--cdelay": "1.4s", "--cs": "13px" } as CutoutStyle}
+          >
+            ✦
+          </span>
+          <span className="vadim-replica sus" style={{ "--rc": "#ff5ad1", left: "-24px", top: "-64px" } as CutoutStyle}>
+            Elodia respinge chestionarele mai lungi de 20 de minute.
+          </span>
+        </button>
+      )}
+    </>
+  );
 }
 
 /* ————— Fundal fun comun: blobs de culoare + cafeluțe aburinde ————— */

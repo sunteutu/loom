@@ -5,6 +5,8 @@ import {
   Oswald,
   Pixelify_Sans,
   Silkscreen,
+  Space_Grotesk,
+  Unbounded,
   VT323,
 } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
@@ -53,6 +55,19 @@ const pixelFont = Silkscreen({
   weight: ["400", "700"],
 });
 
+// Tribunul 3000: titluri de gazetă holografică + textul curent al temei;
+// latin-ext ca diacriticele românești să nu cadă pe fallback
+const tribunFont = Unbounded({
+  variable: "--font-tribun",
+  subsets: ["latin-ext"],
+  weight: ["400", "600", "800", "900"],
+});
+
+const tribunSans = Space_Grotesk({
+  variable: "--font-tribun-sans",
+  subsets: ["latin-ext"],
+});
+
 export const metadata: Metadata = {
   title: "Loom",
   description:
@@ -67,7 +82,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${plexSans.variable} ${plexMono.variable} ${vhsFont.variable} ${stitchFont.variable} ${flapFont.variable} ${pixelFont.variable} h-full antialiased`}
+      className={`${plexSans.variable} ${plexMono.variable} ${vhsFont.variable} ${stitchFont.variable} ${flapFont.variable} ${pixelFont.variable} ${tribunFont.variable} ${tribunSans.variable} h-full antialiased`}
       suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col">

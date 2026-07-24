@@ -152,7 +152,8 @@ html[data-theme="broderie"],
 html[data-theme="bon"],
 html[data-theme="splitflap"],
 html[data-theme="metal"],
-html[data-theme="cyberdeck"] {
+html[data-theme="cyberdeck"],
+html[data-theme="vadim"] {
   --slate-1: color-mix(in oklab, var(--tt-fg) 3%, var(--tt-bg));
   --slate-2: color-mix(in oklab, var(--tt-fg) 5%, var(--tt-bg));
   --slate-3: color-mix(in oklab, var(--tt-fg) 8%, var(--tt-bg));
@@ -1349,6 +1350,1157 @@ html[data-theme="metal"].dark textarea::placeholder {
   color: #6d747f;
 }
 
+/* --- Tribunul 3000 (vadim): gazetă „butic elegant" din anul 3000 —
+   șampanie, gheață și orhidee pe catifea închisă, titluri Unbounded,
+   laser tricolor și aurora holografică pe fundal --- */
+html[data-theme="vadim"] {
+  color-scheme: dark;
+  --tt-bg: #150b28;
+  --tt-fg: #f2eee2;
+  --tt-accent: #ffd23f;
+  --tt-on-accent: #1c1828;
+  --tt-warn: #ff9d5c;
+  --tt-danger: #ff5a7a;
+  --radius: 1rem;
+  --card: #211337;
+  --popover: #291a47;
+  --font-sans: var(--font-tribun-sans);
+}
+/* „cerul de date": două straturi de stele care derivează lent în parallax,
+   în culorile temei — mereu în spatele conținutului (wrapper-ul stă pe z-1) */
+html[data-theme="vadim"] body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image:
+    radial-gradient(1.6px 1.6px at 27px 39px, rgba(242, 238, 226, 0.85), transparent 60%),
+    radial-gradient(1px 1px at 143px 117px, rgba(92, 178, 255, 0.75), transparent 60%),
+    radial-gradient(1.3px 1.3px at 214px 65px, rgba(255, 90, 209, 0.6), transparent 60%),
+    radial-gradient(0.9px 0.9px at 89px 201px, rgba(242, 238, 226, 0.55), transparent 60%),
+    radial-gradient(1.1px 1.1px at 191px 168px, rgba(255, 210, 63, 0.5), transparent 60%),
+    radial-gradient(1px 1px at 61px 133px, rgba(242, 238, 226, 0.7), transparent 60%),
+    radial-gradient(1.2px 1.2px at 238px 214px, rgba(138, 227, 44, 0.5), transparent 60%),
+    radial-gradient(0.8px 0.8px at 117px 21px, rgba(255, 210, 63, 0.6), transparent 60%),
+    radial-gradient(1.4px 1.4px at 172px 246px, rgba(92, 178, 255, 0.55), transparent 60%),
+    radial-gradient(1.1px 1.1px at 44px 318px, rgba(255, 90, 209, 0.5), transparent 60%),
+    radial-gradient(1.7px 1.7px at 296px 104px, rgba(242, 238, 226, 0.8), transparent 60%),
+    radial-gradient(2.2px 2.2px at 340px 260px, rgba(242, 238, 226, 0.9), transparent 60%),
+    radial-gradient(1.4px 1.4px at 420px 90px, rgba(92, 178, 255, 0.65), transparent 60%);
+  background-size:
+    260px 260px,
+    260px 260px,
+    260px 260px,
+    260px 260px,
+    260px 260px,
+    260px 260px,
+    260px 260px,
+    260px 260px,
+    390px 390px,
+    390px 390px,
+    390px 390px,
+    520px 520px,
+    520px 520px;
+  animation: vadim-stele 180s linear infinite;
+}
+@keyframes vadim-stele {
+  to {
+    background-position:
+      -520px 260px,
+      -520px 260px,
+      -520px 260px,
+      -520px 260px,
+      -520px 260px,
+      -520px 260px,
+      -520px 260px,
+      -520px 260px,
+      -780px 390px,
+      -780px 390px,
+      -780px 390px,
+      -520px 520px,
+      -520px 520px;
+  }
+}
+/* nebuloasa statică din spatele stelelor — abia sesizabilă */
+html[data-theme="vadim"] body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(46% 38% at 22% 18%, rgba(157, 123, 255, 0.24), transparent 70%),
+    radial-gradient(40% 34% at 82% 30%, rgba(92, 178, 255, 0.18), transparent 70%),
+    radial-gradient(50% 42% at 70% 88%, rgba(255, 90, 209, 0.17), transparent 70%),
+    radial-gradient(36% 30% at 12% 82%, rgba(255, 210, 63, 0.1), transparent 70%);
+}
+/* filigranul tipografiei: titluri uriașe de gazetă, doar contur, care
+   alunecă lent prin fundal (randate de VadimDecor doar pe Home) */
+.vadim-filigran {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+.vadim-filigran span {
+  position: absolute;
+  left: 0;
+  white-space: nowrap;
+  font-family: var(--font-tribun);
+  font-weight: 900;
+  font-size: var(--fs, 8vw);
+  letter-spacing: 0.04em;
+  color: transparent;
+  -webkit-text-stroke: 1.5px rgba(242, 238, 226, 0.09);
+  animation: vadim-filigran var(--fd, 80s) linear infinite;
+}
+@keyframes vadim-filigran {
+  from {
+    transform: translateX(100vw) rotate(-2deg);
+  }
+  to {
+    transform: translateX(-100%) rotate(-2deg);
+  }
+}
+html[data-theme="vadim"] h1,
+html[data-theme="vadim"] h2,
+html[data-theme="vadim"] h3 {
+  font-family: var(--font-tribun);
+  letter-spacing: 0.01em;
+}
+/* panourile plutesc pe catifea: bordură șampanie stinsă + umbră adâncă */
+html[data-theme="vadim"] [class*="bg-card"] {
+  border-color: rgba(157, 123, 255, 0.28);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
+}
+html[data-theme="vadim"] [class*="bg-indigo-9"] {
+  box-shadow: 0 0 16px rgba(255, 210, 63, 0.3);
+}
+
+/* — decorul Tribunul 3000 (VadimDecor): laser tricolor, scântei de cursor,
+   banda de citate din arhiva de aur — */
+.vadim-tricolor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  z-index: 92;
+  pointer-events: none;
+  background: linear-gradient(90deg, #4d8dff 0 33.33%, #ffd23f 33.33% 66.66%, #ff4d6d 66.66% 100%);
+  box-shadow: 0 0 12px rgba(77, 141, 255, 0.4);
+}
+/* Elodia, în capătul săgeții: sticker decupat pe conturul blănii (alpha
+   din Vision), cu ambele urechi — lipit de baza cursorului, vârful rămâne
+   liber pentru click */
+.vadim-elodia-cursor {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 96;
+  width: 38px;
+  height: 31px;
+  background: url("/themes/vadim/elodia-sticker.png") center / contain no-repeat;
+  filter: drop-shadow(0 0 1px #f6f1e4) drop-shadow(0 0 1px #f6f1e4)
+    drop-shadow(0 2px 6px rgba(255, 90, 209, 0.45));
+  pointer-events: none;
+  opacity: 0;
+  transition:
+    transform 0.09s linear,
+    opacity 0.25s;
+}
+
+.vadim-scanteie {
+  position: fixed;
+  z-index: 95;
+  pointer-events: none;
+  font-size: 15px;
+  animation: vadim-scanteie 1s ease-in-out forwards;
+}
+/* hibrid: 70% „clipici” de pe poze (pop cu overshoot, rotire mică, o
+   clipă pe locul unde a trecut cursorul), 30% zbor. Deriva pornește
+   devreme și crește continuu (fracțiuni din --dx/--dy) — fluid, iar
+   urcarea începe repede după ce s-a oprit cursorul. */
+@keyframes vadim-scanteie {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.3) rotate(0deg);
+  }
+  10% {
+    opacity: 0.85;
+    transform: translate(-50%, -50%) scale(1.18) rotate(9deg);
+  }
+  /* de aici, un SINGUR segment de transform până la final: zborul e un
+     arc continuu, fără opriri. Keyframe-ul de la 55% fixează doar
+     opacitatea — nu atinge transformul, deci nu frânează mișcarea. */
+  24% {
+    transform: translate(calc(-50% + (var(--dx, 0px) * 0.08)), calc(-50% + (var(--dy, -70px) * 0.08)))
+      scale(1) rotate(14deg);
+  }
+  55% {
+    opacity: 0.85;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(calc(-50% + var(--dx, 0px)), calc(-50% + var(--dy, -70px)))
+      scale(var(--sc, 1.2)) rotate(var(--rot, 45deg));
+  }
+}
+/* — colajul de fundal: poze-sticker duoton cu replici, per pagină.
+   Stratul .vadim-colaj e decorativ (z-0, sub conținut); Marian și Elodia
+   sunt butoane fixe pe z-2, clicabile, la marginea liberă a paginii. — */
+.vadim-colaj {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+  perspective: 1000px;
+}
+/* v2 „anul 3000": card holografic de colecție — sticlă cu glow în culoarea
+   cardului, sheen care mătură poza și plutire cu tangaj 3D */
+.vadim-cutout {
+  position: absolute;
+  padding: 8px;
+  background: linear-gradient(150deg, rgba(246, 241, 228, 0.16), rgba(246, 241, 228, 0.05));
+  border: 1px solid color-mix(in oklab, var(--glow, #5cb2ff) 55%, transparent);
+  border-radius: 18px;
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  transform: rotate(var(--rot, 0deg));
+  transform-style: preserve-3d;
+  box-shadow:
+    0 0 30px color-mix(in oklab, var(--glow, #5cb2ff) 32%, transparent),
+    inset 0 0 18px color-mix(in oklab, var(--glow, #5cb2ff) 12%, transparent),
+    0 24px 50px rgba(0, 0, 0, 0.55);
+  animation: vadim-pluteste var(--dur, 14s) ease-in-out infinite alternate;
+}
+.vadim-cutout::after {
+  content: "";
+  position: absolute;
+  inset: 8px;
+  border-radius: 12px;
+  pointer-events: none;
+  background: linear-gradient(
+    115deg,
+    transparent 32%,
+    rgba(255, 255, 255, 0.2) 44%,
+    rgba(92, 178, 255, 0.28) 50%,
+    rgba(255, 90, 209, 0.24) 56%,
+    transparent 68%
+  );
+  background-size: 300% 100%;
+  animation: vadim-sheen 6s ease-in-out infinite;
+  mix-blend-mode: screen;
+}
+@keyframes vadim-sheen {
+  0%,
+  45% {
+    background-position: 130% 0;
+  }
+  75%,
+  100% {
+    background-position: -80% 0;
+  }
+}
+.vadim-cutout img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 12px;
+}
+@keyframes vadim-pluteste {
+  0% {
+    transform: rotate(var(--rot)) translateY(0) rotateY(-6deg) rotateX(1.5deg);
+  }
+  100% {
+    transform: rotate(calc(var(--rot) + 1.4deg)) translateY(-16px) rotateY(6deg) rotateX(-1.5deg);
+  }
+}
+/* poze naturale, doar „remasterizate”: contrast și saturație de ecran nou */
+.vadim-cutout.natural img {
+  filter: contrast(1.08) saturate(1.18) brightness(1.03);
+}
+/* ancorele fâșiilor libere: mijlocul spațiului dintre sidebar și conținut,
+   respectiv dintre conținut și marginea dreaptă a ferestrei */
+.vadim-cutout.pe-stanga {
+  left: max(270px, calc(25vw - var(--w, 220px) / 2));
+}
+.vadim-cutout.pe-dreapta {
+  right: max(10px, calc(25vw - 300px - var(--w, 180px) / 2));
+}
+.pe-stanga .vadim-replica,
+.pe-dreapta .vadim-replica {
+  max-width: calc(100% + 20px);
+}
+/* monocromuri nobile — saturație de galerie, nu de neon */
+.vadim-cutout.ton-cyan img {
+  filter: grayscale(1) contrast(1.12) brightness(1.05) sepia(0.9) hue-rotate(165deg) saturate(1.5);
+}
+.vadim-cutout.ton-magenta img {
+  filter: grayscale(1) contrast(1.12) brightness(1.04) sepia(0.9) hue-rotate(255deg) saturate(1.4);
+}
+.vadim-cutout.ton-orange img {
+  filter: grayscale(1) contrast(1.1) brightness(1.05) sepia(1) hue-rotate(-12deg) saturate(1.6);
+}
+.vadim-cutout.ton-violet img {
+  filter: grayscale(1) contrast(1.12) brightness(1.03) sepia(0.9) hue-rotate(210deg) saturate(1.4);
+}
+.vadim-cutout.interactiv {
+  position: fixed;
+  z-index: 2;
+  pointer-events: auto;
+  cursor: pointer;
+  border: 0;
+  transition: transform 0.18s;
+}
+.vadim-cutout.interactiv:hover {
+  transform: rotate(calc(var(--rot) - 1.6deg)) translateY(-5px) scale(1.03);
+  animation-play-state: paused;
+}
+.vadim-caption {
+  display: block;
+  font-size: 12px;
+  font-style: italic;
+  text-align: left;
+  color: #2c2740;
+  padding: 7px 3px 3px;
+  line-height: 1.4;
+}
+.vadim-caption b {
+  display: block;
+  font-style: normal;
+  font-family: var(--font-geist-mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #c2489f;
+  margin-bottom: 1px;
+}
+/* bule de replici — stickere ca-n clip */
+.vadim-replica {
+  position: absolute;
+  z-index: 3;
+  max-width: 220px;
+  font-family: var(--font-tribun);
+  font-weight: 800;
+  font-size: 11px;
+  line-height: 1.35;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  text-align: center;
+  color: #1c1828;
+  background: #f6f1e4;
+  padding: 9px 13px;
+  border-radius: 16px;
+  box-shadow:
+    0 0 0 2px var(--rc, #ffd23f),
+    0 0 18px color-mix(in oklab, var(--rc, #ffd23f) 40%, transparent),
+    0 10px 26px rgba(0, 0, 0, 0.45);
+}
+.vadim-replica::after {
+  content: "";
+  position: absolute;
+  bottom: -14px;
+  left: 26px;
+  border: 9px solid transparent;
+  border-top-color: #f6f1e4;
+  filter: drop-shadow(0 2px 0 var(--rc, #ffd23f));
+}
+.vadim-replica.sus::after {
+  bottom: auto;
+  top: -14px;
+  border-top-color: transparent;
+  border-bottom-color: #f6f1e4;
+  filter: drop-shadow(0 -2px 0 var(--rc, #ffd23f));
+}
+.vadim-replica.striga {
+  font-size: 15px;
+  animation: vadim-striga 0.25s cubic-bezier(0.2, 1.6, 0.4, 1);
+}
+@keyframes vadim-striga {
+  from {
+    transform: scale(0.4);
+    opacity: 0;
+  }
+}
+/* colajul respiră doar pe ecrane late; pe restul dispare cu tot cu
+   butoanele clicabile, să nu stea peste conținut */
+@media (max-width: 1279px) {
+  .vadim-colaj,
+  .vadim-cutout.interactiv {
+    display: none;
+  }
+}
+
+/* — închiderea de ediție pe Tribuna indicatorilor: foto-documentul cu
+   ochelari negri, în fluxul paginii, la finalul catalogului. — */
+.vadim-ochelari {
+  position: relative;
+  width: min(600px, 94%);
+  margin: 74px auto 10px;
+  background: #f6f1e4;
+  padding: 10px 10px 0;
+  border-radius: 18px;
+  transform: rotate(-1.2deg);
+  box-shadow:
+    0 0 0 1px rgba(246, 241, 228, 0.3),
+    0 0 40px rgba(157, 123, 255, 0.35),
+    0 22px 54px rgba(0, 0, 0, 0.55);
+}
+.vadim-ochelari .vo-rama {
+  display: block;
+  overflow: hidden;
+  border-radius: 10px;
+  aspect-ratio: 1560 / 942;
+  background: url("/themes/vadim/tribun-ochelari.jpg") center / cover no-repeat;
+  filter: grayscale(1) contrast(1.12) brightness(1.03) sepia(0.9) hue-rotate(210deg) saturate(1.4);
+}
+.vadim-ochelari .vadim-caption {
+  padding: 9px 5px 11px;
+  font-size: 14px;
+}
+.vadim-ochelari .vo-replica {
+  --rc: #9d7bff;
+  left: -36px;
+  top: -54px;
+  max-width: 300px;
+  font-size: 13.5px;
+}
+
+/* — lista de ghiduri pe Tribunul 3000: poza cu telefonul ține loc de
+   empty state și de buton de creare — click: „MARIAN!”, apoi ghid nou.
+   Fără duoton aici, la cererea userului: poza rămâne naturală. — */
+/* legănatul stă pe wrapper, ca să nu se bată cu transformul de hover */
+.vmc-sway {
+  display: block;
+  animation: vmc-sway 8s ease-in-out infinite alternate;
+}
+@keyframes vmc-sway {
+  from {
+    transform: rotate(0.45deg) translateY(0);
+  }
+  to {
+    transform: rotate(-0.55deg) translateY(-4px);
+  }
+}
+.vadim-marian-cta {
+  display: block;
+  position: relative;
+  width: min(340px, 90%);
+  margin: 6px auto 30px;
+  background: #f6f1e4;
+  padding: 9px 9px 0;
+  border: 0;
+  border-radius: 16px;
+  cursor: pointer;
+  text-align: left;
+  transform: rotate(-1.4deg);
+  box-shadow:
+    0 0 0 1px rgba(246, 241, 228, 0.3),
+    0 0 24px rgba(255, 157, 92, 0.3),
+    0 18px 44px rgba(0, 0, 0, 0.5);
+  transition: transform 0.18s;
+  animation: vmc-glow 5.5s ease-in-out infinite alternate;
+}
+/* neonul portocaliu respiră în jurul polaroidului */
+@keyframes vmc-glow {
+  from {
+    box-shadow:
+      0 0 0 1px rgba(246, 241, 228, 0.3),
+      0 0 24px rgba(255, 157, 92, 0.3),
+      0 18px 44px rgba(0, 0, 0, 0.5);
+  }
+  to {
+    box-shadow:
+      0 0 0 1px rgba(246, 241, 228, 0.35),
+      0 0 42px rgba(255, 157, 92, 0.55),
+      0 18px 44px rgba(0, 0, 0, 0.5);
+  }
+}
+.vadim-marian-cta:hover {
+  transform: rotate(-2.4deg) translateY(-4px) scale(1.02);
+}
+.vadim-marian-cta:active {
+  transform: rotate(-1.4deg) scale(0.98);
+}
+.vadim-marian-cta .vmc-foto {
+  display: block;
+  position: relative;
+  overflow: hidden;
+  border-radius: 10px;
+  /* din când în când poza zvâcnește scurt: sună telefonul pe teren */
+  animation: vmc-apel 7s ease-in-out infinite;
+}
+@keyframes vmc-apel {
+  0%,
+  84%,
+  100% {
+    rotate: 0deg;
+  }
+  86% {
+    rotate: 1.1deg;
+  }
+  89% {
+    rotate: -1.1deg;
+  }
+  92% {
+    rotate: 0.8deg;
+  }
+  95% {
+    rotate: -0.5deg;
+  }
+  97% {
+    rotate: 0deg;
+  }
+}
+.vadim-marian-cta img {
+  display: block;
+  width: 100%;
+  height: auto;
+  /* Ken Burns discret: poza respiră abia sesizabil în ramă */
+  animation: vmc-zoom 16s ease-in-out infinite alternate;
+}
+@keyframes vmc-zoom {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(1.06) translate(-1.2%, -0.8%);
+  }
+}
+/* ninge mărunt peste corespondentul de pe teren */
+.vmc-fulg {
+  position: absolute;
+  top: -18px;
+  left: var(--fx, 50%);
+  font-size: var(--fs, 13px);
+  font-style: normal;
+  color: rgba(255, 255, 255, 0.9);
+  text-shadow: 0 0 6px rgba(255, 255, 255, 0.55);
+  pointer-events: none;
+  opacity: 0;
+  animation: vmc-ninge var(--fd, 9s) linear infinite;
+  animation-delay: var(--fdelay, 0s);
+}
+@keyframes vmc-ninge {
+  0% {
+    transform: translate3d(0, 0, 0) rotate(0deg);
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.9;
+  }
+  30% {
+    transform: translate3d(9px, 120px, 0) rotate(45deg);
+  }
+  55% {
+    transform: translate3d(-6px, 225px, 0) rotate(85deg);
+  }
+  85% {
+    opacity: 0.9;
+  }
+  100% {
+    transform: translate3d(14px, 400px, 0) rotate(140deg);
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .vmc-sway,
+  .vadim-marian-cta,
+  .vadim-marian-cta .vmc-foto,
+  .vadim-marian-cta img {
+    animation: none;
+  }
+  .vmc-fulg {
+    display: none;
+  }
+}
+.vadim-marian-cta .vadim-caption {
+  padding: 8px 4px 10px;
+  font-size: 13px;
+}
+.vadim-marian-cta .vmc-replica {
+  --rc: #ff9d5c;
+  right: -14px;
+  top: -46px;
+}
+
+/* — Știrile ediției (VadimStiri, pe Home): pozele devin articole de
+   gazetă din anul 3000 — pagini scanate cu glow propriu, sheen și tilt
+   3D la hover — */
+.vadim-stiri {
+  margin-top: 48px;
+  perspective: 1100px;
+}
+.vadim-stiri .vs-cap {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 0 0 16px;
+  font-family: var(--font-geist-mono);
+  font-size: 11.5px;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: #ffd23f;
+  text-shadow: 0 0 10px rgba(255, 210, 63, 0.35);
+}
+.vadim-stiri .vs-cap::before,
+.vadim-stiri .vs-cap::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, #ffd23f);
+}
+.vadim-stiri .vs-cap::after {
+  background: linear-gradient(90deg, #5cb2ff, transparent);
+}
+.vadim-stiri .vs-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+}
+.vadim-stiri .vs-card {
+  position: relative;
+  padding: 10px 12px 14px;
+  border-radius: 18px;
+  background: linear-gradient(150deg, rgba(246, 241, 228, 0.14), rgba(246, 241, 228, 0.04));
+  border: 1px solid color-mix(in oklab, var(--glow, #5cb2ff) 50%, transparent);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  box-shadow:
+    0 0 26px color-mix(in oklab, var(--glow, #5cb2ff) 22%, transparent),
+    0 20px 44px rgba(0, 0, 0, 0.5);
+  transform-style: preserve-3d;
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease;
+  overflow: hidden;
+}
+.vadim-stiri .vs-card:hover {
+  transform: translateY(-6px) rotateX(3deg) rotateY(-3deg) scale(1.02);
+  box-shadow:
+    0 0 40px color-mix(in oklab, var(--glow, #5cb2ff) 40%, transparent),
+    0 26px 52px rgba(0, 0, 0, 0.55);
+}
+.vadim-stiri .vs-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    115deg,
+    transparent 32%,
+    rgba(255, 255, 255, 0.16) 44%,
+    rgba(92, 178, 255, 0.22) 50%,
+    rgba(255, 90, 209, 0.18) 56%,
+    transparent 68%
+  );
+  background-size: 300% 100%;
+  animation: vadim-sheen 7s ease-in-out infinite;
+  mix-blend-mode: screen;
+}
+.vadim-stiri .vs-card:nth-child(2)::after {
+  animation-delay: 1.2s;
+}
+.vadim-stiri .vs-foto {
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  border-radius: 12px;
+  filter: contrast(1.08) saturate(1.18) brightness(1.03);
+}
+.vadim-stiri .vs-kicker {
+  margin: 12px 0 4px;
+  font-family: var(--font-geist-mono);
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: color-mix(in oklab, var(--glow, #5cb2ff) 80%, #f2eee2);
+}
+.vadim-stiri .vs-titlu {
+  margin: 0;
+  font-family: var(--font-tribun);
+  font-weight: 800;
+  font-size: 16.5px;
+  line-height: 1.3;
+  color: #f2eee2;
+}
+.vadim-stiri .vs-meta {
+  margin: 8px 0 0;
+  font-family: var(--font-geist-mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #aaa393;
+}
+@media (max-width: 860px) {
+  .vadim-stiri .vs-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* — Citatul zilei (VadimCitat, pe Home): panou cu orhidee și sticker — */
+.vadim-citat {
+  position: relative;
+  margin: 44px 0 4px;
+  padding: 30px 32px 24px;
+  background: rgba(30, 18, 52, 0.88);
+  border: 1px solid rgba(255, 90, 209, 0.35);
+  border-radius: 22px;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow:
+    0 0 22px rgba(255, 90, 209, 0.12),
+    0 24px 60px rgba(0, 0, 0, 0.45);
+}
+.vadim-citat::before {
+  content: "CITATUL ZILEI · DIN OPERA TRIBUNULUI";
+  position: absolute;
+  top: -10px;
+  left: 26px;
+  background: linear-gradient(90deg, #ff5ad1, #9d7bff);
+  color: #1c1828;
+  padding: 2px 12px;
+  border-radius: 999px;
+  font-family: var(--font-geist-mono);
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  box-shadow: 0 0 12px rgba(255, 90, 209, 0.35);
+}
+.vadim-citat blockquote {
+  margin: 0;
+  padding-right: min(170px, 20vw);
+  font-family: var(--font-tribun);
+  font-weight: 600;
+  font-size: clamp(15px, 2vw, 20px);
+  line-height: 1.45;
+  transition: opacity 0.4s;
+}
+.vadim-citat .vc-autor {
+  margin: 12px 0 0;
+  font-family: var(--font-geist-mono);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #aaa393;
+}
+/* banda subțire de sub citat: precizarea din redacție — pagina e pamflet */
+.vadim-pamflet {
+  display: block;
+  margin: 10px 0 4px;
+  padding: 6px 16px;
+  text-align: center;
+  font-family: var(--font-geist-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #aaa393;
+  background: rgba(30, 18, 52, 0.55);
+  border: 1px dashed rgba(242, 238, 226, 0.25);
+  border-radius: 999px;
+}
+.vadim-citat .vc-foto {
+  position: absolute;
+  right: -18px;
+  top: -40px;
+  width: min(150px, 20vw);
+  margin: 0;
+  background: #f6f1e4;
+  padding: 7px;
+  border-radius: 14px;
+  transform: rotate(5deg);
+  box-shadow:
+    0 0 0 1px rgba(246, 241, 228, 0.3),
+    0 0 22px rgba(92, 178, 255, 0.25),
+    0 14px 36px rgba(0, 0, 0, 0.5);
+}
+.vadim-citat .vc-rama {
+  display: block;
+  border-radius: 8px;
+  aspect-ratio: 2040 / 1996;
+  background: url("/themes/vadim/tribun-ganditor.jpg") center / cover no-repeat;
+  filter: grayscale(1) contrast(1.12) brightness(1.06) sepia(0.9) hue-rotate(165deg) saturate(1.5);
+}
+@media (max-width: 640px) {
+  .vadim-citat .vc-foto {
+    display: none;
+  }
+  .vadim-citat blockquote {
+    padding-right: 0;
+  }
+}
+
+/* — Biroul de Export de pe pagina ghidului: ghișeul cu Funcționarul-șef
+   și controalele de export mutate din toolbar (doar pe vadim) — */
+.vadim-birou {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(0, 0.65fr);
+  gap: 30px;
+  align-items: center;
+  margin-top: 40px;
+  padding: 36px 34px 30px;
+  /* ghișeu de stat: banda tricoloră sus, ca panglica de inaugurare */
+  background:
+    linear-gradient(90deg, #2456d6 0 33.4%, #ffd23f 33.4% 66.7%, #e0263c 66.7% 100%)
+      top / 100% 7px no-repeat,
+    rgba(30, 18, 52, 0.88);
+  border: 1px solid rgba(92, 178, 255, 0.3);
+  border-radius: 22px;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow:
+    0 0 20px rgba(92, 178, 255, 0.1),
+    0 24px 60px rgba(0, 0, 0, 0.45);
+}
+.vadim-birou h4 {
+  margin: 0 0 6px;
+  font-family: var(--font-tribun);
+  font-weight: 900;
+  font-size: clamp(20px, 3vw, 27px);
+  background: linear-gradient(90deg, #4d8dff, #ffd23f, #ff5252);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 0 12px rgba(92, 178, 255, 0.3));
+}
+.vadim-birou .vb-text > p {
+  margin: 0 0 18px;
+  font-size: 15px;
+  line-height: 1.55;
+  color: #aaa393;
+}
+.vadim-birou .vb-foto {
+  position: relative;
+  margin: 0;
+  background: #f6f1e4;
+  padding: 9px 9px 0;
+  border-radius: 16px;
+  transform: rotate(2deg);
+  box-shadow:
+    0 0 0 1px rgba(246, 241, 228, 0.3),
+    0 0 24px rgba(92, 178, 255, 0.28),
+    0 18px 44px rgba(0, 0, 0, 0.5);
+}
+.vadim-birou .vb-rama {
+  display: block;
+  overflow: hidden;
+  border-radius: 10px;
+  aspect-ratio: 1346 / 1028;
+  background: url("/themes/vadim/tribun-portret.jpg") center / cover no-repeat;
+}
+.vadim-birou .vb-caption {
+  display: block;
+  font-size: 13px;
+  font-style: italic;
+  color: #2c2740;
+  padding: 9px 4px 11px;
+  line-height: 1.45;
+}
+.vadim-birou .vb-caption b {
+  display: block;
+  font-style: normal;
+  font-family: var(--font-geist-mono);
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #d21f36;
+  margin-bottom: 2px;
+}
+.vadim-birou .vb-bifa {
+  left: -24px;
+  top: -22px;
+  width: 52px;
+  height: 52px;
+  color: #ffd23f;
+}
+.vadim-birou .vb-bifa path {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 9;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+@media (max-width: 760px) {
+  .vadim-birou {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* — Biroul de Export (VadimExportOverlay): dialogurile destinului —
+   aprobat de Tribun (șampanie + scântei) sau comisia de disciplină
+   (roșu + cutremur). Clasele apar doar când tema vadim e activă. */
+.vadim-voal {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(5, 2, 14, 0.74);
+  backdrop-filter: blur(9px);
+  -webkit-backdrop-filter: blur(9px);
+}
+.vadim-dialog {
+  position: relative;
+  max-width: 860px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  display: grid;
+  grid-template-columns: 0.8fr 1.2fr;
+  gap: 28px;
+  align-items: center;
+  padding: 32px;
+  border-radius: 22px;
+  background: rgba(32, 19, 56, 0.96);
+  backdrop-filter: blur(10px);
+}
+.vadim-dialog.succes {
+  border: 1px solid rgba(168, 224, 99, 0.5);
+  box-shadow:
+    0 0 34px rgba(168, 224, 99, 0.2),
+    0 34px 80px rgba(0, 0, 0, 0.6);
+}
+.vadim-dialog.eroare {
+  border: 1px solid rgba(255, 61, 109, 0.6);
+  box-shadow:
+    0 0 34px rgba(255, 61, 109, 0.25),
+    0 34px 80px rgba(0, 0, 0, 0.6);
+  animation: vadim-cutremur 0.45s;
+}
+@keyframes vadim-cutremur {
+  0%,
+  100% {
+    transform: translate(0, 0) rotate(0);
+  }
+  20% {
+    transform: translate(-9px, 3px) rotate(-0.7deg);
+  }
+  40% {
+    transform: translate(8px, -4px) rotate(0.6deg);
+  }
+  60% {
+    transform: translate(-6px, -3px) rotate(-0.4deg);
+  }
+  80% {
+    transform: translate(5px, 3px) rotate(0.3deg);
+  }
+}
+.vadim-dialog .vd-inchide {
+  position: absolute;
+  top: 14px;
+  right: 16px;
+  z-index: 4;
+  cursor: pointer;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 1px solid rgba(157, 123, 255, 0.28);
+  background: rgba(255, 255, 255, 0.08);
+  color: #f2eee2;
+  font-size: 16px;
+  line-height: 1;
+  transition:
+    background 0.15s,
+    transform 0.15s;
+}
+.vadim-dialog .vd-inchide:hover {
+  background: rgba(255, 255, 255, 0.18);
+  transform: rotate(90deg);
+}
+.vadim-dialog .vd-foto {
+  position: relative;
+  margin: 0;
+  background: #f6f1e4;
+  padding: 9px 9px 0;
+  border-radius: 16px;
+}
+.vadim-dialog.succes .vd-foto {
+  transform: rotate(-1.6deg);
+  box-shadow:
+    0 0 0 1px rgba(246, 241, 228, 0.3),
+    0 0 24px rgba(255, 210, 63, 0.35),
+    0 18px 44px rgba(0, 0, 0, 0.5);
+}
+.vadim-dialog.eroare .vd-foto {
+  transform: rotate(1.4deg);
+  box-shadow:
+    0 0 0 1px rgba(246, 241, 228, 0.3),
+    0 0 24px rgba(255, 61, 109, 0.4),
+    0 18px 44px rgba(0, 0, 0, 0.5);
+}
+.vadim-dialog .vd-rama {
+  display: block;
+  overflow: hidden;
+  border-radius: 10px;
+}
+.vadim-dialog .vd-rama.succes {
+  aspect-ratio: 1612 / 1520;
+  background: url("/themes/vadim/tribun-succes.jpg") center / cover no-repeat;
+  filter: contrast(1.06) saturate(1.12) brightness(1.03);
+}
+.vadim-dialog .vd-rama.eroare {
+  aspect-ratio: 1032 / 616;
+  background: url("/themes/vadim/tribun-striga.jpg") center / cover no-repeat;
+  filter: grayscale(1) contrast(1.15) brightness(1.02) sepia(1) hue-rotate(-38deg) saturate(1.8);
+}
+.vadim-dialog .vd-caption {
+  display: block;
+  font-size: 13px;
+  font-style: italic;
+  color: #2c2740;
+  padding: 9px 4px 11px;
+  line-height: 1.45;
+}
+.vadim-dialog .vd-caption b {
+  display: block;
+  font-style: normal;
+  font-family: var(--font-geist-mono);
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #c2489f;
+  margin-bottom: 2px;
+}
+.vadim-dialog .vd-fulger {
+  left: -26px;
+  top: -26px;
+  width: 62px;
+  height: 62px;
+  color: #ffd23f;
+}
+.vadim-dialog .vd-stea {
+  right: -24px;
+  bottom: 14%;
+  width: 54px;
+  height: 54px;
+  color: #a8e063;
+}
+.vadim-dialog.eroare .vd-stea {
+  color: #ff5a7a;
+}
+.vadim-dialog h5 {
+  font-family: var(--font-tribun);
+  font-weight: 900;
+  font-size: clamp(20px, 3vw, 28px);
+  line-height: 1.15;
+  margin: 0 0 12px;
+}
+.vadim-dialog.succes h5 {
+  background: linear-gradient(90deg, #a8e063, #ffd23f, #5cb2ff);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 0 12px rgba(168, 224, 99, 0.35));
+}
+.vadim-dialog.eroare h5 {
+  color: #ff5a7a;
+  text-shadow: 0 0 14px rgba(255, 61, 109, 0.45);
+}
+.vadim-dialog .vd-text p {
+  font-size: 15px;
+  line-height: 1.55;
+  color: #aaa393;
+  margin: 0 0 16px;
+}
+.vadim-dialog .vd-text p strong {
+  color: #f2eee2;
+}
+.vadim-dialog .vd-erori {
+  list-style: none;
+  margin: 0 0 16px;
+  padding: 0;
+  display: grid;
+  gap: 10px;
+  max-height: 34vh;
+  overflow-y: auto;
+}
+.vadim-dialog .vd-erori li {
+  padding: 10px 14px;
+  border-radius: 12px;
+  font-size: 14px;
+  line-height: 1.45;
+  color: #f2eee2;
+  background: rgba(255, 61, 109, 0.08);
+  border: 1px solid rgba(255, 61, 109, 0.3);
+}
+.vadim-dialog .vd-erori li b {
+  display: block;
+  font-family: var(--font-geist-mono);
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #ff5a7a;
+  margin-bottom: 2px;
+}
+.vadim-dialog .vd-rand {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.vadim-dialog .vd-btn {
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+  font-family: var(--font-geist-mono);
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  border: none;
+  border-radius: 999px;
+  padding: 12px 20px;
+  color: #1c1828;
+  transition:
+    transform 0.14s,
+    box-shadow 0.14s;
+}
+.vadim-dialog .vd-btn:hover {
+  transform: translateY(-2px) rotate(-1deg) scale(1.03);
+}
+.vadim-dialog .vd-btn:active {
+  transform: translateY(1px) scale(0.98);
+}
+.vadim-dialog .vd-btn.aur {
+  background: linear-gradient(100deg, #ffd23f, #ffe9a3);
+  box-shadow:
+    0 0 16px rgba(255, 210, 63, 0.3),
+    0 8px 22px rgba(0, 0, 0, 0.4);
+}
+.vadim-dialog .vd-btn.rosu {
+  background: linear-gradient(100deg, #ff5a7a, #ff9d5c);
+  box-shadow:
+    0 0 16px rgba(255, 61, 109, 0.35),
+    0 8px 22px rgba(0, 0, 0, 0.4);
+}
+.vadim-dialog .vd-btn.gol {
+  background: transparent;
+  color: #aaa393;
+  border: 1px solid rgba(157, 123, 255, 0.28);
+  box-shadow: none;
+}
+.vadim-dialog .vd-btn.gol:hover {
+  color: #f2eee2;
+  border-color: #f2eee2;
+}
+@media (max-width: 760px) {
+  .vadim-dialog {
+    grid-template-columns: 1fr;
+  }
+}
+
 /* ==================== Decorațiuni de temă ====================
    Elementele de mai jos sunt randate de ThemeDecorations.tsx doar când
    tema respectivă e activă. */
@@ -2302,7 +3454,14 @@ html[data-theme="vhs"] .loom-btn-primary {
 .loom-slot,
 .loom-bon-head,
 .loom-bon-rows,
-.loom-bon-code {
+.loom-bon-code,
+.loom-vadim-breton,
+.loom-vadim-h1,
+.loom-vadim-sapou,
+.loom-vadim-nb,
+.loom-vadim-foto,
+.loom-vadim-frontispiciu,
+.loom-vadim-only {
   display: none;
 }
 
@@ -2749,6 +3908,435 @@ html[data-theme="splitflap"] .loom-grad {
   color: var(--indigo-9);
 }
 
+/* ————— Tribunul 3000: hero = manșeta gazetei, cu foto-sticker ————— */
+html[data-theme="vadim"] .loom-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+  column-gap: 38px;
+  max-width: 100%;
+  margin-top: 22px;
+  padding: 40px 34px;
+  background: rgba(30, 18, 52, 0.88);
+  border: 1px solid rgba(157, 123, 255, 0.28);
+  border-radius: 22px;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
+}
+/* frontispiciul gazetei: supratitlu, titlul holografic, deviza și caseta
+   tehnică cu goarna — deasupra manșetei, doar pe Tribunul 3000 */
+html[data-theme="vadim"] .loom-vadim-frontispiciu {
+  display: block;
+  text-align: center;
+  margin-top: 18px;
+  padding: 30px 26px 20px;
+  background: rgba(30, 18, 52, 0.88);
+  border: 1px solid rgba(157, 123, 255, 0.28);
+  border-radius: 22px;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
+}
+html[data-theme="vadim"] .lvf-supra {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  margin: 0;
+  font-family: var(--font-geist-mono);
+  font-size: 11.5px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: #ffd23f;
+  text-shadow: 0 0 10px rgba(255, 210, 63, 0.35);
+}
+html[data-theme="vadim"] .lvf-supra::before,
+html[data-theme="vadim"] .lvf-supra::after {
+  content: "";
+  flex: 1;
+  max-width: 180px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, #ffd23f);
+}
+html[data-theme="vadim"] .lvf-supra::after {
+  background: linear-gradient(90deg, #5cb2ff, transparent);
+}
+html[data-theme="vadim"] .lvf-titlu {
+  margin: 26px 0 18px;
+  font-family: var(--font-tribun);
+  font-weight: 900;
+  font-size: clamp(30px, 5.4vw, 62px);
+  line-height: 1.04;
+  letter-spacing: 0.01em;
+  background: linear-gradient(
+    105deg,
+    #7fd0ff 0%,
+    #fff3c4 22%,
+    #ffd23f 46%,
+    #ff5ad1 66%,
+    #9d7bff 86%,
+    #7fd0ff 100%
+  );
+  background-size: 300% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: vadim-holoscroll 9s linear infinite;
+  filter: drop-shadow(0 0 18px rgba(255, 210, 63, 0.4))
+    drop-shadow(0 0 34px rgba(255, 90, 209, 0.3));
+}
+@keyframes vadim-holoscroll {
+  to {
+    background-position: 300% 0;
+  }
+}
+html[data-theme="vadim"] .lvf-deviza {
+  margin: 0;
+  font-family: var(--font-geist-mono);
+  font-weight: 500;
+  font-size: clamp(11px, 1.4vw, 13.5px);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #ffd23f;
+  text-shadow: 0 0 10px rgba(255, 210, 63, 0.3);
+}
+html[data-theme="vadim"] .lvf-caseta {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px 22px;
+  flex-wrap: wrap;
+  margin-top: 22px;
+  padding-top: 13px;
+  border-top: 1px solid rgba(157, 123, 255, 0.28);
+  font-family: var(--font-geist-mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #aaa393;
+}
+html[data-theme="vadim"] .lvf-goarna {
+  cursor: pointer;
+  background: none;
+  border: 0;
+  padding: 0;
+  font-size: 17px;
+  line-height: 1;
+  filter: drop-shadow(0 0 8px #ffd23f);
+  transition: transform 0.15s;
+}
+html[data-theme="vadim"] .lvf-goarna:hover {
+  transform: scale(1.2) rotate(-8deg);
+}
+
+/* pe Vadim intră copy-ul de gazetă; varianta standard iese din scenă */
+html[data-theme="vadim"] .loom-hero > .loom-eyebrow,
+html[data-theme="vadim"] .loom-hero > h1:not(.loom-vadim-h1),
+html[data-theme="vadim"] .loom-hero > p:not(.loom-vadim-sapou):not(.loom-vadim-nb) {
+  display: none;
+}
+html[data-theme="vadim"] .loom-vadim-only {
+  display: inline;
+}
+html[data-theme="vadim"] .loom-not-vadim {
+  display: none;
+}
+html[data-theme="vadim"] .loom-vadim-breton {
+  display: inline-block;
+  justify-self: start;
+  font-family: var(--font-geist-mono);
+  font-size: 11.5px;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #1c1828;
+  background: linear-gradient(90deg, #ffd23f, #ff9d5c);
+  padding: 5px 12px;
+  border-radius: 999px;
+  margin-bottom: 16px;
+  box-shadow: 0 0 14px rgba(255, 210, 63, 0.3);
+}
+html[data-theme="vadim"] .loom-vadim-h1 {
+  display: block;
+  font-family: var(--font-tribun);
+  font-weight: 800;
+  font-size: clamp(26px, 3.4vw, 42px);
+  line-height: 1.12;
+  letter-spacing: 0;
+  margin: 0 0 16px;
+  text-shadow:
+    0 0 26px rgba(92, 178, 255, 0.35),
+    0 0 60px rgba(157, 123, 255, 0.25);
+}
+html[data-theme="vadim"] .loom-vadim-h1 em {
+  font-style: normal;
+  background: linear-gradient(90deg, #ffd23f, #ff5ad1);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 0 12px rgba(255, 90, 209, 0.35));
+}
+html[data-theme="vadim"] .loom-vadim-sapou {
+  display: block;
+  font-size: 16.5px;
+  line-height: 1.55;
+  color: #aaa393;
+  max-width: 54ch;
+  margin: 0 0 24px;
+}
+html[data-theme="vadim"] .loom-vadim-nb {
+  display: inline-block;
+  justify-self: start;
+  margin: 18px 0 0;
+  font-style: italic;
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 1.3;
+  color: #ffd23f;
+  transform: rotate(-2deg);
+  text-shadow: 0 0 10px rgba(255, 210, 63, 0.3);
+}
+/* foto-stickerul cu ștampilă și mâzgălituri care fierb */
+html[data-theme="vadim"] .loom-vadim-foto {
+  display: block;
+  position: relative;
+  grid-column: 2;
+  grid-row: 1 / span 5;
+  align-self: center;
+  margin: 0;
+  background: #f6f1e4;
+  padding: 9px 9px 0;
+  border-radius: 16px;
+  transform: rotate(1.2deg);
+  box-shadow:
+    0 0 0 1px rgba(246, 241, 228, 0.3),
+    0 0 24px rgba(92, 178, 255, 0.28),
+    0 18px 44px rgba(0, 0, 0, 0.5);
+}
+html[data-theme="vadim"] .lv-rama {
+  display: block;
+  overflow: hidden;
+  border-radius: 10px;
+  aspect-ratio: 1612 / 1520;
+  background: url("/themes/vadim/tribun-succes.jpg") center / cover no-repeat;
+}
+html[data-theme="vadim"] .lv-caption {
+  display: block;
+  font-size: 13px;
+  font-style: italic;
+  color: #2c2740;
+  padding: 9px 4px 11px;
+  line-height: 1.45;
+}
+html[data-theme="vadim"] .lv-caption b {
+  display: block;
+  font-style: normal;
+  font-family: var(--font-geist-mono);
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #c2489f;
+  margin-bottom: 2px;
+}
+html[data-theme="vadim"] .lv-stamp {
+  position: absolute;
+  right: -6px;
+  top: -16px;
+  z-index: 3;
+  padding: 6px 12px;
+  transform: rotate(-9deg);
+  border: 2.5px solid #ffd23f;
+  border-radius: 8px;
+  background: rgba(17, 15, 27, 0.8);
+  color: #ffd23f;
+  font-family: var(--font-geist-mono);
+  font-weight: 600;
+  font-size: 12.5px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  text-shadow: 0 0 10px rgba(255, 210, 63, 0.4);
+  box-shadow:
+    0 0 14px rgba(255, 210, 63, 0.25),
+    inset 0 0 10px rgba(255, 210, 63, 0.12);
+}
+html[data-theme="vadim"] .lv-doodle {
+  position: absolute;
+  overflow: visible;
+  pointer-events: none;
+}
+html[data-theme="vadim"] .lv-doodle path {
+  fill: currentColor;
+  stroke: none;
+}
+html[data-theme="vadim"] .lv-fulger {
+  left: -26px;
+  top: 34%;
+  width: 64px;
+  height: 64px;
+  color: #ffd23f;
+}
+html[data-theme="vadim"] .lv-stea {
+  right: -24px;
+  bottom: 20%;
+  width: 56px;
+  height: 56px;
+  color: #ff5ad1;
+}
+html[data-theme="vadim"] .lv-boil {
+  animation: vadim-boil 0.38s steps(1, end) infinite;
+}
+html[data-theme="vadim"] .lv-boil2 {
+  animation: vadim-boil 0.38s steps(1, end) 0.13s infinite;
+}
+html[data-theme="vadim"] .lv-boil3 {
+  animation: vadim-boil 0.38s steps(1, end) 0.26s infinite;
+}
+/* doodle-uri din contur (inimă, mâzgălitură, ochelari, val) — spre
+   deosebire de cele pline (fulger, stea) */
+html[data-theme="vadim"] .lv-doodle.contur path,
+html[data-theme="vadim"] .lv-doodle.contur circle {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+/* scânteile de pe poze: ✦ care clipește scurt, la câteva secunde — cea mai
+   mare parte a ciclului e invizibil, ca poza să rămână vedeta */
+html[data-theme="vadim"] .vadim-clipici {
+  position: absolute;
+  z-index: 2;
+  pointer-events: none;
+  font-size: var(--cs, 15px);
+  line-height: 1;
+  color: var(--cc, #f2eee2);
+  text-shadow: 0 0 9px currentColor;
+  opacity: 0;
+  animation: vadim-clipire var(--ccd, 5.2s) ease-in-out var(--cdelay, 0s) infinite;
+}
+@keyframes vadim-clipire {
+  0%,
+  62% {
+    opacity: 0;
+    transform: scale(0.3) rotate(0deg);
+  }
+  70% {
+    opacity: 1;
+    transform: scale(1.25) rotate(18deg);
+  }
+  80% {
+    opacity: 0.85;
+    transform: scale(1) rotate(32deg);
+  }
+  92%,
+  100% {
+    opacity: 0;
+    transform: scale(0.4) rotate(55deg);
+  }
+}
+/* raza de lumină care mătură periodic pozele înrămate în crem */
+html[data-theme="vadim"] .lv-rama,
+html[data-theme="vadim"] .vc-rama,
+html[data-theme="vadim"] .vo-rama,
+html[data-theme="vadim"] .vb-rama {
+  position: relative;
+}
+html[data-theme="vadim"] .vadim-lumina {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  overflow: hidden;
+  pointer-events: none;
+}
+html[data-theme="vadim"] .vadim-lumina::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    115deg,
+    transparent 35%,
+    rgba(255, 255, 255, 0.18) 46%,
+    rgba(92, 178, 255, 0.2) 50%,
+    rgba(255, 90, 209, 0.16) 54%,
+    transparent 65%
+  );
+  background-size: 320% 100%;
+  animation: vadim-sheen 7.5s ease-in-out var(--ld, 0s) infinite;
+  mix-blend-mode: screen;
+}
+/* CTA-ul Marian de pe lista de ghiduri primește și el sheen-ul de card */
+.vadim-marian-cta::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: linear-gradient(
+    115deg,
+    transparent 32%,
+    rgba(255, 255, 255, 0.14) 44%,
+    rgba(92, 178, 255, 0.18) 50%,
+    rgba(255, 90, 209, 0.15) 56%,
+    transparent 68%
+  );
+  background-size: 300% 100%;
+  animation: vadim-sheen 8s ease-in-out infinite;
+  mix-blend-mode: screen;
+}
+@keyframes vadim-boil {
+  0% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+  33% {
+    transform: translate(2px, -1.5px) rotate(1.2deg);
+  }
+  66% {
+    transform: translate(-1.5px, 2px) rotate(-1deg);
+  }
+  100% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+}
+/* butoanele manșetei: pastile lucioase — orhidee pentru acțiunea mare,
+   șampanie pentru arhivă */
+html[data-theme="vadim"] .loom-btn {
+  border-radius: 999px;
+  font-family: var(--font-geist-mono);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+html[data-theme="vadim"] .loom-btn-primary {
+  background: linear-gradient(100deg, #ff5ad1, #9d7bff);
+  color: #1c1828;
+  box-shadow:
+    0 0 16px rgba(255, 90, 209, 0.35),
+    0 8px 22px rgba(0, 0, 0, 0.4);
+}
+html[data-theme="vadim"] .loom-btn-primary:hover {
+  background: linear-gradient(100deg, #ff5ad1, #9d7bff);
+  transform: translateY(-2px) rotate(-1deg) scale(1.03);
+  box-shadow:
+    0 0 24px rgba(255, 90, 209, 0.55),
+    0 12px 26px rgba(0, 0, 0, 0.4);
+}
+html[data-theme="vadim"] .loom-btn-secondary {
+  background: linear-gradient(100deg, #ffd23f, #ffe9a3);
+  border: none;
+  color: #1c1828;
+  box-shadow:
+    0 0 16px rgba(255, 210, 63, 0.3),
+    0 8px 22px rgba(0, 0, 0, 0.4);
+}
+html[data-theme="vadim"] .loom-btn-secondary:hover {
+  transform: translateY(-2px) rotate(1deg) scale(1.03);
+  box-shadow:
+    0 0 24px rgba(255, 210, 63, 0.5),
+    0 12px 26px rgba(0, 0, 0, 0.4);
+}
+
 /* ————— Cardurile quick-links (glass + chip + lift) ————— */
 .loom-cards {
   display: grid;
@@ -3092,6 +4680,20 @@ html[data-theme="vhs"] .loom-blob { opacity: 0.3; }
     padding: 13px 20px;
   }
 
+  /* — Tribunul 3000: manșeta pe o singură coloană, foto sub text — */
+  html[data-theme="vadim"] .loom-hero {
+    display: block;
+    padding: 28px 20px;
+  }
+  html[data-theme="vadim"] .loom-vadim-foto {
+    margin-top: 26px;
+    transform: rotate(0.8deg);
+  }
+  html[data-theme="vadim"] .loom-vadim-nb {
+    display: block;
+    width: fit-content;
+  }
+
   /* — blobs: mai mici și cu blur mai ieftin pe GPU-uri de telefon — */
   .loom-blob {
     filter: blur(46px);
@@ -3126,3 +4728,6 @@ html[data-theme="vhs"] .loom-blob { opacity: 0.3; }
     scroll-behavior: auto !important;
   }
 }
+/* bump: paleta electrică v2 */
+
+/* bump */

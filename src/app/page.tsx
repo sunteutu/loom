@@ -3,6 +3,8 @@ import { SignInButton, SignUpButton } from "@clerk/nextjs";
 import { FlaskConical } from "lucide-react";
 import { HomeDashboard } from "@/components/HomeDashboard";
 import { HomeHero } from "@/components/HomeHero";
+import { VadimCitat } from "@/components/VadimCitat";
+import { VadimStiri } from "@/components/VadimStiri";
 
 export default async function Home() {
   // Session state comes from the server (Clerk middleware), so the right
@@ -95,6 +97,9 @@ function Landing() {
             </div>
           </div>
         </section>
+
+        <VadimStiri />
+        <VadimCitat />
       </div>
     </>
   );

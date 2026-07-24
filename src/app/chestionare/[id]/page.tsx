@@ -40,6 +40,7 @@ import {
   bonCode,
   formatBonDate,
 } from "@/components/BonExportOverlay";
+import { VadimExportOverlay } from "@/components/VadimExportOverlay";
 
 const VARIABLE_FIELDS = [
   { key: "category", label: "[category]", hint: "ex. aplicații de banking" },
@@ -88,6 +89,8 @@ function SurveyEditor({
   const { theme } = useLoomTheme();
   // Pe tema „bon" exportul trece prin imprimanta fiscală (overlay).
   const [bonExport, setBonExport] = useState<"md" | "docx" | null>(null);
+  // Pe „Tribunul 3000" trece pe la Biroul de Export: aprobare sau ceartă.
+  const [vadimExport, setVadimExport] = useState<"md" | "docx" | null>(null);
   const groups = groupSurveyItems(survey.items);
   const loi = surveyLoiMinutes(survey);
   const issues = lintSurvey(survey, lang);
@@ -108,6 +111,12 @@ function SurveyEditor({
   };
 
   const startExport = (format: "md" | "docx") => {
+    // Biroul de Export își ține singur judecata: dialogul de ceartă
+    // preia rolul lui window.confirm de la erorile de lint.
+    if (theme === "vadim") {
+      setVadimExport(format);
+      return;
+    }
     if (!confirmExport()) return;
     if (theme === "bon") {
       setBonExport(format);
@@ -448,6 +457,21 @@ function SurveyEditor({
               : downloadSurveyMarkdown(survey, lang)
           }
           onClose={() => setBonExport(null)}
+        />
+      )}
+
+      {vadimExport && (
+        <VadimExportOverlay
+          errors={issues.filter((i) => i.severity === "error")}
+          saveLabel={
+            vadimExport === "docx" ? "Descarcă .docx" : "Descarcă .md"
+          }
+          onSave={() =>
+            vadimExport === "docx"
+              ? downloadSurveyDocx(survey, lang)
+              : downloadSurveyMarkdown(survey, lang)
+          }
+          onClose={() => setVadimExport(null)}
         />
       )}
     </main>

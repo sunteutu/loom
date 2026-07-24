@@ -8,7 +8,8 @@ const themeValidator = v.union(
   v.literal("vhs"),
   v.literal("broderie"),
   v.literal("bon"),
-  v.literal("splitflap")
+  v.literal("splitflap"),
+  v.literal("vadim")
 );
 
 const modeValidator = v.union(

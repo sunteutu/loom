@@ -70,6 +70,13 @@ export const THEMES = [
     preview: { bg: "#1b1c21", card: "#0f1013", accent: "#ffb400", fg: "#f3efe4" },
     previewDark: undefined,
   },
+  {
+    id: "vadim",
+    label: "Tribunul 3000",
+    pinned: "dark",
+    preview: { bg: "#150b28", card: "#211337", accent: "#ffd23f", fg: "#f2eee2" },
+    previewDark: undefined,
+  },
 ] as const;
 
 export type LoomTheme = (typeof THEMES)[number]["id"];

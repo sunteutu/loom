@@ -11,6 +11,7 @@ import {
   Gamepad2,
   Gauge,
   Home,
+  Megaphone,
   Menu,
   Monitor,
   Moon,
@@ -68,6 +69,7 @@ const THEME_ICONS: Record<LoomTheme, React.ComponentType<{ className?: string }>
   broderie: Scissors,
   bon: Receipt,
   splitflap: Plane,
+  vadim: Megaphone,
 };
 
 function ThemeToggle() {

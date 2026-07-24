@@ -1,0 +1,1112 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cercetarea Mare — tema „Tribunul 3000” (mockup Vadim)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;800;900&family=Space+Grotesk:wght@400..700&family=IBM+Plex+Mono:wght@400;500;600&subset=latin-ext&display=swap" rel="stylesheet">
+<style>
+  :root {
+    /* paletă „butic elegant": șampanie, gheață, orhidee — nimic care să ardă retina */
+    --bg: #110f1b;
+    --panel: rgba(22, 19, 34, .88);
+    --panel-border: rgba(242, 230, 200, .12);
+    --alb: #f2eee2;
+    --slab: #aaa393;
+    --cyan: #9dbdf5;
+    --magenta: #d795cf;
+    --lime: #bcd79c;
+    --orange: #dfa87e;
+    --yellow: #e5c26e;
+    --violet: #a89ce0;
+    --holo: linear-gradient(105deg, #cdd7e8 0%, #f6efdb 22%, #e5c26e 46%, #f1e5c6 66%, #a9bfe4 86%, #cdd7e8 100%);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { font-size: 16px; }
+  body {
+    font-family: "Space Grotesk", system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--alb);
+    line-height: 1.55;
+    overflow-x: hidden;
+  }
+
+  /* ————— COLAJUL: pozele, vizibile, cu duoton acid + stickere ————— */
+  .colaj { position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; }
+  /* aurora holografică pe fundal */
+  .colaj::before {
+    content: ""; position: absolute; inset: -20%;
+    background:
+      radial-gradient(42% 34% at 18% 22%, rgba(168,156,224,.16), transparent 70%),
+      radial-gradient(38% 30% at 84% 16%, rgba(157,189,245,.12), transparent 70%),
+      radial-gradient(46% 36% at 78% 82%, rgba(215,149,207,.12), transparent 70%),
+      radial-gradient(34% 30% at 12% 84%, rgba(229,194,110,.10), transparent 70%);
+    animation: aurora 32s ease-in-out infinite alternate;
+  }
+  @keyframes aurora {
+    0%   { transform: rotate(0deg) scale(1); filter: hue-rotate(0deg); }
+    100% { transform: rotate(6deg) scale(1.1); filter: hue-rotate(18deg); }
+  }
+  /* grilă de podea „anul 3000" */
+  .colaj::after {
+    content: ""; position: absolute; left: -20%; right: -20%; bottom: -6%; height: 46%;
+    background:
+      repeating-linear-gradient(90deg, rgba(229,194,110,.07) 0 1px, transparent 1px 72px),
+      repeating-linear-gradient(0deg, rgba(157,189,245,.06) 0 1px, transparent 1px 44px);
+    transform: perspective(420px) rotateX(64deg);
+    transform-origin: 50% 100%;
+    mask-image: linear-gradient(180deg, transparent, #000 55%);
+  }
+  .cutout {
+    position: absolute; padding: 8px; background: #f6f1e4;
+    border-radius: 14px; transform: rotate(var(--rot, 0deg));
+    box-shadow: 0 0 0 1px rgba(246,241,228,.28), 0 0 26px color-mix(in oklab, var(--glow, rgba(157,189,245,.5)) 35%, transparent), 0 18px 50px rgba(0,0,0,.5);
+    animation: pluteste var(--dur, 14s) ease-in-out infinite alternate;
+  }
+  .cutout img { display: block; width: 100%; height: auto; border-radius: 8px; }
+  /* monocromuri nobile: aceleași nuanțe, saturație de galerie de artă */
+  .ton-cyan img    { filter: grayscale(1) contrast(1.12) brightness(1.05) sepia(.9) hue-rotate(165deg) saturate(1.5); }
+  .ton-magenta img { filter: grayscale(1) contrast(1.12) brightness(1.04) sepia(.9) hue-rotate(255deg) saturate(1.4); }
+  .ton-lime img    { filter: grayscale(1) contrast(1.1)  brightness(1.06) sepia(.9) hue-rotate(48deg)  saturate(1.3); }
+  .ton-orange img  { filter: grayscale(1) contrast(1.1)  brightness(1.05) sepia(1)  hue-rotate(-12deg) saturate(1.6); }
+  .ton-violet img  { filter: grayscale(1) contrast(1.12) brightness(1.03) sepia(.9) hue-rotate(210deg) saturate(1.4); }
+  .ton-yellow img  { filter: grayscale(1) contrast(1.08) brightness(1.08) sepia(1)  hue-rotate(6deg)   saturate(1.5); }
+  @keyframes pluteste {
+    0%   { transform: rotate(var(--rot)) translateY(0); }
+    100% { transform: rotate(calc(var(--rot) + 1.6deg)) translateY(-18px); }
+  }
+
+  /* ————— DOODLES: mâzgălituri care „fierb" ca-n clip ————— */
+  .doodle { position: absolute; overflow: visible; pointer-events: none; z-index: 2; }
+  .doodle * { fill: none; stroke: var(--dc, var(--yellow)); stroke-width: 7; stroke-linecap: round; stroke-linejoin: round; }
+  .doodle .plin { fill: var(--dc, var(--yellow)); stroke: none; }
+  .boil  { animation: boil .38s steps(1, end) infinite; }
+  .boil2 { animation: boil .38s steps(1, end) .13s infinite; }
+  .boil3 { animation: boil .38s steps(1, end) .26s infinite; }
+  @keyframes boil {
+    0%   { transform: translate(0, 0) rotate(0deg); }
+    33%  { transform: translate(2px, -1.5px) rotate(1.2deg); }
+    66%  { transform: translate(-1.5px, 2px) rotate(-1deg); }
+    100% { transform: translate(0, 0) rotate(0deg); }
+  }
+
+  /* bule de replici peste colaj — stickere ca-n clip */
+  .replica {
+    position: absolute; z-index: 3; max-width: 240px;
+    font-family: "Unbounded", sans-serif; font-weight: 800; font-size: 12.5px; line-height: 1.3;
+    text-transform: uppercase; letter-spacing: .02em; text-align: center;
+    color: #1c1828; background: #f6f1e4; padding: 10px 14px; border-radius: 16px;
+    box-shadow: 0 0 0 2px var(--rc, var(--yellow)), 0 0 18px color-mix(in oklab, var(--rc, var(--yellow)) 40%, transparent), 0 10px 26px rgba(0,0,0,.45);
+  }
+  .replica::after {
+    content: ""; position: absolute; bottom: -14px; left: 26px;
+    border: 9px solid transparent; border-top-color: #f6f1e4;
+    filter: drop-shadow(0 2px 0 var(--rc, var(--yellow)));
+  }
+  .replica.sus::after { bottom: auto; top: -14px; border-top-color: transparent; border-bottom-color: #f6f1e4; filter: drop-shadow(0 -2px 0 var(--rc, var(--yellow))); }
+
+  /* ————— laser tricolor ————— */
+  .tricolor {
+    height: 6px; position: relative; z-index: 5;
+    background: linear-gradient(90deg, #5a7fc4 0 33.33%, #e5c26e 33.33% 66.66%, #c95a6d 66.66% 100%);
+    box-shadow: 0 0 12px rgba(90,127,196,.35);
+  }
+  .tricolor.subtire { height: 4px; }
+
+  .pagina { position: relative; z-index: 3; max-width: 1080px; margin: 0 auto; padding: 0 28px 90px; }
+
+  .panel {
+    background: var(--panel); border: 1px solid var(--panel-border); border-radius: 22px;
+    backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+    box-shadow: 0 24px 60px rgba(0,0,0,.45);
+  }
+
+  /* ————— Frontispiciul ————— */
+  .frontispiciu { text-align: center; padding: 34px 26px 22px; margin-top: 26px; position: relative; }
+  .supratitlu {
+    display: flex; align-items: center; justify-content: center; gap: 14px;
+    font-family: "IBM Plex Mono", monospace; font-size: 11.5px; letter-spacing: .22em;
+    text-transform: uppercase; color: var(--yellow); text-shadow: 0 0 10px rgba(229,194,110,.35);
+  }
+  .supratitlu::before, .supratitlu::after { content: ""; flex: 1; max-width: 180px; height: 1px; background: linear-gradient(90deg, transparent, var(--yellow)); }
+  .supratitlu::after { background: linear-gradient(90deg, var(--cyan), transparent); }
+  .frontispiciu h1 {
+    font-family: "Unbounded", sans-serif; font-weight: 900;
+    font-size: clamp(34px, 6.6vw, 78px); line-height: 1.04; letter-spacing: .01em;
+    margin: 12px 0 6px;
+    background: var(--holo); background-size: 300% 100%;
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+    animation: holoscroll 9s linear infinite;
+    filter: drop-shadow(0 0 18px rgba(229,194,110,.3));
+  }
+  @keyframes holoscroll { to { background-position: 300% 0; } }
+  .frontispiciu .deviza {
+    font-family: "Space Grotesk", sans-serif; font-weight: 500; font-style: italic;
+    font-size: clamp(15px, 2vw, 19px); letter-spacing: .02em; color: var(--yellow);
+    text-shadow: 0 0 10px rgba(229,194,110,.3);
+  }
+  .caseta-tehnica {
+    display: flex; justify-content: center; align-items: center; gap: 10px 22px; flex-wrap: wrap;
+    margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--panel-border);
+    font-family: "IBM Plex Mono", monospace; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--slab);
+  }
+  .caseta-tehnica .goarna { cursor: pointer; user-select: none; font-size: 17px; filter: drop-shadow(0 0 8px var(--yellow)); pointer-events: auto; }
+  .caseta-tehnica .goarna:hover { transform: scale(1.2) rotate(-8deg); display: inline-block; }
+
+  /* ————— Banda de citate ————— */
+  .banda { position: relative; z-index: 4; border-block: 1px solid rgba(229,194,110,.35); background: rgba(10,8,18,.92); overflow: hidden; }
+  .banda .panglica { display: flex; width: max-content; animation: banda 80s linear infinite; padding: 8px 0; }
+  .banda span { white-space: nowrap; font-style: italic; font-size: 14.5px; padding-right: 14px; color: var(--alb); }
+  .banda b { color: var(--yellow); font-family: "IBM Plex Mono", monospace; font-style: normal; font-weight: 500; font-size: 11px; letter-spacing: .1em; padding-right: 14px; }
+  @keyframes banda { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+  /* ————— Bara aplicației ————— */
+  .bara-app {
+    display: flex; align-items: center; gap: 20px; flex-wrap: wrap;
+    padding: 14px 22px; margin-top: 18px;
+    font-family: "IBM Plex Mono", monospace; font-size: 12.5px; letter-spacing: .06em;
+  }
+  .bara-app .sigla { font-family: "Unbounded", sans-serif; font-weight: 900; font-size: 19px; letter-spacing: 0; color: var(--alb); }
+  .bara-app .sigla i { font-style: normal; color: var(--yellow); text-shadow: 0 0 10px rgba(229,194,110,.4); }
+  .bara-app a { color: var(--slab); text-decoration: none; text-transform: uppercase; border-bottom: 2px solid transparent; padding-bottom: 2px; transition: color .15s, text-shadow .15s; }
+  .bara-app a:hover, .bara-app a.activ { color: var(--yellow); border-bottom-color: var(--yellow); text-shadow: 0 0 10px rgba(229,194,110,.4); }
+  .bara-app .dreapta { margin-left: auto; font-size: 11px; }
+  .bara-app .dreapta a { text-transform: none; letter-spacing: 0; }
+
+  /* ————— Eroul ————— */
+  .erou { display: grid; grid-template-columns: 1.15fr .85fr; gap: 34px; align-items: center; padding: 40px 34px; margin-top: 22px; position: relative; }
+  @media (max-width: 860px) { .erou { grid-template-columns: 1fr; } }
+  .erou .breton {
+    display: inline-block; font-family: "IBM Plex Mono", monospace; font-size: 11.5px; letter-spacing: .2em; text-transform: uppercase;
+    color: #1c1828; background: linear-gradient(90deg, var(--yellow), var(--orange)); padding: 5px 12px; border-radius: 999px; margin-bottom: 16px;
+    box-shadow: 0 0 14px rgba(229,194,110,.3);
+  }
+  .erou h2 {
+    font-family: "Unbounded", sans-serif; font-weight: 800;
+    font-size: clamp(26px, 3.8vw, 44px); line-height: 1.12; letter-spacing: 0;
+    margin-bottom: 16px;
+  }
+  .erou h2 em {
+    font-style: normal;
+    background: linear-gradient(90deg, var(--yellow), var(--magenta));
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+    filter: drop-shadow(0 0 12px rgba(215,149,207,.35));
+  }
+  .erou .sapou { font-size: 16.5px; color: var(--slab); margin-bottom: 24px; max-width: 54ch; }
+  .rand-btn { display: flex; gap: 14px; flex-wrap: wrap; }
+  .btn {
+    font-family: "IBM Plex Mono", monospace; font-size: 13px; letter-spacing: .04em; cursor: pointer;
+    padding: 13px 22px; border: none; border-radius: 999px; color: #1c1828; font-weight: 600; text-transform: uppercase;
+    background: linear-gradient(100deg, var(--yellow), #f1e0b4);
+    box-shadow: 0 0 16px rgba(229,194,110,.3), 0 8px 22px rgba(0,0,0,.4);
+    transition: transform .14s, box-shadow .14s;
+  }
+  .btn:hover { transform: translateY(-2px) rotate(-1deg) scale(1.03); box-shadow: 0 0 24px rgba(229,194,110,.5), 0 12px 26px rgba(0,0,0,.4); }
+  .btn:active { transform: translateY(1px) scale(.98); }
+  .btn.plin { background: linear-gradient(100deg, var(--magenta), var(--violet)); box-shadow: 0 0 16px rgba(215,149,207,.35), 0 8px 22px rgba(0,0,0,.4); }
+  .btn.plin:hover { box-shadow: 0 0 24px rgba(215,149,207,.55), 0 12px 26px rgba(0,0,0,.4); }
+
+  /* fotografii-sticker în conținut */
+  .foto { position: relative; background: #f6f1e4; padding: 9px 9px 0; border-radius: 16px; box-shadow: 0 0 0 1px rgba(246,241,228,.3), 0 0 24px color-mix(in oklab, var(--glow, rgba(157,189,245,.5)) 32%, transparent), 0 18px 44px rgba(0,0,0,.5); }
+  .foto .rama { position: relative; overflow: hidden; border-radius: 10px; }
+  .foto img { display: block; width: 100%; height: auto; }
+  .foto figcaption { font-size: 13px; font-style: italic; color: #2c2740; padding: 9px 4px 11px; line-height: 1.45; }
+  .foto figcaption b { font-style: normal; font-family: "IBM Plex Mono", monospace; font-size: 10.5px; letter-spacing: .12em; text-transform: uppercase; color: #9a5f8e; display: block; margin-bottom: 2px; }
+  .foto.t-cyan .rama img    { filter: grayscale(1) contrast(1.12) brightness(1.06) sepia(.9) hue-rotate(165deg) saturate(1.5); }
+  .foto.t-magenta .rama img { filter: grayscale(1) contrast(1.12) brightness(1.04) sepia(.9) hue-rotate(255deg) saturate(1.4); }
+  .foto.t-lime .rama img    { filter: grayscale(1) contrast(1.1) brightness(1.07) sepia(.9) hue-rotate(48deg) saturate(1.3); }
+  .foto.t-orange .rama img  { filter: grayscale(1) contrast(1.1) brightness(1.05) sepia(1) hue-rotate(-12deg) saturate(1.6); }
+  .foto.t-violet .rama img  { filter: grayscale(1) contrast(1.12) brightness(1.03) sepia(.9) hue-rotate(210deg) saturate(1.4); }
+
+  .stampila {
+    position: absolute; z-index: 3; padding: 6px 12px; transform: rotate(-9deg);
+    border: 2.5px solid var(--yellow); color: var(--yellow); border-radius: 8px; background: rgba(17,15,27,.8);
+    font-family: "IBM Plex Mono", monospace; font-weight: 600; font-size: 12.5px; letter-spacing: .16em; text-transform: uppercase;
+    text-shadow: 0 0 10px rgba(229,194,110,.4); box-shadow: 0 0 14px rgba(229,194,110,.25), inset 0 0 10px rgba(229,194,110,.12);
+  }
+  .erou .stampila { right: -6px; top: -16px; }
+
+  .marginalie {
+    font-family: "Space Grotesk", sans-serif; font-style: italic; font-weight: 500;
+    color: var(--yellow); font-size: 14px; line-height: 1.3;
+    transform: rotate(-2deg); display: inline-block; text-shadow: 0 0 10px rgba(229,194,110,.3);
+  }
+
+  /* ————— Citatul zilei ————— */
+  .citat-zi { margin: 30px 0; padding: 30px 34px; position: relative; border: 1px solid rgba(215,149,207,.35); box-shadow: 0 0 22px rgba(215,149,207,.12), 0 24px 60px rgba(0,0,0,.45); }
+  .citat-zi::before {
+    content: "CITATUL ZILEI · DIN OPERA TRIBUNULUI"; position: absolute; top: -10px; left: 26px;
+    background: linear-gradient(90deg, var(--magenta), var(--violet)); color: #1c1828; padding: 2px 12px; border-radius: 999px;
+    font-family: "IBM Plex Mono", monospace; font-size: 10.5px; letter-spacing: .18em; font-weight: 600;
+    box-shadow: 0 0 12px rgba(215,149,207,.35);
+  }
+  .citat-zi blockquote { font-family: "Unbounded", sans-serif; font-weight: 600; font-size: clamp(16px, 2.2vw, 22px); line-height: 1.45; transition: opacity .4s; }
+  .citat-zi .autor { margin-top: 12px; font-family: "IBM Plex Mono", monospace; font-size: 11.5px; letter-spacing: .14em; text-transform: uppercase; color: var(--slab); }
+
+  /* ————— Rubricile ————— */
+  .rubrica { padding: 30px 34px 18px; margin-top: 26px; position: relative; border: 1px solid color-mix(in oklab, var(--acc) 35%, transparent); box-shadow: 0 0 20px color-mix(in oklab, var(--acc) 12%, transparent), 0 24px 60px rgba(0,0,0,.45); }
+  .rubrica[data-acc="cyan"]    { --acc: var(--cyan); }
+  .rubrica[data-acc="magenta"] { --acc: var(--magenta); }
+  .rubrica[data-acc="lime"]    { --acc: var(--lime); }
+  .rubrica[data-acc="orange"]  { --acc: var(--orange); }
+  .rubrica[data-acc="violet"]  { --acc: var(--violet); }
+  .rubrica[data-acc="yellow"]  { --acc: var(--yellow); }
+  .rubrica-cap { display: flex; align-items: baseline; gap: 16px; flex-wrap: wrap; border-bottom: 1px solid color-mix(in oklab, var(--acc) 65%, transparent); padding-bottom: 12px; margin-bottom: 8px; }
+  .rubrica-cap .numar {
+    font-family: "Unbounded", sans-serif; font-weight: 800; font-size: 12.5px; color: #1c1828;
+    background: var(--acc); padding: 4px 12px; border-radius: 999px; letter-spacing: .08em;
+    box-shadow: 0 0 12px color-mix(in oklab, var(--acc) 35%, transparent);
+  }
+  .rubrica-cap h3 { font-family: "Unbounded", sans-serif; font-weight: 800; font-size: clamp(19px, 2.8vw, 28px); letter-spacing: .01em; text-shadow: 0 0 16px color-mix(in oklab, var(--acc) 25%, transparent); }
+  .rubrica-cap .orig-cat { font-family: "IBM Plex Mono", monospace; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--acc); margin-left: auto; }
+  .rubrica .motto { font-family: "Space Grotesk", sans-serif; font-style: italic; color: var(--slab); font-size: 14.5px; margin: 8px 0 18px; }
+
+  .indicatori { columns: 2; column-gap: 40px; column-rule: 1px solid rgba(255,255,255,.1); }
+  @media (max-width: 760px) { .indicatori { columns: 1; } }
+  .ind { break-inside: avoid; padding: 10px 8px 11px; border-bottom: 1px dashed rgba(255,255,255,.12); border-radius: 10px; }
+  .ind .orig { display: block; font-family: "IBM Plex Mono", monospace; font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--acc); margin-bottom: 2px; }
+  .ind .orig::before { content: "⚡ "; }
+  .ind .vadim { font-size: 15.5px; line-height: 1.4; color: var(--alb); }
+  .ind .vadim::before { content: "„"; } .ind .vadim::after { content: '"'; }
+  .ind:hover { background: color-mix(in oklab, var(--acc) 8%, transparent); }
+
+  /* ————— Dosarele foto ————— */
+  .dosar { margin-top: 26px; padding: 30px 34px; position: relative; border: 1px solid rgba(229,194,110,.3); box-shadow: 0 0 20px rgba(229,194,110,.1), 0 24px 60px rgba(0,0,0,.45); }
+  .dosar > h4 { font-family: "Unbounded", sans-serif; font-weight: 900; font-size: clamp(20px, 3vw, 27px); margin-bottom: 4px;
+    background: linear-gradient(90deg, var(--yellow), var(--orange), var(--magenta));
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+    filter: drop-shadow(0 0 12px rgba(223,168,126,.3)); }
+  .dosar > .sub { font-family: "Space Grotesk", sans-serif; font-style: italic; color: var(--slab); margin-bottom: 22px; font-size: 14.5px; }
+  .galerie { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; align-items: start; }
+  @media (max-width: 860px) { .galerie { grid-template-columns: 1fr; } }
+  .galerie .foto { cursor: pointer; transition: transform .18s; }
+  .galerie .foto:hover { transform: rotate(-1.6deg) translateY(-5px) scale(1.02); }
+  .galerie .foto:nth-child(2):hover { transform: rotate(1.6deg) translateY(-5px) scale(1.02); }
+  .dosar .stampila { right: 40px; top: -16px; transform: rotate(6deg); border-color: var(--magenta); color: var(--magenta); text-shadow: 0 0 10px rgba(215,149,207,.4); box-shadow: 0 0 14px rgba(215,149,207,.25), inset 0 0 10px rgba(215,149,207,.12); }
+  .dosar .ham-hint { position: absolute; bottom: 10px; right: 20px; }
+
+  .duo { display: grid; grid-template-columns: .9fr 1.1fr; gap: 34px; align-items: center; margin-top: 26px; padding: 30px 34px; position: relative; }
+  @media (max-width: 860px) { .duo { grid-template-columns: 1fr; } }
+  .duo .text h4 { font-family: "Unbounded", sans-serif; font-weight: 800; font-size: clamp(18px, 2.6vw, 24px); margin-bottom: 12px; }
+  .duo .text p { font-size: 15.5px; margin-bottom: 12px; color: var(--slab); }
+  .duo .text p em { color: var(--magenta); font-style: normal; text-shadow: 0 0 12px rgba(255,61,242,.6); }
+
+  /* ————— Manifestul ————— */
+  .manifest { margin-top: 40px; padding: 34px; text-align: center; position: relative; }
+  .manifest .pamflet {
+    font-family: "Unbounded", sans-serif; font-weight: 600; font-size: clamp(15px, 2.2vw, 20px); max-width: 62ch; margin: 18px auto 16px;
+    background: var(--holo); background-size: 300% 100%;
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+    animation: holoscroll 9s linear infinite;
+  }
+  .manifest .tehnic { font-family: "IBM Plex Mono", monospace; font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--slab); line-height: 2; }
+
+  /* ————— Biroul de export + dialogurile destinului ————— */
+  .export-birou { border-color: rgba(157,189,245,.3); box-shadow: 0 0 20px rgba(157,189,245,.1), 0 24px 60px rgba(0,0,0,.45); }
+  .export-birou > h4 { background: linear-gradient(90deg, var(--cyan), var(--lime), var(--yellow)); -webkit-background-clip: text; background-clip: text; color: transparent; filter: drop-shadow(0 0 12px rgba(157,189,245,.3)); }
+
+  .voal {
+    position: fixed; inset: 0; z-index: 80; display: flex; align-items: center; justify-content: center;
+    padding: 24px; background: rgba(5,2,14,.74);
+    backdrop-filter: blur(9px); -webkit-backdrop-filter: blur(9px);
+  }
+  .voal[hidden] { display: none; }
+  .dialog {
+    position: relative; max-width: 900px; width: 100%;
+    display: grid; grid-template-columns: .8fr 1.2fr; gap: 28px; align-items: center;
+    padding: 32px;
+  }
+  @media (max-width: 760px) { .dialog { grid-template-columns: 1fr; max-height: 90vh; overflow-y: auto; } }
+  .dialog .foto { cursor: default; }
+  .dialog h5 {
+    font-family: "Unbounded", sans-serif; font-weight: 900; font-size: clamp(20px, 3vw, 30px);
+    line-height: 1.15; margin-bottom: 12px;
+  }
+  .dialog p { font-size: 15.5px; color: var(--slab); margin-bottom: 16px; }
+  .dialog p strong { color: var(--alb); }
+  .dialog .inchide {
+    position: absolute; top: 14px; right: 16px; z-index: 4; cursor: pointer;
+    width: 38px; height: 38px; border-radius: 50%; border: 1px solid var(--panel-border);
+    background: rgba(255,255,255,.08); color: var(--alb); font-size: 16px; line-height: 1;
+  }
+  .dialog .inchide:hover { background: rgba(255,255,255,.18); transform: rotate(90deg); }
+
+  .dialog.succes { border: 1px solid rgba(188,215,156,.5); box-shadow: 0 0 34px rgba(188,215,156,.2), 0 34px 80px rgba(0,0,0,.6); }
+  .dialog.succes h5 { background: linear-gradient(90deg, var(--lime), var(--yellow), var(--cyan)); -webkit-background-clip: text; background-clip: text; color: transparent; filter: drop-shadow(0 0 12px rgba(188,215,156,.35)); }
+  .dialog.succes .foto { --glow: rgba(229,194,110,.55); transform: rotate(-1.6deg); }
+  .dialog.succes .foto .rama img { filter: contrast(1.06) saturate(1.12) brightness(1.03); }
+
+  .dialog.eroare { border: 1px solid rgba(201,90,109,.6); box-shadow: 0 0 34px rgba(201,90,109,.25), 0 34px 80px rgba(0,0,0,.6); animation: cutremur .45s; }
+  .dialog.eroare h5 { color: #d96c7e; text-shadow: 0 0 14px rgba(201,90,109,.45); }
+  .dialog.eroare .foto { --glow: rgba(201,90,109,.55); transform: rotate(1.4deg); }
+  .dialog.eroare .foto .rama img { filter: grayscale(1) contrast(1.15) brightness(1.02) sepia(1) hue-rotate(-38deg) saturate(1.8); }
+  @keyframes cutremur {
+    0%, 100% { transform: translate(0,0) rotate(0); }
+    20% { transform: translate(-9px, 3px) rotate(-.7deg); }
+    40% { transform: translate(8px, -4px) rotate(.6deg); }
+    60% { transform: translate(-6px, -3px) rotate(-.4deg); }
+    80% { transform: translate(5px, 3px) rotate(.3deg); }
+  }
+  .erori-lista { list-style: none; margin: 0 0 16px; display: grid; gap: 10px; }
+  .erori-lista li {
+    padding: 10px 14px; border-radius: 12px; font-size: 14.5px; line-height: 1.45; color: var(--alb);
+    background: rgba(201,90,109,.08); border: 1px solid rgba(201,90,109,.3);
+  }
+  .erori-lista li b {
+    display: block; font-family: "IBM Plex Mono", monospace; font-size: 10.5px; letter-spacing: .12em;
+    text-transform: uppercase; color: #d96c7e; margin-bottom: 2px;
+  }
+  .btn.rosu { background: linear-gradient(100deg, #d96c7e, var(--orange)); box-shadow: 0 0 16px rgba(201,90,109,.35), 0 8px 22px rgba(0,0,0,.4); }
+  .btn.gol { background: transparent; color: var(--slab); border: 1px solid var(--panel-border); box-shadow: none; }
+  .btn.gol:hover { color: var(--alb); border-color: var(--alb); }
+
+  .foto.marian { cursor: pointer; transition: transform .18s; }
+  .foto.marian:hover { transform: rotate(-2.4deg) scale(1.02) !important; }
+
+  /* scânteile cursorului */
+  .scanteie { position: fixed; z-index: 60; pointer-events: none; font-size: 14px; animation: scanteie .7s ease-out forwards; }
+  @keyframes scanteie {
+    0%   { opacity: 1; transform: translate(-50%,-50%) scale(.6) rotate(0deg); }
+    100% { opacity: 0; transform: translate(-50%,-120%) scale(1.5) rotate(70deg); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .banda .panglica, .colaj::before, .cutout, .boil, .boil2, .boil3,
+    .frontispiciu h1, .manifest .pamflet { animation: none !important; }
+    .galerie .foto, .btn { transition: none; }
+    .scanteie { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- COLAJUL DE FUNDAL: Tribunul în șase duotonuri acide, cu mâzgălituri care fierb -->
+<div class="colaj" aria-hidden="true">
+  <!-- discurs — cyan, dreapta sus -->
+  <div class="cutout ton-cyan" style="--rot:5deg; --glow:rgba(0,240,255,.55); --dur:15s; width:min(30vw,420px); right:-4%; top:6%;">
+    <img src="assets/vadim/tribun-discurs.jpg" alt="">
+    <svg class="doodle boil" style="--dc:var(--yellow); left:-34px; top:-30px; width:74px; height:74px" viewBox="0 0 100 100"><path d="M58 6 L34 48 L52 48 L30 94 L74 40 L54 40 L76 6 Z" class="plin"/></svg>
+    <svg class="doodle boil2" style="--dc:var(--magenta); right:-26px; bottom:-24px; width:60px; height:60px" viewBox="0 0 100 100"><path d="M50 4 L58 42 L96 50 L58 58 L50 96 L42 58 L4 50 L42 42 Z" class="plin"/></svg>
+    <div class="replica boil3" style="--rc:var(--yellow); left:-40px; bottom:-46px;">Nu mai fabula, măi!</div>
+  </div>
+  <!-- elodia — magenta, stânga sus -->
+  <div class="cutout ton-magenta" style="--rot:-6deg; --glow:rgba(255,61,242,.55); --dur:17s; width:min(26vw,360px); left:-5%; top:12%;">
+    <img src="assets/vadim/tribun-elodia.jpg" alt="">
+    <svg class="doodle boil3" style="--dc:var(--cyan); right:-30px; top:-26px; width:64px; height:64px" viewBox="0 0 100 100"><path d="M10 70 Q30 10 50 50 Q70 90 90 30"/></svg>
+    <div class="replica sus boil" style="--rc:var(--magenta); right:-34px; top:-52px;">Ham! Am scris cărți, mă!</div>
+  </div>
+  <!-- iarna — orange, stânga mijloc -->
+  <div class="cutout ton-orange" style="--rot:4deg; --glow:rgba(255,138,0,.55); --dur:13s; width:min(20vw,270px); left:-3%; top:52%;">
+    <img src="assets/vadim/tribun-iarna.jpg" alt="">
+    <svg class="doodle boil" style="--dc:var(--lime); left:-28px; bottom:-26px; width:58px; height:58px" viewBox="0 0 100 100"><circle cx="50" cy="50" r="34"/><circle cx="50" cy="50" r="14"/></svg>
+    <div class="replica sus boil2" style="--rc:var(--orange); right:-24px; top:-50px;">Să vină armata! Să vină poliția!</div>
+  </div>
+  <!-- corgi — lime, dreapta jos -->
+  <div class="cutout ton-lime" style="--rot:-4deg; --glow:rgba(168,255,0,.5); --dur:16s; width:min(26vw,350px); right:-4%; top:56%;">
+    <img src="assets/vadim/tribun-corgi.jpg" alt="">
+    <svg class="doodle boil2" style="--dc:var(--magenta); left:-30px; top:-28px; width:66px; height:66px" viewBox="0 0 100 100"><path d="M50 88 C20 66 6 44 18 28 C28 14 46 18 50 32 C54 18 72 14 82 28 C94 44 80 66 50 88 Z"/></svg>
+    <div class="replica boil" style="--rc:var(--lime); left:-36px; bottom:-48px;">Te mănânc cu fulgi cu tot!</div>
+  </div>
+  <!-- ochelari — violet, mijloc jos-stânga -->
+  <div class="cutout ton-violet" style="--rot:7deg; --glow:rgba(139,92,255,.55); --dur:18s; width:min(24vw,330px); left:8%; bottom:-4%;">
+    <img src="assets/vadim/tribun-ochelari.jpg" alt="">
+    <svg class="doodle boil" style="--dc:var(--cyan); right:-30px; top:30%; width:70px; height:40px" viewBox="0 0 140 60"><path d="M6 30 L38 30 M102 30 L134 30"/><circle cx="52" cy="30" r="16"/><circle cx="88" cy="30" r="16"/></svg>
+    <div class="replica sus boil3" style="--rc:var(--violet); left:-30px; top:-52px;">Cine ești tu, mă, să ai dialog cu mine?</div>
+  </div>
+  <!-- salut cu ochelari negri — violet, dreapta jos -->
+  <div class="cutout ton-violet" style="--rot:6deg; --glow:rgba(139,92,255,.55); --dur:19s; width:min(19vw,260px); right:5%; bottom:-9%;">
+    <img src="assets/vadim/tribun-salut.jpg" alt="">
+    <svg class="doodle boil2" style="--dc:var(--yellow); left:-30px; top:-26px; width:64px; height:64px" viewBox="0 0 100 100"><path d="M58 6 L34 48 L52 48 L30 94 L74 40 L54 40 L76 6 Z" class="plin"/></svg>
+    <div class="replica sus boil" style="--rc:var(--yellow); right:-28px; top:-54px;">Treziți-vă, români, până nu e prea târziu!</div>
+  </div>
+  <!-- corgi tv — yellow, dreapta mijloc-sus -->
+  <div class="cutout ton-yellow" style="--rot:-8deg; --glow:rgba(255,230,0,.5); --dur:14s; width:min(18vw,250px); right:14%; top:34%;">
+    <img src="assets/vadim/tribun-corgi-tv.jpg" alt="">
+    <svg class="doodle boil3" style="--dc:var(--orange); left:-26px; top:-24px; width:56px; height:56px" viewBox="0 0 100 100"><path d="M50 4 L58 42 L96 50 L58 58 L50 96 L42 58 L4 50 L42 42 Z" class="plin"/></svg>
+    <div class="replica boil2" style="--rc:var(--cyan); left:-30px; bottom:-46px;">Jos mafia, sus patria!</div>
+  </div>
+</div>
+
+<div class="tricolor"></div>
+
+<!-- banda cu citate autentice -->
+<div class="banda" aria-hidden="true">
+  <div class="panglica" id="panglica">
+    <span><b>DIN ARHIVĂ:</b> „Nu pot sta trei români pe aceeași cracă — unul dintre ei trebuie s-o taie cu fierăstrăul."</span>
+    <span><b>·</b> „România e singura țară din lume unde, dacă cei vii boicotează votul, votează morții."</span>
+    <span><b>·</b> „Așa cum Austria e o țară de doctori, România e o țară de președinți."</span>
+    <span><b>·</b> „România este țara unde aviația e la pământ, iar agricultura e în aer."</span>
+    <span><b>·</b> „Politicienii s-au modernizat: au renunțat la coloana vertebrală pentru coloana oficială."</span>
+    <span><b>·</b> „Suntem singura țară din Europa unde poliția aleargă după hoți nu ca să-i prindă, ci ca să împartă prada cu ei."</span>
+    <span><b>·</b> „Eu am o memorie de elefant: nu uit nimic și nu iert pe nimeni!"</span>
+    <span><b>·</b> „Eu vorbesc în versuri și voi îmi răspundeți în proză ieftină!"</span>
+    <span><b>·</b> „Un pamflet bun ustură mai tare decât o palmă peste față!"</span>
+    <span><b>·</b> „Voi face ordine în țara asta în 48 de ore!"</span>
+    <span><b>·</b> „Genul meu de geniu apare o dată la un secol, băieți!"</span>
+    <span><b>·</b> „Se crede vultur, dar e doar o cioară vopsită!"</span>
+    <span><b>·</b> „E un zero barat cu pretenții de număr prim!"</span>
+    <span><b>·</b> „Cultura voastră generală se oprește la eticheta de pe sticla de bere!"</span>
+    <span><b>·</b> „Săracă țară bogată, pe ce mâini ai ajuns să cazi!"</span>
+    <span><b>·</b> „Treziți-vă, români, până nu e prea târziu!"</span>
+  </div>
+</div>
+
+<div class="pagina">
+
+  <!-- frontispiciu -->
+  <header class="frontispiciu panel">
+    <div class="supratitlu">Foaie de studii, indicatori și atitudine · apare când e gata ghidul</div>
+    <h1>CERCETAREA MARE</h1>
+    <div class="deviza">„Cine nu folosește indicatori standardizați nu merită nici respondenți!"</div>
+    <div class="caseta-tehnica">
+      <span>Anul 3000 · Nr. 1</span>
+      <span id="dataAzi">— · —</span>
+      <span class="goarna" id="goarna" title="Sună adunarea">📯</span>
+      <span>Director fondator: TRIBUNUL</span>
+      <span>Prețul: 2 lei · gratuit pentru patrioți</span>
+    </div>
+  </header>
+
+  <!-- navigația aplicației -->
+  <nav class="bara-app panel">
+    <span class="sigla">loom<i>.</i></span>
+    <a href="#" class="activ">Mapare</a>
+    <a href="#">Ghiduri</a>
+    <a href="#">Chestionare</a>
+    <a href="#">Indicatori</a>
+    <span class="dreapta"><a href="teme.html">← celelalte teme</a></span>
+  </nav>
+
+  <!-- manșeta -->
+  <section class="erou panel">
+    <div>
+      <span class="breton">Ediție specială · Cercetare de piață</span>
+      <h2>S-a terminat cu studiile făcute <em>după ureche</em>, domnilor!</h2>
+      <p class="sapou">Alegi indicatorii din catalogul standard, iar loom îi așează în ghid de interviu sau chestionar — cu timing, verificări de calitate și export în Word, ca la carte. Cine lucrează altfel, să poftească la tribună și să explice poporului de ce.</p>
+      <div class="rand-btn">
+        <button class="btn plin">＋ Mapare nouă, să tremure piața</button>
+        <button class="btn">Arhiva de ghiduri a neamului</button>
+      </div>
+      <p style="margin-top:18px"><span class="marginalie">N.B. Elodia a aprobat macheta. — T.</span></p>
+    </div>
+    <figure class="foto" style="transform: rotate(1.2deg); --glow: rgba(0,240,255,.55)">
+      <span class="stampila">Aprobat de Tribun</span>
+      <svg class="doodle boil" style="--dc:var(--yellow); left:-26px; top:34%; width:64px; height:64px" viewBox="0 0 100 100"><path d="M58 6 L34 48 L52 48 L30 94 L74 40 L54 40 L76 6 Z" class="plin"/></svg>
+      <svg class="doodle boil2" style="--dc:var(--magenta); right:-24px; bottom:20%; width:56px; height:56px" viewBox="0 0 100 100"><path d="M50 4 L58 42 L96 50 L58 58 L50 96 L42 58 L4 50 L42 42 Z" class="plin"/></svg>
+      <div class="rama"><img src="assets/vadim/tribun-succes.jpg" alt="Tribunul zâmbește și semnează ghidul de interviu"></div>
+      <figcaption><b>Foto: redacția</b>Tribunul semnează personal fiecare chestionar făcut ca la carte: semnificativ statistic, p &lt; 0,05, să audă toată țara!</figcaption>
+    </figure>
+  </section>
+
+  <!-- citatul zilei -->
+  <section class="citat-zi panel">
+    <figure class="foto t-cyan" style="position:absolute; right:-22px; top:-48px; width:min(170px,22vw); transform:rotate(5deg); --glow:rgba(0,240,255,.5)" title="Tribunul meditează în bibliotecă">
+      <svg class="doodle boil" style="--dc:var(--magenta); left:-22px; bottom:-18px; width:46px; height:46px" viewBox="0 0 100 100"><path d="M10 70 Q30 10 50 50 Q70 90 90 30"/></svg>
+      <div class="rama"><img src="assets/vadim/tribun-ganditor.jpg" alt="Tribunul meditează, cu degetele împreunate, în fața bibliotecii"></div>
+    </figure>
+    <blockquote id="citatText" style="padding-right: min(170px, 20vw)">„Mai bine să regrete lumea că ai murit, decât că ai trăit prea mult."</blockquote>
+    <div class="autor">— Tribunul, din arhiva de aur</div>
+  </section>
+
+  <!-- Biroul de export: cele două sorți ale destinului -->
+  <section class="dosar panel export-birou">
+    <figure class="foto" style="float:right; width:min(230px,38%); margin:-6px 0 14px 20px; transform:rotate(2deg); --glow:rgba(0,240,255,.45)">
+      <svg class="doodle boil2" style="--dc:var(--lime); left:-24px; top:-22px; width:52px; height:52px" viewBox="0 0 100 100"><path d="M14 54 L40 80 L88 20"/></svg>
+      <div class="rama"><img src="assets/vadim/tribun-portret.jpg" alt="Tribunul zâmbește cu mâinile împreunate, gata de audiențe"></div>
+      <figcaption><b>Funcționarul-șef</b>Vă așteaptă cu dosarul pregătit. Nu primește șpagă — doar date curate.</figcaption>
+    </figure>
+    <h4>BIROUL DE EXPORT</h4>
+    <p class="sub">Tribunul semnează doar ce e fără cusur. Încearcă ambele sorți ale destinului:</p>
+    <div class="rand-btn">
+      <button class="btn" id="btnExportOk">⬇ Descarcă ghidul (impecabil)</button>
+      <button class="btn rosu" id="btnExportRau">⬇ Descarcă chestionarul (cu boacăne)</button>
+    </div>
+    <div style="clear:both"></div>
+  </section>
+
+  <!-- RUBRICA I -->
+  <section class="rubrica panel" data-acc="cyan">
+    <div class="rubrica-cap">
+      <span class="numar">RUBRICA I</span>
+      <h3>Sănătatea brandului, domnilor!</h3>
+      <span class="orig-cat">Brand Health &amp; Equity</span>
+    </div>
+    <p class="motto">Starea națiunii de marcă, de la primul strigăt de notorietate până la zestrea cântărită la gram.</p>
+    <div class="indicatori">
+      <div class="ind"><span class="orig">Top-of-Mind Awareness (TOM)</span><span class="vadim">Primul nume care-ți țâșnește din creier, ca porumbelul din colivie</span></div>
+      <div class="ind"><span class="orig">Spontaneous (Unaided) Awareness</span><span class="vadim">Mărcile pe care le știi singur, nesuflat de nimeni</span></div>
+      <div class="ind"><span class="orig">Aided (Prompted) Awareness</span><span class="vadim">Îți suflăm noi numele, ca la teatru, și vedem dacă tresari</span></div>
+      <div class="ind"><span class="orig">Brand Salience</span><span class="vadim">Cât de tare îți sare marca în ochi când nici n-o cauți</span></div>
+      <div class="ind"><span class="orig">Brand Familiarity</span><span class="vadim">O cunoști cum își cunoaște Tribunul adversarii: pe nume mic</span></div>
+      <div class="ind"><span class="orig">Brand Consideration</span><span class="vadim">Ai lua-o în calcul, ori treci pe lângă ea cu nasul pe sus?</span></div>
+      <div class="ind"><span class="orig">Brand Preference</span><span class="vadim">Pe care o alegi cu mâna pe inimă și tricolorul în piept</span></div>
+      <div class="ind"><span class="orig">Brand Trial (Ever Used)</span><span class="vadim">Ai gustat măcar o dată din ea, fie și pe furiș</span></div>
+      <div class="ind"><span class="orig">Brand Usage (P12M / P3M / P4W)</span><span class="vadim">Cine a folosit-o în ultimul an — jurați pe Elodia că spuneți drept</span></div>
+      <div class="ind"><span class="orig">Brand Used Most Often (BUMO)</span><span class="vadim">Marca de casă, ca ciorba de la mama: la ea te întorci mereu</span></div>
+      <div class="ind"><span class="orig">Brand Loyalty / Retention</span><span class="vadim">Credincios mărcii cum îi e Elodia stăpânului</span></div>
+      <div class="ind"><span class="orig">Brand Advocacy / Recommendation</span><span class="vadim">O lauzi la rude, la vecini și la întreg poporul, de la tribună</span></div>
+      <div class="ind"><span class="orig">Brand Image / Associations</span><span class="vadim">Ce-ți evocă marca: măreție națională sau jale organizată?</span></div>
+      <div class="ind"><span class="orig">Brand Affinity / Brand Love</span><span class="vadim">Iubire curată, ca între Tribun și cățelușa lui</span></div>
+      <div class="ind"><span class="orig">Brand Trust</span><span class="vadim">Te încrezi în ea, sau te ține de vorbă ca politicienii?</span></div>
+      <div class="ind"><span class="orig">Brand Equity Index</span><span class="vadim">Zestrea mărcii, cântărită la gram, ca aurul dacilor</span></div>
+      <div class="ind"><span class="orig">Brand Funnel Conversion</span><span class="vadim">Din tot poporul care te știe, câți te și cumpără, domnilor?</span></div>
+      <div class="ind"><span class="orig">Share of Voice (SOV)</span><span class="vadim">Cine strigă mai tare în piață — măsurat cu decibelmetrul patriotic</span></div>
+      <div class="ind"><span class="orig">Distinctive Brand Assets (DBA)</span><span class="vadim">Fularul roșu al mărcii: îl recunoști de la o poștă, pe viscol</span></div>
+      <div class="ind"><span class="orig">Sustainability &amp; Ethical Perception</span><span class="vadim">E marca asta cinstită și verde, ori doar se dă mare la televizor?</span></div>
+    </div>
+  </section>
+
+  <!-- Cabinetul Elodia -->
+  <section class="dosar panel">
+    <span class="stampila">Strict secret · nu e</span>
+    <h4>CABINETUL ELODIA</h4>
+    <p class="sub">Direcția Generală de Control al Calității. Nu mușcă decât dublele negații.</p>
+    <div class="galerie">
+      <figure class="foto elodia t-magenta" style="transform: rotate(-1deg); --glow: rgba(255,61,242,.5)">
+        <svg class="doodle boil" style="--dc:var(--cyan); left:-22px; top:-22px; width:54px; height:54px" viewBox="0 0 100 100"><path d="M50 88 C20 66 6 44 18 28 C28 14 46 18 50 32 C54 18 72 14 82 28 C94 44 80 66 50 88 Z"/></svg>
+        <div class="rama"><img src="assets/vadim/tribun-elodia.jpg" alt="Tribunul pe canapeaua roșie, cu Elodia în brațe"></div>
+        <figcaption><b>Ședință de lucru</b>Elodia respinge din principiu chestionarele de peste 45 de minute. Se vede pe fața ei.</figcaption>
+      </figure>
+      <figure class="foto elodia t-lime" style="transform: rotate(.8deg); --glow: rgba(168,255,0,.45)">
+        <svg class="doodle boil2" style="--dc:var(--magenta); right:-20px; top:-20px; width:52px; height:52px" viewBox="0 0 100 100"><path d="M50 4 L58 42 L96 50 L58 58 L50 96 L42 58 L4 50 L42 42 Z" class="plin"/></svg>
+        <div class="rama"><img src="assets/vadim/tribun-corgi.jpg" alt="Tribunul în cămașă hawaiiană, cu cățelul în brațe"></div>
+        <figcaption><b>Control de calitate</b>Miroase dubla negație de la o poștă. N-a scăpat una din '92 încoace.</figcaption>
+      </figure>
+      <figure class="foto elodia t-orange" style="transform: rotate(-.6deg); --glow: rgba(255,138,0,.5)">
+        <svg class="doodle boil3" style="--dc:var(--yellow); left:30%; bottom:-22px; width:70px; height:44px" viewBox="0 0 140 60"><path d="M8 40 Q24 10 40 40 Q56 70 72 40 Q88 10 104 40 Q120 70 134 40"/></svg>
+        <div class="rama"><img src="assets/vadim/tribun-corgi-tv.jpg" alt="Tribunul la televizor, cățelul salută publicul"></div>
+        <figcaption><b>În direct la popor</b>Elodia salută călduros respondenții loiali (P12M) și îi mustră blând pe cei lapsed.</figcaption>
+      </figure>
+    </div>
+    <span class="marginalie ham-hint">click pe poze — vă răspunde personal ↑</span>
+  </section>
+
+  <!-- RUBRICA II -->
+  <section class="rubrica panel" data-acc="magenta">
+    <div class="rubrica-cap">
+      <span class="numar">RUBRICA II</span>
+      <h3>Năravuri și apucături</h3>
+      <span class="orig-cat">Usage &amp; Attitudes (U&amp;A)</span>
+    </div>
+    <p class="motto">Cine, ce, cât și mai ales de ce — obiceiurile neamului, puse la dosar.</p>
+    <div class="indicatori">
+      <div class="ind"><span class="orig">Category Penetration</span><span class="vadim">Câți din popor au căzut în patima categoriei</span></div>
+      <div class="ind"><span class="orig">Usage / Purchase Frequency</span><span class="vadim">Cât de des, domnilor: zilnic, duminica, ori la Paștele cailor?</span></div>
+      <div class="ind"><span class="orig">Usage Occasions / Moments</span><span class="vadim">Când anume: la cafea, la telejurnal sau la supărare?</span></div>
+      <div class="ind"><span class="orig">Weight of Consumption (Heavy/Medium/Light)</span><span class="vadim">Consumatori de elită, de mijloc și de duminică</span></div>
+      <div class="ind"><span class="orig">Brand Repertoire</span><span class="vadim">Suita de mărci a fiecărui cetățean — care intră la palat, care așteaptă la poartă</span></div>
+      <div class="ind"><span class="orig">Share of Wallet / Share of Requirements</span><span class="vadim">Cât din portofel îi dai ei, și cât împrăștii prin concurență</span></div>
+      <div class="ind"><span class="orig">Habits &amp; Practices</span><span class="vadim">Obiceiurile neamului, de la stră-străbunici citire</span></div>
+      <div class="ind"><span class="orig">Attitudes toward Category</span><span class="vadim">Ce zice poporul despre categorie, cu mâna pe inimă</span></div>
+      <div class="ind"><span class="orig">Needs &amp; Motivations</span><span class="vadim">Ce-l arde pe om cu adevărat, în adâncul sufletului său</span></div>
+      <div class="ind"><span class="orig">Jobs to Be Done (JTBD)</span><span class="vadim">Treaba pentru care ai tocmit produsul — să muncească, nu să lenevească</span></div>
+      <div class="ind"><span class="orig">Path to Purchase / Decision Journey</span><span class="vadim">Drumul crucii, de la prima ispită până la casa de marcat</span></div>
+      <div class="ind"><span class="orig">Channel / Place of Purchase</span><span class="vadim">De unde târguiește românul: din piață, de la boutique ori de pe net</span></div>
+      <div class="ind"><span class="orig">Media Consumption Habits</span><span class="vadim">Ce privește poporul la televizor, în loc să citească pamflete</span></div>
+      <div class="ind"><span class="orig">Lapsed Usage &amp; Churn Reasons</span><span class="vadim">De ce te-au părăsit? Foștii clienți depun mărturie la tribună</span></div>
+    </div>
+  </section>
+
+  <!-- RUBRICA III -->
+  <section class="rubrica panel" data-acc="lime">
+    <div class="rubrica-cap">
+      <span class="numar">RUBRICA III</span>
+      <h3>Banul, ochiul dracului</h3>
+      <span class="orig-cat">Purchase Behaviour &amp; Pricing</span>
+    </div>
+    <p class="motto">Aici se despart patrioții de zgârciți: totul despre preț, fără perdea.</p>
+    <div class="indicatori">
+      <div class="ind"><span class="orig">Purchase Intention</span><span class="vadim">Cumperi sau nu cumperi? Răspunde, nu te codi!</span></div>
+      <div class="ind"><span class="orig">Purchase Triggers / Drivers</span><span class="vadim">Scânteia care aprinde portofelul</span></div>
+      <div class="ind"><span class="orig">Purchase Barriers</span><span class="vadim">Zidurile Bastiliei dintre om și produs</span></div>
+      <div class="ind"><span class="orig">Trial Intent</span><span class="vadim">Ai încerca o dată, măcar de gura lumii?</span></div>
+      <div class="ind"><span class="orig">Repeat Purchase Intent</span><span class="vadim">Te mai întorci, ori a fost amor de-o vară?</span></div>
+      <div class="ind"><span class="orig">Willingness to Pay (WTP)</span><span class="vadim">Cât scoți din buzunar fără să verși o lacrimă de patriot</span></div>
+      <div class="ind"><span class="orig">Price Sensitivity (Van Westendorp PSM)</span><span class="vadim">Domnul Van Westendorp, olandez serios, află exact unde te doare prețul</span></div>
+      <div class="ind"><span class="orig">Price Elasticity (Gabor–Granger)</span><span class="vadim">Întindem prețul ca elasticul și notăm când plesnește răbdarea poporului</span></div>
+      <div class="ind"><span class="orig">Value for Money Perception</span><span class="vadim">Face banii, ori e jaf în plină zi, ca la drumul mare?</span></div>
+      <div class="ind"><span class="orig">Promotion Responsiveness</span><span class="vadim">Cum sare românul la reduceri, ca știuca la momeală</span></div>
+      <div class="ind"><span class="orig">Conjoint / Discrete Choice (Trade-off)</span><span class="vadim">Alegeri grele, domnilor: ori ieftin, ori bun — ca la vot</span></div>
+    </div>
+  </section>
+
+  <!-- corespondență de iarnă -->
+  <section class="duo panel">
+    <figure class="foto t-orange marian" id="fotoMarian" style="transform: rotate(-1.4deg); --glow: rgba(255,138,0,.5)" title="Îl strigă pe Marian">
+      <svg class="doodle boil" style="--dc:var(--cyan); right:-24px; top:-24px; width:58px; height:58px" viewBox="0 0 100 100"><path d="M50 8 L50 50 M50 50 L26 30 M50 50 L74 30 M50 50 L18 62 M50 50 L82 62 M50 50 L38 88 M50 50 L62 88"/></svg>
+      <div class="rama"><img src="assets/vadim/tribun-iarna.jpg" alt="Tribunul în viscol, cu fular roșu, vorbind la telefon"></div>
+      <figcaption><b>Corespondență de pe teren</b>Fularul roșu: activ distinctiv de brand, vizibil de la o poștă chiar și pe viscol. Click pe poză: îl strigă pe Marian!</figcaption>
+    </figure>
+    <div class="text">
+      <h4>Reportaj: culegerea datelor nu ține cont de vreme</h4>
+      <p>Corespondentul nostru special iese pe teren la minus zece grade, cu fularul roșu și cu ghidul de interviu generat de loom. Timing-ul e calculat, verificările de calitate sunt trecute, iar respondenții — <em>rata de răspuns: sută la sută</em> — nu îndrăznesc să refuze un om atât de hotărât.</p>
+      <p>„Alții fac studii din birou, cu aerul condiționat pe față. Noi facem cercetare cu căciula pe urechi și cu adevărul în mână!" — a declarat corespondentul, înainte să-i înghețe telefonul.</p>
+      <p><span class="marginalie">de verificat LOI la frig — scade cu 3 min. — T.</span></p>
+    </div>
+  </section>
+
+  <!-- RUBRICA IV -->
+  <section class="rubrica panel" data-acc="orange">
+    <div class="rubrica-cap">
+      <span class="numar">RUBRICA IV</span>
+      <h3>Judecata de apoi a produselor</h3>
+      <span class="orig-cat">Concept &amp; Product Testing</span>
+    </div>
+    <p class="motto">Concepte intră, sentințe ies. Aici nu se fentează nimic.</p>
+    <div class="indicatori">
+      <div class="ind"><span class="orig">Overall Liking</span><span class="vadim">Îți place sau nu-ți place? Simplu ca bună ziua!</span></div>
+      <div class="ind"><span class="orig">Likes &amp; Dislikes</span><span class="vadim">Ce lăudăm în piața mare și ce trimitem la topit</span></div>
+      <div class="ind"><span class="orig">Uniqueness / Differentiation</span><span class="vadim">Unic ca Tribunul, ori copie la indigo?</span></div>
+      <div class="ind"><span class="orig">Relevance / Meets Needs</span><span class="vadim">Îți trebuie cu adevărat, sau doar așa, de fală?</span></div>
+      <div class="ind"><span class="orig">Believability / Credibility</span><span class="vadim">Te credem, ori am mai auzit noi promisiuni electorale?</span></div>
+      <div class="ind"><span class="orig">Comprehension / Clarity</span><span class="vadim">S-a înțeles, ori vorbim păsărește ca diplomații?</span></div>
+      <div class="ind"><span class="orig">Just-About-Right (JAR) Scales</span><span class="vadim">Nici prea-prea, nici foarte-foarte: fix cât trebuie</span></div>
+      <div class="ind"><span class="orig">Paired Preference</span><span class="vadim">Duel în zori de zi: două produse intră, unul singur iese</span></div>
+      <div class="ind"><span class="orig">Expected Purchase Frequency</span><span class="vadim">Cât de des l-ai lua: săptămânal, ori o dată pe mandat?</span></div>
+      <div class="ind"><span class="orig">Concept Price Perception</span><span class="vadim">La prețul ăsta: pomană cerească sau tâlhărie la drumul mare?</span></div>
+      <div class="ind"><span class="orig">Kano Model</span><span class="vadim">Domnul Kano desparte moftul de necesitate, ca grâul de neghină</span></div>
+      <div class="ind"><span class="orig">MaxDiff (Best-Worst Scaling)</span><span class="vadim">Cel mai iubit și cel mai hulit, ca în politica dâmbovițeană</span></div>
+      <div class="ind"><span class="orig">TURF Analysis</span><span class="vadim">Cu ce combinație de produse cucerim toată patria, județ cu județ</span></div>
+    </div>
+  </section>
+
+  <!-- RUBRICA V -->
+  <section class="rubrica panel" data-acc="violet">
+    <div class="rubrica-cap">
+      <span class="numar">RUBRICA V</span>
+      <h3>Doleanțele poporului</h3>
+      <span class="orig-cat">Customer Experience &amp; Satisfaction</span>
+    </div>
+    <p class="motto">Registrul de jalbe și mulțumiri, ținut la zi cu sfințenie.</p>
+    <div class="indicatori">
+      <div class="ind"><span class="orig">Net Promoter Score (NPS)</span><span class="vadim">Ne recomanzi la neamuri, ori ne faci de râs în târg? Notă de la 0 la 10!</span></div>
+      <div class="ind"><span class="orig">Customer Satisfaction (CSAT)</span><span class="vadim">Mulțumit, cetățene, ori scrii memorii la gazetă?</span></div>
+      <div class="ind"><span class="orig">Customer Effort Score (CES)</span><span class="vadim">Cât te-ai canonit, ca Meșterul Manole, pentru o nimica toată</span></div>
+      <div class="ind"><span class="orig">Repurchase / Renewal Intention</span><span class="vadim">Mai semnezi un mandat cu noi, ori treci în opoziție?</span></div>
+      <div class="ind"><span class="orig">Complaint Incidence &amp; Resolution</span><span class="vadim">Jalbe primite, jalbe rezolvate: contabilitatea supărării naționale</span></div>
+      <div class="ind"><span class="orig">Touchpoint / Attribute Importance (Key Drivers)</span><span class="vadim">Unde se câștigă și unde se pierde inima clientului</span></div>
+      <div class="ind"><span class="orig">Service Quality (SERVQUAL / RATER)</span><span class="vadim">Servit ca la curtea regală, ori ca la ghișeul din anii '90?</span></div>
+    </div>
+  </section>
+
+  <!-- RUBRICA VI -->
+  <section class="rubrica panel" data-acc="yellow">
+    <div class="rubrica-cap">
+      <span class="numar">RUBRICA VI</span>
+      <h3>Propaganda și tribuna</h3>
+      <span class="orig-cat">Advertising &amp; Communications</span>
+    </div>
+    <p class="motto">Reclama e sufletul comerțului — dar sufletul trebuie verificat, domnilor.</p>
+    <div class="indicatori">
+      <div class="ind"><span class="orig">Advertising Recall (Unaided/Aided)</span><span class="vadim">Ți-a rămas reclama în cap, ori a intrat pe-o ureche și-a ieșit pe cealaltă?</span></div>
+      <div class="ind"><span class="orig">Ad Recognition</span><span class="vadim">O recunoști dintr-o mie, ca pe fularul roșu?</span></div>
+      <div class="ind"><span class="orig">Brand Linkage / Branding</span><span class="vadim">Ții minte reclama, dar știi și a cui e, istețule?</span></div>
+      <div class="ind"><span class="orig">Message Takeout / Communication</span><span class="vadim">Ce-a priceput poporul din discurs — că una zici și alta se aude</span></div>
+      <div class="ind"><span class="orig">Persuasion / Intent Shift</span><span class="vadim">Te-a întors reclama din drum, ca un discurs bine țintit?</span></div>
+      <div class="ind"><span class="orig">Ad Likeability</span><span class="vadim">Aplauze la scenă deschisă, ori huiduieli din galerie?</span></div>
+      <div class="ind"><span class="orig">Ad Distinctiveness / Engagement</span><span class="vadim">Iese din plutonul de reclame, ori defilează la grămadă cu toate?</span></div>
+      <div class="ind"><span class="orig">Response / Action Intent</span><span class="vadim">După reclamă treci la fapte, ori rămâi la vorbe, ca dânșii?</span></div>
+    </div>
+  </section>
+
+  <!-- editorial cu ochelari -->
+  <section class="duo panel">
+    <div class="text">
+      <h4>Editorial: ochelarii negri văd tot</h4>
+      <p>Sunt unii care cred că pot strecura în chestionar o dublă negație, o scală șchioapă, un „nu știu / nu răspund" pitit unde nu trebuie. Le transmitem pe această cale: <em>linter-ul loom nu doarme niciodată</em>. Verifică timingul, numerotarea, logica de salt și bunul-simț al fiecărei întrebări.</p>
+      <p>Iar cine crede că scapă, să știe că avem și noi ochelarii noștri negri, prin care se vede direct în sufletul chestionarului.</p>
+      <p><span class="marginalie">aprobat. fără milă pentru scale șchioape — T.</span></p>
+    </div>
+    <figure class="foto t-violet" style="transform: rotate(1.1deg); --glow: rgba(139,92,255,.55)">
+      <svg class="doodle boil2" style="--dc:var(--lime); left:-26px; bottom:24%; width:60px; height:60px" viewBox="0 0 100 100"><path d="M10 70 Q30 10 50 50 Q70 90 90 30"/></svg>
+      <div class="rama"><img src="assets/vadim/tribun-ochelari.jpg" alt="Tribunul cu ochelari negri, cu mâinile împreunate, la microfoane"></div>
+      <figcaption><b>Foto-document</b>Redactorul-șef al calității, meditând la soarta dublelor negații. Nu se anunță vremuri bune pentru ele.</figcaption>
+    </figure>
+  </section>
+
+  <!-- RUBRICA VII -->
+  <section class="rubrica panel" data-acc="cyan">
+    <div class="rubrica-cap">
+      <span class="numar">RUBRICA VII</span>
+      <h3>Chinurile utilizatorului</h3>
+      <span class="orig-cat">UX Research</span>
+    </div>
+    <p class="motto">Calvarul omului în fața butoanelor, documentat științific.</p>
+    <div class="indicatori">
+      <div class="ind"><span class="orig">Task Success Rate</span><span class="vadim">Câți ajung la liman și câți se îneacă la mal</span></div>
+      <div class="ind"><span class="orig">Time on Task</span><span class="vadim">Cât durează isprava: cât un discurs, ori cât o legislatură?</span></div>
+      <div class="ind"><span class="orig">Error Rate</span><span class="vadim">Câte boacăne pe cap de utilizator</span></div>
+      <div class="ind"><span class="orig">System Usability Scale (SUS)</span><span class="vadim">Nota poporului pentru sistem: zece întrebări, fără pile</span></div>
+      <div class="ind"><span class="orig">Single Ease Question (SEQ)</span><span class="vadim">O singură întrebare, ca la spovedanie: greu a fost, fiule?</span></div>
+      <div class="ind"><span class="orig">UMUX-Lite</span><span class="vadim">Procesul scurt: două întrebări și sentința</span></div>
+      <div class="ind"><span class="orig">UMUX (Usability Metric for User Experience)</span><span class="vadim">Procesul întreg, cu toată comisia de față</span></div>
+      <div class="ind"><span class="orig">First Click Success</span><span class="vadim">Primul click: la țintă, ori în lături ca vânătorul de duminică?</span></div>
+      <div class="ind"><span class="orig">Findability / Navigation Success</span><span class="vadim">Găsești ce cauți, ori te rătăcești ca-n Bărăgan pe timp de noapte?</span></div>
+      <div class="ind"><span class="orig">Learnability</span><span class="vadim">Cât de iute prinde poporul șmecheria</span></div>
+      <div class="ind"><span class="orig">Perceived Workload (NASA-TLX)</span><span class="vadim">Cât te-a stors efortul — măsurat de NASA, nu de vecina de palier</span></div>
+      <div class="ind"><span class="orig">Desirability (Product Reaction Cards)</span><span class="vadim">Spune-i produsului în față ce simți: cuvintele pe masă!</span></div>
+      <div class="ind"><span class="orig">Feature Adoption</span><span class="vadim">Câți au îmbrățișat noutatea, și câți o ocolesc ca pe recensământ</span></div>
+      <div class="ind"><span class="orig">Engagement (DAU/MAU, Stickiness)</span><span class="vadim">Se lipește lumea de produs cum se lipește poporul de televizor?</span></div>
+      <div class="ind"><span class="orig">Retention / Churn Rate</span><span class="vadim">Câți rămân credincioși, și câți trădează pe lună — cu nume și prenume</span></div>
+      <div class="ind"><span class="orig">HEART Framework Metrics</span><span class="vadim">Cardiograma produsului, făcută — cică — la Google</span></div>
+      <div class="ind"><span class="orig">Accessibility</span><span class="vadim">Pentru tot poporul, domnilor — nimeni nu rămâne pe dinafară!</span></div>
+      <div class="ind"><span class="orig">Digital Literacy</span><span class="vadim">Cât de bine se descurcă românul cu drăcia asta de internet</span></div>
+    </div>
+  </section>
+
+  <!-- RUBRICA VIII -->
+  <section class="rubrica panel" data-acc="magenta">
+    <div class="rubrica-cap">
+      <span class="numar">RUBRICA VIII</span>
+      <h3>Bancherii, domnilor!</h3>
+      <span class="orig-cat">Banking &amp; Payments</span>
+    </div>
+    <p class="motto">Unde sunt banii neamului și pe la ce ghișee umblă.</p>
+    <div class="indicatori">
+      <div class="ind"><span class="orig">Main Bank Share</span><span class="vadim">Banca de suflet: acolo unde-ți ții și banii, și nervii</span></div>
+      <div class="ind"><span class="orig">Bank Switching Intent</span><span class="vadim">Fugi la altă bancă, ori rămâi pe baricadă până la capăt?</span></div>
+      <div class="ind"><span class="orig">Switching Triggers &amp; Barriers</span><span class="vadim">Ce te-ar face să-ți iei banii și să trântești ușa de se-aude-n sucursală</span></div>
+      <div class="ind"><span class="orig">Cross-Sell / Deepening Intent</span><span class="vadim">Îți mai vinde banca un produs, ori ți-ai învățat lecția?</span></div>
+      <div class="ind"><span class="orig">Consolidation Intent</span><span class="vadim">Aduni toți banii sub un singur steag, ca un adevărat unificator?</span></div>
+      <div class="ind"><span class="orig">Financial Product Purchase Pipeline (Next 12M)</span><span class="vadim">Ce-ți mai iei de la bancă până la anul, cu voia Domnului și a dobânzii</span></div>
+      <div class="ind"><span class="orig">Account Opening / Onboarding Completion</span><span class="vadim">Câți deschid contul până la capăt, și câți dezertează la primul act cerut</span></div>
+      <div class="ind"><span class="orig">Digital Banking Adoption &amp; Frequency</span><span class="vadim">Banca din buzunar: cât o folosește națiunea, cu degetul mare</span></div>
+      <div class="ind"><span class="orig">Banking Channel Mix</span><span class="vadim">La ghișeu ca pe vremuri, ori pe telefon ca tineretul?</span></div>
+      <div class="ind"><span class="orig">Payment Method Usage</span><span class="vadim">Cash ca bunicul, card ca nepotul, telefon ca strănepotul</span></div>
+      <div class="ind"><span class="orig">Fintech / Neobank Usage &amp; Propensity</span><span class="vadim">Băncile astea noi, fără sediu și fără cravată — le-ncredințezi agoniseala?</span></div>
+      <div class="ind"><span class="orig">BNPL Usage &amp; Attitudes</span><span class="vadim">Cumperi acum, plătești mai târziu — dulce la gust, amară la scadență</span></div>
+      <div class="ind"><span class="orig">Trust in Banks / Financial System</span><span class="vadim">Mai crede poporul în bănci, ori doarme cu banii la saltea, ca strămoșii?</span></div>
+      <div class="ind"><span class="orig">Fee Transparency &amp; Fairness Perception</span><span class="vadim">Comisioanele: la vedere, ca oamenii cinstiți, ori pitite ca dosarele?</span></div>
+      <div class="ind"><span class="orig">Perceived Security &amp; Fraud Concern</span><span class="vadim">Doarme românul liniștit, ori visează hackeri și pungași?</span></div>
+    </div>
+  </section>
+
+  <!-- RUBRICA IX -->
+  <section class="rubrica panel" data-acc="lime">
+    <div class="rubrica-cap">
+      <span class="numar">RUBRICA IX</span>
+      <h3>Sărăcia și nevoile neamului</h3>
+      <span class="orig-cat">Financial Needs &amp; Wellbeing</span>
+    </div>
+    <p class="motto">Portofelul poporului, ascultat cu stetoscopul.</p>
+    <div class="indicatori">
+      <div class="ind"><span class="orig">Financial Well-Being Score</span><span class="vadim">Starea de bine la portofel: notă de la jale la huzur</span></div>
+      <div class="ind"><span class="orig">Financial Literacy</span><span class="vadim">Câtă carte financiară a citit poporul — sincer acum, fără copiuțe</span></div>
+      <div class="ind"><span class="orig">Savings Behaviour &amp; Emergency Fund Coverage</span><span class="vadim">Bani albi pentru zile negre: cât ține sacul?</span></div>
+      <div class="ind"><span class="orig">Budgeting / Money Management Style</span><span class="vadim">Cine-i contabil-șef acasă: caietul, aplicația, ori soacra?</span></div>
+      <div class="ind"><span class="orig">Financial Goals &amp; Life Events</span><span class="vadim">Visurile neamului: casă, mașină și nuntă ca în povești</span></div>
+      <div class="ind"><span class="orig">Attitude to Credit / Borrowing Propensity</span><span class="vadim">Te împrumuți cu inima ușoară, ori numai cu cuțitul la os?</span></div>
+      <div class="ind"><span class="orig">Debt Burden / Over-Indebtedness</span><span class="vadim">Câtă datorie duce românul în spinare fără să crâcnească</span></div>
+      <div class="ind"><span class="orig">Investment Risk Tolerance</span><span class="vadim">Joci la bursă ca la ruletă, ori păstrezi cu sfințenie, ca strămoșii?</span></div>
+      <div class="ind"><span class="orig">Retirement Preparedness</span><span class="vadim">Pregătit de pensie, ori te lași în grija milei statului?</span></div>
+      <div class="ind"><span class="orig">Insurance / Protection Gap</span><span class="vadim">Asigurat ca lumea bună, ori descoperit ca hotarul patriei?</span></div>
+      <div class="ind"><span class="orig">Financial Confidence &amp; Anxiety</span><span class="vadim">Dormi liniștit pe banii tăi, ori te trezești noaptea în sudori?</span></div>
+      <div class="ind"><span class="orig">Financial Advice-Seeking Behaviour</span><span class="vadim">Pe cine asculți la bani: banca, cumătrul, ori Tribunul?</span></div>
+    </div>
+  </section>
+
+  <!-- manifest de subsol -->
+  <footer class="manifest panel">
+    <div class="tricolor subtire" style="max-width:280px;margin:0 auto"></div>
+    <p class="pamflet">„Acest text este un pamflet și trebuie tratat ca atare."</p>
+    <p class="tehnic">
+      Temă-omagiu satiric · Replicile sunt din arhiva și folclorul Tribunului, restul e pamflet curat<br>
+      Tipărit la tipografia poporului · Corectura: Elodia · Export Word cu DM Sans, ca la carte<br>
+      cercetarea mare · tribuna indicatorilor · anul 3000
+    </p>
+  </footer>
+
+</div>
+
+<!-- DIALOG: export reușit — Tribunul semnează -->
+<div class="voal" id="voalSucces" hidden>
+  <div class="dialog succes panel" role="dialog" aria-modal="true" aria-labelledby="titluSucces">
+    <button class="inchide" aria-label="Închide">✕</button>
+    <figure class="foto" style="--glow: rgba(255,230,0,.6)">
+      <svg class="doodle boil" style="--dc:var(--yellow); left:-26px; top:-26px; width:62px; height:62px" viewBox="0 0 100 100"><path d="M50 4 L58 42 L96 50 L58 58 L50 96 L42 58 L4 50 L42 42 Z" class="plin"/></svg>
+      <svg class="doodle boil2" style="--dc:var(--lime); right:-24px; bottom:14%; width:54px; height:54px" viewBox="0 0 100 100"><path d="M14 54 L40 80 L88 20"/></svg>
+      <div class="rama"><img src="assets/vadim/tribun-succes.jpg" alt="Tribunul zâmbește și semnează documentul"></div>
+      <figcaption><b>Se semnează personal</b>Stiloul de aur iese doar la documentele fără cusur.</figcaption>
+    </figure>
+    <div>
+      <h5 id="titluSucces">SE APROBĂ! GENIAL, BĂIETE!</h5>
+      <p>„Niciun avertisment, nicio boacănă — <strong>un document cum apare unul la un secol, băieți!</strong> Nici Elodia n-a găsit ceva de mușcat, și ea găsește și-n vis. Semnez și parafez cu mâna mea: du-l în lume, <strong>să tremure concurența!</strong>"</p>
+      <div class="rand-btn">
+        <button class="btn" id="btnDescarca">⬇ Descarcă, cu mândrie patriotică</button>
+        <button class="btn gol inchide-btn">Mai șlefuiesc puțin</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- DIALOG: export cu erori — Tribunul te ceartă după tipul greșelii -->
+<div class="voal" id="voalEroare" hidden>
+  <div class="dialog eroare panel" role="dialog" aria-modal="true" aria-labelledby="titluEroare">
+    <button class="inchide" aria-label="Închide">✕</button>
+    <figure class="foto" style="--glow: rgba(255,47,94,.6)">
+      <svg class="doodle boil" style="--dc:var(--yellow); left:-30px; top:-28px; width:68px; height:68px" viewBox="0 0 100 100"><path d="M58 6 L34 48 L52 48 L30 94 L74 40 L54 40 L76 6 Z" class="plin"/></svg>
+      <svg class="doodle boil3" style="--dc:#ff2f5e; right:-26px; bottom:20%; width:56px; height:56px" viewBox="0 0 100 100"><path d="M20 20 L80 80 M80 20 L20 80"/></svg>
+      <div class="rama"><img src="assets/vadim/tribun-striga.jpg" alt="Tribunul strigă, revoltat de erorile din document"></div>
+      <figcaption><b>Comisia de disciplină</b>Ședință extraordinară, convocată de erorile tale.</figcaption>
+    </figure>
+    <div>
+      <h5 id="titluEroare">CE MI-AI FĂCUT AICI?!</h5>
+      <p>Documentul <strong>NU pleacă nicăieri</strong> până nu repari ce-ai stricat. Citește sentința, punct cu punct:</p>
+      <ul class="erori-lista" id="listaErori"></ul>
+      <p>„Repară tot și vino înapoi ca un patriot — <strong>altfel te mănânc cu fulgi cu tot, la rubrica de erate!</strong>"</p>
+      <div class="rand-btn">
+        <button class="btn rosu inchide-btn">Mă duc să repar, să trăiți!</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // data gazetei
+  (function () {
+    const luni = ['ianuarie','februarie','martie','aprilie','mai','iunie','iulie','august','septembrie','octombrie','noiembrie','decembrie'];
+    const d = new Date();
+    document.getElementById('dataAzi').textContent = d.getDate() + ' ' + luni[d.getMonth()] + ' ' + d.getFullYear();
+  })();
+
+  // banda: dublăm conținutul ca bucla să fie continuă
+  (function () {
+    const p = document.getElementById('panglica');
+    p.innerHTML += p.innerHTML;
+  })();
+
+  // citatul zilei se schimbă singur, ca ediția de seară
+  (function () {
+    const citate = [
+      '„Mai bine să regrete lumea că ai murit, decât că ai trăit prea mult."',
+      '„Nu pot sta trei români pe aceeași cracă — unul dintre ei trebuie s-o taie cu fierăstrăul."',
+      '„România e singura țară din lume unde, dacă cei vii boicotează votul, votează morții."',
+      '„Așa cum Austria e o țară de doctori, România e o țară de președinți."',
+      '„România este țara unde aviația e la pământ, iar agricultura e în aer."',
+      '„Politicienii s-au modernizat: au renunțat la coloana vertebrală pentru coloana oficială."',
+      '„Eu am o memorie de elefant: nu uit nimic și nu iert pe nimeni!"',
+      '„Un pamflet bun ustură mai tare decât o palmă peste față!"',
+      '„Eu vorbesc în versuri și voi îmi răspundeți în proză ieftină!"',
+      '„Ce pot să scriu ca să vă fiu pe plac? Tot ce-i măreț s-a spus. Mai bine tac."',
+      '„Are mintea cât o nucă, și aia e seacă!"',
+      '„Nu confundați bunătatea mea cu slăbiciunea, că vă înșelați amarnic!"',
+      '„Măcar eu spun adevărul verde-n față, nu mă ascund după degete!"',
+      '„Am trăit printre titani și acum trebuie să suport acești pitici de grădină."',
+      '„Nu mă întrerupe când vorbesc, că pierzi firul și rămâi prost!"',
+      '„Băi băiatule, tu știi cine sunt eu? Eu am scris cărți, mă!"'
+    ];
+    let i = 0;
+    const el = document.getElementById('citatText');
+    setInterval(() => {
+      el.style.opacity = '0';
+      setTimeout(() => {
+        i = (i + 1) % citate.length;
+        el.textContent = citate[i];
+        el.style.opacity = '1';
+      }, 400);
+    }, 8000);
+  })();
+
+  // scânteile cursorului — ✦ care sar din mișcare, ca-n clip
+  (function () {
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const culori = ['#00f0ff', '#ff3df2', '#a8ff00', '#ffe600', '#ff8a00', '#8b5cff'];
+    let ultim = 0;
+    addEventListener('pointermove', (e) => {
+      const acum = performance.now();
+      if (acum - ultim < 70) return; // nu îngropa pagina în scântei
+      ultim = acum;
+      const s = document.createElement('span');
+      s.className = 'scanteie';
+      s.textContent = Math.random() < 0.25 ? '⚡' : '✦';
+      s.style.left = (e.clientX + (Math.random() - 0.5) * 26) + 'px';
+      s.style.top = (e.clientY + (Math.random() - 0.5) * 26) + 'px';
+      s.style.color = culori[(Math.random() * culori.length) | 0];
+      s.style.textShadow = '0 0 10px currentColor';
+      document.body.appendChild(s);
+      setTimeout(() => s.remove(), 720);
+    }, { passive: true });
+  })();
+
+  // ————— sunete: AudioContext leneș, la primul gest —————
+  let actx = null;
+  function audio() {
+    if (!actx) actx = new (window.AudioContext || window.webkitAudioContext)();
+    if (actx.state === 'suspended') actx.resume();
+    return actx;
+  }
+
+  // „Ham!" — două silabe: lătrat mic de cățel de canapea, nimic strident.
+  function ham() {
+    const ctx = audio();
+    const t0 = ctx.currentTime;
+    const silabe = [[0, 640, .09], [0.16, 560, .11]]; // [start, f0, durată]
+    for (const [st, f0, dur] of silabe) {
+      const t = t0 + st;
+      const osc = ctx.createOscillator();
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(f0, t);
+      osc.frequency.exponentialRampToValueAtTime(f0 * 0.32, t + dur);
+      const lp = ctx.createBiquadFilter();
+      lp.type = 'lowpass'; lp.frequency.value = 1400; lp.Q.value = 1.2;
+      const g = ctx.createGain();
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.exponentialRampToValueAtTime(0.22, t + 0.012);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+      osc.connect(lp); lp.connect(g); g.connect(ctx.destination);
+      osc.start(t); osc.stop(t + dur + 0.02);
+      const nd = 0.045;
+      const buf = ctx.createBuffer(1, Math.ceil(ctx.sampleRate * nd), ctx.sampleRate);
+      const d = buf.getChannelData(0);
+      for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / d.length, 1.8);
+      const noise = ctx.createBufferSource(); noise.buffer = buf;
+      const bp = ctx.createBiquadFilter();
+      bp.type = 'bandpass'; bp.frequency.value = 900; bp.Q.value = 0.9;
+      const ng = ctx.createGain(); ng.gain.value = 0.10;
+      noise.connect(bp); bp.connect(ng); ng.connect(ctx.destination);
+      noise.start(t);
+    }
+  }
+  document.querySelectorAll('.foto.elodia').forEach(f => f.addEventListener('click', ham));
+
+  // goarna din caseta tehnică: trei note de fanfară, scurte și demne
+  function goarna() {
+    const ctx = audio();
+    const t0 = ctx.currentTime;
+    const note = [[0, 392], [0.16, 523], [0.32, 659], [0.5, 784]];
+    for (const [st, f] of note) {
+      const t = t0 + st;
+      const durata = st === 0.5 ? 0.5 : 0.17;
+      for (const [mult, vol] of [[1, 0.11], [2, 0.045], [3, 0.02]]) {
+        const o = ctx.createOscillator();
+        o.type = 'square';
+        o.frequency.value = f * mult;
+        const g = ctx.createGain();
+        g.gain.setValueAtTime(0.0001, t);
+        g.gain.exponentialRampToValueAtTime(vol, t + 0.02);
+        g.gain.setValueAtTime(vol, t + durata - 0.05);
+        g.gain.exponentialRampToValueAtTime(0.0001, t + durata);
+        const lp = ctx.createBiquadFilter();
+        lp.type = 'lowpass'; lp.frequency.value = 3200;
+        o.connect(lp); lp.connect(g); g.connect(ctx.destination);
+        o.start(t); o.stop(t + durata + 0.03);
+      }
+    }
+  }
+  document.getElementById('goarna').addEventListener('click', goarna);
+
+  // ————— „MARIAN!" — strigătul autentic, la click pe corespondentul de iarnă —————
+  const marian = new Audio('assets/vadim/marian.mp3?v=2');
+  document.getElementById('fotoMarian').addEventListener('click', () => {
+    marian.currentTime = 0;
+    marian.play();
+  });
+
+  // ————— fanfare mici pentru dialogurile de export —————
+  function sunetSucces() {
+    const ctx = audio();
+    const t0 = ctx.currentTime;
+    [[0, 523.25], [0.09, 659.25], [0.18, 783.99], [0.27, 1046.5]].forEach(([st, f]) => {
+      const t = t0 + st;
+      const o = ctx.createOscillator();
+      o.type = 'sine'; o.frequency.value = f;
+      const g = ctx.createGain();
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.exponentialRampToValueAtTime(0.14, t + 0.015);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + 0.3);
+      o.connect(g); g.connect(ctx.destination);
+      o.start(t); o.stop(t + 0.32);
+    });
+  }
+  function sunetEroare() {
+    const ctx = audio();
+    const t0 = ctx.currentTime;
+    [[0, 130], [0.22, 87]].forEach(([st, f]) => {
+      const t = t0 + st;
+      const o = ctx.createOscillator();
+      o.type = 'sawtooth'; o.frequency.setValueAtTime(f, t);
+      o.frequency.exponentialRampToValueAtTime(f * 0.8, t + 0.24);
+      const lp = ctx.createBiquadFilter();
+      lp.type = 'lowpass'; lp.frequency.value = 600;
+      const g = ctx.createGain();
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.exponentialRampToValueAtTime(0.16, t + 0.02);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + 0.26);
+      o.connect(lp); lp.connect(g); g.connect(ctx.destination);
+      o.start(t); o.stop(t + 0.28);
+    });
+  }
+
+  // ————— dialogurile destinului: cearta e croită pe tipul erorii —————
+  const CEARTA = [
+    { cod: 'DUBLĂ NEGAȚIE · Q4', text: '„Nu credeți că nu e bine?" — omul nu mai știe dacă «da» înseamnă nu! Vorbește limpede, ca la tribună!' },
+    { cod: 'TIMING DEPĂȘIT · 62 MIN', text: 'Chestionarul tău ține cât o legislatură! Respondentul are și el o viață — taie jumătate, fără milă!' },
+    { cod: 'SCALĂ ȘCHIOAPĂ · Q11', text: 'Patru trepte pozitive și una negativă?! Asta nu e cercetare, e propagandă ieftină de doi lei!' },
+    { cod: 'LOGICĂ DE SALT · Q9 → Q23', text: 'Saltul tău trimite omul în neant, ca vânătorul de duminică! Q23 nici măcar nu există, măi!' },
+    { cod: 'LIPSĂ NȘ/NR · Q7', text: 'Ai uitat „Nu știu / Nu răspund"! Vrei să smulgi răspunsuri cu forța, ca la interogatoriu?!' },
+    { cod: 'NUMEROTARE RUPTĂ · Q8', text: 'După Q7 vine direct Q9! Unde e Q8, în ce buzunar ai pitit-o, istețule?!' },
+    { cod: 'ÎNTREBARE SUGESTIVĂ · Q15', text: 'Îi bagi omului vorba-n gură cu întrebarea asta! Lasă poporul să vorbească singur, nu mai fabula!' },
+    { cod: 'DIACRITICE LIPSĂ · SECȚIUNEA B', text: 'Limba română are ă, î, ș, ț — nu o schilodi ca pe un SMS din 2004! Rușine, domnule, rușine!' }
+  ];
+  function deschide(voal) { voal.hidden = false; document.body.style.overflow = 'hidden'; }
+  function inchideTot() {
+    document.querySelectorAll('.voal').forEach(v => { v.hidden = true; });
+    document.body.style.overflow = '';
+  }
+  const voalSucces = document.getElementById('voalSucces');
+  const voalEroare = document.getElementById('voalEroare');
+
+  document.getElementById('btnExportOk').addEventListener('click', () => {
+    deschide(voalSucces);
+    sunetSucces();
+    // ploaie de scântei festive în jurul dialogului
+    if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      const culori = ['#bcd79c', '#e5c26e', '#9dbdf5', '#d795cf'];
+      for (let i = 0; i < 26; i++) {
+        setTimeout(() => {
+          const s = document.createElement('span');
+          s.className = 'scanteie';
+          s.textContent = '✦';
+          s.style.left = (innerWidth * (0.2 + Math.random() * 0.6)) + 'px';
+          s.style.top = (innerHeight * (0.15 + Math.random() * 0.7)) + 'px';
+          s.style.fontSize = (12 + Math.random() * 16) + 'px';
+          s.style.color = culori[(Math.random() * culori.length) | 0];
+          s.style.textShadow = '0 0 12px currentColor';
+          document.body.appendChild(s);
+          setTimeout(() => s.remove(), 720);
+        }, i * 45);
+      }
+    }
+  });
+  document.getElementById('btnExportRau').addEventListener('click', () => {
+    // linter-ul „găsește" 2-3 boacăne, altele la fiecare încercare
+    const lista = document.getElementById('listaErori');
+    lista.innerHTML = '';
+    const amestec = [...CEARTA].sort(() => Math.random() - 0.5).slice(0, 2 + (Math.random() < 0.5 ? 1 : 0));
+    for (const e of amestec) {
+      const li = document.createElement('li');
+      const b = document.createElement('b'); b.textContent = '⚠ ' + e.cod;
+      li.appendChild(b); li.appendChild(document.createTextNode('„' + e.text + '"'));
+      lista.appendChild(li);
+    }
+    // re-pornește cutremurul la fiecare deschidere
+    const dlg = voalEroare.querySelector('.dialog');
+    dlg.style.animation = 'none'; void dlg.offsetWidth; dlg.style.animation = '';
+    deschide(voalEroare);
+    sunetEroare();
+  });
+  document.getElementById('btnDescarca').addEventListener('click', () => { goarna(); setTimeout(inchideTot, 600); });
+  document.querySelectorAll('.inchide, .inchide-btn').forEach(b => b.addEventListener('click', inchideTot));
+  document.querySelectorAll('.voal').forEach(v => v.addEventListener('click', (e) => { if (e.target === v) inchideTot(); }));
+  addEventListener('keydown', (e) => { if (e.key === 'Escape') inchideTot(); });
+
+  // deep-link de test: vadim.html#succes / vadim.html#eroare
+  if (location.hash === '#succes') document.getElementById('btnExportOk').click();
+  if (location.hash === '#eroare') document.getElementById('btnExportRau').click();
+</script>
+
+</body>
+</html>

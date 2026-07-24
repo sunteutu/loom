@@ -6,7 +6,7 @@
 <title>Loom — Mockup look 2026 (alege paleta)</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400..700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500;600&family=Silkscreen:wght@400;700&family=Chakra+Petch:wght@500;600;700&family=VT323&family=Pixelify+Sans:wght@400..700&family=Oswald:wght@400..600&subset=latin-ext&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400..700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500;600&family=Silkscreen:wght@400;700&family=Chakra+Petch:wght@500;600;700&family=VT323&family=Pixelify+Sans:wght@400..700&family=Oswald:wght@400..600&family=Unbounded:wght@400;600;800;900&subset=latin-ext&display=swap" rel="stylesheet">
 <style>
   /* ————— Baza comună ————— */
   :root {
@@ -96,6 +96,16 @@
     --glass: #dfe2e7d9; --glass-border: #f2f4f7;
     --sand-3: #c3c8d0; --sand-7: #969ca6; --sand-8: #737a85; --sand-11: #3e444c;
   }
+  [data-theme="vadim"] {
+    /* Cercetarea Mare: butic „anul 3000" — șampanie, gheață, orhidee pe întuneric */
+    --primary: #e5c26e; --primary-hover: #ecd08a; --primary-deep: #f1e0b4; --primary-fg: #1c1828;
+    --accent2: #9dbdf5; --accent2-hover: #b3ccf8; --accent2-deep: #cdddfa;
+    --background: #110f1b; --foreground: #f2eee2; --card: #1a1726;
+    --border: #3a3450; --muted: #aaa393;
+    --glass: rgba(22,19,34,.86); --glass-border: #3a3450;
+    --sand-3: #201c30; --sand-7: #3a3450; --sand-8: #4c4566; --sand-11: #aaa393; --sand-12: #f2eee2;
+    --orange-soft: #3a2c1a; --orange-deep: #e5c26e; --red-soft: #40222c;
+  }
 
   /* Derivate automate din paletă */
   :root, [data-theme] {
@@ -178,7 +188,8 @@
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .blob, .cup, .steam, .card-item, .bubble, .sticky-note, .mring, .burst * { animation: none !important; }
+    .blob, .cup, .steam, .card-item, .bubble, .sticky-note, .mring, .burst *,
+    .vadim-cut, .vadim-cut svg, .scanteie { animation: none !important; }
     [data-theme="metal"] .hero h1 { animation: none !important; }
     [data-theme="vhs"] body::before { animation: none !important; }
     [data-theme="splitflap"] .flap-char { animation: none !important; }
@@ -676,23 +687,23 @@
 
   /* ————— Comun pentru temele întunecate noi ————— */
   .switcher { border-radius: 26px; }
-  [data-theme="blueprint"], [data-theme="vhs"], [data-theme="splitflap"] {
+  [data-theme="blueprint"], [data-theme="vhs"], [data-theme="splitflap"], [data-theme="vadim"] {
     --primary-soft: color-mix(in oklab, var(--primary) 22%, var(--background));
     --accent2-soft: color-mix(in oklab, var(--accent2) 22%, var(--background));
   }
-  [data-theme="blueprint"] .badge-destr, [data-theme="vhs"] .badge-destr, [data-theme="splitflap"] .badge-destr,
-  [data-theme="blueprint"] .btn-destructive, [data-theme="vhs"] .btn-destructive, [data-theme="splitflap"] .btn-destructive,
-  [data-theme="blueprint"] .icon-btn:hover, [data-theme="vhs"] .icon-btn:hover, [data-theme="splitflap"] .icon-btn:hover {
+  [data-theme="blueprint"] .badge-destr, [data-theme="vhs"] .badge-destr, [data-theme="splitflap"] .badge-destr, [data-theme="vadim"] .badge-destr,
+  [data-theme="blueprint"] .btn-destructive, [data-theme="vhs"] .btn-destructive, [data-theme="splitflap"] .btn-destructive, [data-theme="vadim"] .btn-destructive,
+  [data-theme="blueprint"] .icon-btn:hover, [data-theme="vhs"] .icon-btn:hover, [data-theme="splitflap"] .icon-btn:hover, [data-theme="vadim"] .icon-btn:hover {
     color: #ff9c9c;
   }
-  [data-theme="blueprint"] .switcher, [data-theme="vhs"] .switcher, [data-theme="splitflap"] .switcher {
+  [data-theme="blueprint"] .switcher, [data-theme="vhs"] .switcher, [data-theme="splitflap"] .switcher, [data-theme="vadim"] .switcher {
     background: rgba(16,18,26,.82); border-color: rgba(255,255,255,.16);
   }
-  [data-theme="blueprint"] .swatch-btn, [data-theme="vhs"] .swatch-btn, [data-theme="splitflap"] .swatch-btn { color: #b9c2cf; }
-  [data-theme="blueprint"] .swatch-btn:hover, [data-theme="vhs"] .swatch-btn:hover, [data-theme="splitflap"] .swatch-btn:hover {
+  [data-theme="blueprint"] .swatch-btn, [data-theme="vhs"] .swatch-btn, [data-theme="splitflap"] .swatch-btn, [data-theme="vadim"] .swatch-btn { color: #b9c2cf; }
+  [data-theme="blueprint"] .swatch-btn:hover, [data-theme="vhs"] .swatch-btn:hover, [data-theme="splitflap"] .swatch-btn:hover, [data-theme="vadim"] .swatch-btn:hover {
     background: rgba(255,255,255,.12); color: #ffffff;
   }
-  [data-theme="blueprint"] .swatch-btn.on, [data-theme="vhs"] .swatch-btn.on, [data-theme="splitflap"] .swatch-btn.on {
+  [data-theme="blueprint"] .swatch-btn.on, [data-theme="vhs"] .swatch-btn.on, [data-theme="splitflap"] .swatch-btn.on, [data-theme="vadim"] .swatch-btn.on {
     background: #f2f4f8; color: #14161c;
   }
 
@@ -989,6 +1000,76 @@
   }
 
   /* — ștampila PLĂTIT — */
+  /* ————— Tema VADIM / „Cercetarea Mare" (butic anul 3000) ————— */
+  [data-theme="vadim"] body {
+    background:
+      radial-gradient(42% 34% at 18% 22%, rgba(168,156,224,.14), transparent 70%),
+      radial-gradient(38% 30% at 84% 16%, rgba(157,189,245,.10), transparent 70%),
+      radial-gradient(46% 36% at 78% 82%, rgba(215,149,207,.10), transparent 70%),
+      #110f1b;
+    background-attachment: fixed;
+  }
+  [data-theme="vadim"] .cup { display: none; }
+  [data-theme="vadim"] .blob { opacity: .16; }
+  [data-theme="vadim"] h1, [data-theme="vadim"] h2, [data-theme="vadim"] h3 {
+    font-family: "Unbounded", "Space Grotesk", sans-serif; letter-spacing: 0;
+  }
+  [data-theme="vadim"] .hero h1 {
+    background: linear-gradient(105deg, #cdd7e8 0%, #f6efdb 22%, #e5c26e 46%, #f1e5c6 66%, #a9bfe4 86%, #cdd7e8 100%);
+    background-size: 300% 100%;
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+    animation: vadimHolo 9s linear infinite;
+    filter: drop-shadow(0 0 18px rgba(229,194,110,.3));
+  }
+  @keyframes vadimHolo { to { background-position: 300% 0; } }
+  /* colajul de poze-sticker, în monocromuri nobile */
+  .vadim-cut { display: none; }
+  [data-theme="vadim"] .vadim-cut {
+    display: block; position: fixed; z-index: 0;
+    padding: 7px; background: #f6f1e4; border-radius: 12px;
+    box-shadow: 0 0 0 1px rgba(246,241,228,.28), 0 0 24px rgba(157,189,245,.2), 0 16px 40px rgba(0,0,0,.5);
+    animation: vadimFloat var(--vd, 15s) ease-in-out infinite alternate;
+    pointer-events: none;
+  }
+  [data-theme="vadim"] .vadim-cut img { display: block; width: 100%; border-radius: 7px; }
+  @keyframes vadimFloat {
+    0%   { translate: 0 0; }
+    100% { translate: 0 -14px; }
+  }
+  [data-theme="vadim"] .vadim-cut.vc1 { top: 10%; left: 1.5%; width: min(15vw, 200px); transform: rotate(-6deg); --vd: 17s; pointer-events: auto; cursor: pointer; }
+  [data-theme="vadim"] .vadim-cut.vc1 img { filter: grayscale(1) contrast(1.12) brightness(1.04) sepia(.9) hue-rotate(255deg) saturate(1.4); }
+  [data-theme="vadim"] .vadim-cut.vc2 { bottom: 12%; left: 2.5%; width: min(13vw, 170px); transform: rotate(4deg); --vd: 13s; pointer-events: auto; cursor: pointer; }
+  [data-theme="vadim"] .vadim-cut.vc2 img { filter: grayscale(1) contrast(1.1) brightness(1.05) sepia(1) hue-rotate(-12deg) saturate(1.6); }
+  [data-theme="vadim"] .vadim-cut.vc3 { top: 14%; right: 2%; width: min(16vw, 220px); transform: rotate(5deg); --vd: 16s; }
+  [data-theme="vadim"] .vadim-cut.vc3 img { filter: grayscale(1) contrast(1.1) brightness(1.06) sepia(.9) hue-rotate(48deg) saturate(1.3); }
+  [data-theme="vadim"] .vadim-cut.vc4 { bottom: 8%; right: 2.5%; width: min(13vw, 175px); transform: rotate(-4deg); --vd: 18s; }
+  [data-theme="vadim"] .vadim-cut.vc4 img { filter: grayscale(1) contrast(1.12) brightness(1.03) sepia(.9) hue-rotate(210deg) saturate(1.4); }
+  /* mâzgălituri care „fierb" + bula de replică */
+  [data-theme="vadim"] .vadim-cut svg { position: absolute; overflow: visible; }
+  [data-theme="vadim"] .vadim-cut svg * { fill: none; stroke-width: 7; stroke-linecap: round; stroke-linejoin: round; }
+  [data-theme="vadim"] .vadim-cut .boilA { animation: vadimBoil .38s steps(1, end) infinite; }
+  [data-theme="vadim"] .vadim-cut .boilB { animation: vadimBoil .38s steps(1, end) .13s infinite; }
+  @keyframes vadimBoil {
+    0%   { transform: translate(0, 0) rotate(0deg); }
+    33%  { transform: translate(2px, -1.5px) rotate(1.2deg); }
+    66%  { transform: translate(-1.5px, 2px) rotate(-1deg); }
+    100% { transform: translate(0, 0) rotate(0deg); }
+  }
+  [data-theme="vadim"] .vadim-rep {
+    position: absolute; left: -14px; top: -44px; max-width: 200px;
+    font: 800 11px "Unbounded", sans-serif; line-height: 1.3; text-transform: uppercase; text-align: center;
+    color: #1c1828; background: #f6f1e4; padding: 8px 11px; border-radius: 13px;
+    box-shadow: 0 0 0 2px #e5c26e, 0 0 16px rgba(229,194,110,.35), 0 8px 20px rgba(0,0,0,.45);
+  }
+  .vadim-rep { display: none; }
+  [data-theme="vadim"] .vadim-rep { display: block; }
+  /* scânteile cursorului (doar tema Vadim) */
+  .scanteie { position: fixed; z-index: 60; pointer-events: none; font-size: 14px; animation: scanteie .7s ease-out forwards; }
+  @keyframes scanteie {
+    0%   { opacity: 1; transform: translate(-50%,-50%) scale(.6) rotate(0deg); }
+    100% { opacity: 0; transform: translate(-50%,-120%) scale(1.5) rotate(70deg); }
+  }
+
   .stamp-paid { display: none; }
   [data-theme="bon"] .stamp-paid {
     display: block; position: absolute; top: 92px; right: 24px; z-index: 2;
@@ -1610,6 +1691,22 @@
   <div class="old-bon ob2" aria-hidden="true"></div>
   <div class="old-bon ob3" aria-hidden="true"></div>
 
+  <!-- colaj foto cu Tribunul (doar tema Vadim / Cercetarea Mare) -->
+  <div class="vadim-cut vc1" aria-hidden="true">
+    <svg class="boilA" style="right:-24px; top:-22px; width:54px; height:54px; stroke:#e5c26e" viewBox="0 0 100 100"><path d="M58 6 L34 48 L52 48 L30 94 L74 40 L54 40 L76 6 Z" fill="#e5c26e" stroke="none"/></svg>
+    <img src="assets/vadim/tribun-elodia.jpg" alt="">
+    <span class="vadim-rep">Ham! Am scris cărți, mă!</span>
+  </div>
+  <div class="vadim-cut vc2" id="vadimIarna" title="Îl strigă pe Marian"><img src="assets/vadim/tribun-iarna.jpg" alt=""></div>
+  <div class="vadim-cut vc3" aria-hidden="true">
+    <svg class="boilB" style="left:-26px; bottom:-20px; width:56px; height:44px; stroke:#d795cf" viewBox="0 0 100 70"><path d="M10 50 Q30 10 50 40 Q70 70 90 25"/></svg>
+    <img src="assets/vadim/tribun-corgi.jpg" alt="">
+  </div>
+  <div class="vadim-cut vc4" aria-hidden="true">
+    <svg class="boilA" style="left:-22px; top:-22px; width:48px; height:48px; stroke:#9dbdf5" viewBox="0 0 100 100"><path d="M50 4 L58 42 L96 50 L58 58 L50 96 L42 58 L4 50 L42 42 Z" fill="#9dbdf5" stroke="none"/></svg>
+    <img src="assets/vadim/tribun-salut.jpg" alt="">
+  </div>
+
   <!-- etichetă de bagaj (doar tema Split-flap) -->
   <div class="bag-tag" aria-hidden="true">
     <i class="hole"></i>
@@ -1796,6 +1893,9 @@
   </button>
   <button class="swatch-btn" data-set="splitflap">
     <span class="dots"><i style="background:#17181d"></i><i style="background:#f2efe6"></i><i style="background:#5aa2e8"></i></span> Split-flap
+  </button>
+  <button class="swatch-btn" data-set="vadim">
+    <span class="dots"><i style="background:#110f1b"></i><i style="background:#e5c26e"></i><i style="background:#9dbdf5"></i><i style="background:#d795cf"></i></span> Cercetarea Mare
   </button>
 </div>
 
@@ -2190,6 +2290,7 @@
       else stopBoards();
       if (btn.dataset.set === 'bon') bonPrint();
       if (btn.dataset.set === 'blueprint') bpDraw();
+      if (btn.dataset.set === 'vadim') vadimGoarna();
       if (btn.dataset.set === 'broderie') sewSeam();
       else {
         seamRun++;
@@ -2198,6 +2299,86 @@
       }
     });
   });
+
+  // ————— tema Vadim / Cercetarea Mare: goarnă, „Marian!", ham și scântei —————
+  // goarna: patru note de fanfară pe square, prin lowpass — sună adunarea
+  function vadimGoarna() {
+    const ctx = flapAudio();
+    const t0 = ctx.currentTime;
+    for (const [st, f] of [[0, 392], [0.16, 523], [0.32, 659], [0.5, 784]]) {
+      const t = t0 + st;
+      const durata = st === 0.5 ? 0.5 : 0.17;
+      for (const [mult, vol] of [[1, 0.11], [2, 0.045], [3, 0.02]]) {
+        const o = ctx.createOscillator();
+        o.type = 'square'; o.frequency.value = f * mult;
+        const g = ctx.createGain();
+        g.gain.setValueAtTime(0.0001, t);
+        g.gain.exponentialRampToValueAtTime(vol, t + 0.02);
+        g.gain.setValueAtTime(vol, t + durata - 0.05);
+        g.gain.exponentialRampToValueAtTime(0.0001, t + durata);
+        const lp = ctx.createBiquadFilter();
+        lp.type = 'lowpass'; lp.frequency.value = 3200;
+        o.connect(lp); lp.connect(g); g.connect(ctx.destination);
+        o.start(t); o.stop(t + durata + 0.03);
+      }
+    }
+  }
+  // „ham": două silabe sawtooth cu pitch în cădere + puf de zgomot
+  function vadimHam() {
+    const ctx = flapAudio();
+    const t0 = ctx.currentTime;
+    for (const [st, f0, dur] of [[0, 640, .09], [0.16, 560, .11]]) {
+      const t = t0 + st;
+      const osc = ctx.createOscillator();
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(f0, t);
+      osc.frequency.exponentialRampToValueAtTime(f0 * 0.32, t + dur);
+      const lp = ctx.createBiquadFilter();
+      lp.type = 'lowpass'; lp.frequency.value = 1400; lp.Q.value = 1.2;
+      const g = ctx.createGain();
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.exponentialRampToValueAtTime(0.22, t + 0.012);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+      osc.connect(lp); lp.connect(g); g.connect(ctx.destination);
+      osc.start(t); osc.stop(t + dur + 0.02);
+      const buf = ctx.createBuffer(1, Math.ceil(ctx.sampleRate * 0.045), ctx.sampleRate);
+      const d = buf.getChannelData(0);
+      for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / d.length, 1.8);
+      const noise = ctx.createBufferSource(); noise.buffer = buf;
+      const bp = ctx.createBiquadFilter();
+      bp.type = 'bandpass'; bp.frequency.value = 900; bp.Q.value = 0.9;
+      const ng = ctx.createGain(); ng.gain.value = 0.10;
+      noise.connect(bp); bp.connect(ng); ng.connect(ctx.destination);
+      noise.start(t);
+    }
+  }
+  const vadimMarian = new Audio('assets/vadim/marian.mp3');
+  document.getElementById('vadimIarna').addEventListener('click', () => {
+    vadimMarian.currentTime = 0;
+    vadimMarian.play();
+  });
+  document.querySelector('.vadim-cut.vc1').addEventListener('click', vadimHam);
+  // scânteile neon după cursor, doar cât e tema activă
+  (function () {
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const culori = ['#00f0ff', '#ff3df2', '#a8ff00', '#ffe600', '#ff8a00', '#8b5cff'];
+    let ultim = 0;
+    addEventListener('pointermove', (e) => {
+      if (document.documentElement.dataset.theme !== 'vadim') return;
+      const acum = performance.now();
+      if (acum - ultim < 70) return;
+      ultim = acum;
+      const s = document.createElement('span');
+      s.className = 'scanteie';
+      s.textContent = Math.random() < 0.25 ? '⚡' : '✦';
+      s.style.left = (e.clientX + (Math.random() - 0.5) * 26) + 'px';
+      s.style.top = (e.clientY + (Math.random() - 0.5) * 26) + 'px';
+      s.style.color = culori[(Math.random() * culori.length) | 0];
+      s.style.textShadow = '0 0 10px currentColor';
+      document.body.appendChild(s);
+      setTimeout(() => s.remove(), 720);
+    }, { passive: true });
+  })();
 
   // ————— tabloul de litere: fiecare cartonaș ciclează până la litera lui —————
   // generic pentru ambele mecanici: 'flip' (split-flap, pe orizontală)

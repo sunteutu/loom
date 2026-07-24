@@ -3,6 +3,7 @@
 import {
   Suspense,
   useCallback,
+  useEffect,
   useMemo,
   useState,
   type ReactNode,
@@ -38,12 +39,19 @@ import {
   removeItemFromActiveSurvey,
   useSurveyStore,
 } from "@/lib/surveys";
+import { useLoomTheme } from "@/components/ThemeProvider";
+import { VADIM_INDICATOR_RO, VADIM_RUBRICI } from "@/lib/indicators-vadim-ro";
+import { INDICATOR_QUAL_RO } from "@/lib/indicators-ro";
+import {
+  INDICATOR_SURVEY_RO,
+  type SurveyItemRo,
+} from "@/lib/indicators-survey-ro";
 
 function queryTerms(query: string) {
   return query.trim().toLowerCase().split(/\s+/).filter(Boolean);
 }
 
-function matches(indicator: Indicator, terms: string[]) {
+function matches(indicator: Indicator, terms: string[], extra?: string) {
   if (terms.length === 0) return true;
   const haystack = [
     indicator.name,
@@ -52,6 +60,7 @@ function matches(indicator: Indicator, terms: string[]) {
     indicator.measurement,
     ...indicator.aliases,
     ...(indicator.qualQuestions ?? []),
+    extra ?? "",
   ]
     .join(" ")
     .toLowerCase();
@@ -99,6 +108,14 @@ function IndicatoriContent() {
     () => new Set(),
   );
 
+  // Pe „Tribunul 3000" pagina vorbește românește: rubrici de gazetă și
+  // descrieri-sentință din mockups/vadim.html. Gate pe mounted ca SSR-ul
+  // (care nu știe tema) să nu se certe cu clientul la hidratare.
+  const { theme } = useLoomTheme();
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+  const vadim = mounted && theme === "vadim";
+
   const toggleCategory = useCallback((cat: IndicatorCategory) => {
     setSelectedCats((prev) => {
       const next = new Set(prev);
@@ -118,8 +135,11 @@ function IndicatoriContent() {
   const terms = useMemo(() => queryTerms(query), [query]);
 
   const queryMatched = useMemo(
-    () => INDICATORS.filter((ind) => matches(ind, terms)),
-    [terms],
+    () =>
+      INDICATORS.filter((ind) =>
+        matches(ind, terms, vadim ? VADIM_INDICATOR_RO[ind.id] : undefined),
+      ),
+    [terms, vadim],
   );
 
   const countByCategory = useMemo(() => {
@@ -147,14 +167,73 @@ function IndicatoriContent() {
 
   return (
     <main className="mx-auto w-full max-w-6xl flex-1 px-4 sm:px-8 pb-16">
+      {/* deschiderea de ediție: foto-documentul cu ochelari negri, mare și
+          centrat, deasupra titlului și căutării — doar pe Tribunul 3000 */}
+      {vadim && (
+        <figure className="vadim-ochelari" aria-hidden>
+          <span className="vadim-replica sus vo-replica">
+            Ochelarii negri văd tot — prin ei se vede direct în sufletul
+            studiului.
+          </span>
+          <svg
+            className="lv-doodle contur lv-boil"
+            style={{ left: -30, bottom: 70, width: 84, height: 40, color: "#9d7bff" }}
+            viewBox="0 0 140 60"
+          >
+            <path d="M6 30 L38 30 M102 30 L134 30" />
+            <circle cx="52" cy="30" r="16" />
+            <circle cx="88" cy="30" r="16" />
+          </svg>
+          <svg
+            className="lv-doodle lv-boil3"
+            style={{ right: -18, top: -16, width: 46, height: 46, color: "#ffd23f" }}
+            viewBox="0 0 100 100"
+          >
+            <path d="M50 4 L58 42 L96 50 L58 58 L50 96 L42 58 L4 50 L42 42 Z" />
+          </svg>
+          <span className="vo-rama">
+            <span className="vadim-lumina" />
+            <span
+              className="vadim-clipici"
+              style={{ left: "10%", top: "16%", "--cc": "#9d7bff", "--cdelay": "1.9s" } as React.CSSProperties}
+            >
+              ✦
+            </span>
+            <span
+              className="vadim-clipici"
+              style={{ right: "12%", bottom: "18%", "--cc": "#ffd23f", "--cdelay": "4.6s", "--cs": "12px" } as React.CSSProperties}
+            >
+              ✦
+            </span>
+          </span>
+          <span className="vadim-caption">
+            <b>Foto-document</b>
+            Redactorul-șef al calității, meditând la soarta studiilor gândite
+            prost. Nu se anunță vremuri bune pentru ele.
+          </span>
+        </figure>
+      )}
+
       <div className="sticky top-14 z-10 -mx-4 border-b border-border bg-background/95 px-4 pb-4 pt-6 backdrop-blur supports-[backdrop-filter]:bg-background/80 md:top-0 sm:-mx-8 sm:px-8 sm:pt-8">
         <header className="mb-4">
-          <h1 className="text-2xl font-semibold tracking-tight">Indicatori</h1>
+          <h1 className="text-2xl font-semibold tracking-tight">
+            {vadim ? "Tribuna indicatorilor" : "Indicatori"}
+          </h1>
           <p className="mt-1 text-base text-muted-foreground">
-            Gold-standard market &amp; UX research indicators —{" "}
-            {INDICATORS.length} indicators across{" "}
-            {INDICATOR_CATEGORIES.length} categories. Click an indicator for its
-            qual interview guide and survey items.
+            {vadim ? (
+              <>
+                Catalogul de aur al cercetării, ca la carte — {INDICATORS.length}{" "}
+                indicatori în {INDICATOR_CATEGORIES.length} rubrici. Click pe un
+                indicator pentru ghidul de interviu și itemii de chestionar.
+              </>
+            ) : (
+              <>
+                Gold-standard market &amp; UX research indicators —{" "}
+                {INDICATORS.length} indicators across{" "}
+                {INDICATOR_CATEGORIES.length} categories. Click an indicator for
+                its qual interview guide and survey items.
+              </>
+            )}
           </p>
         </header>
 
@@ -172,7 +251,11 @@ function IndicatoriContent() {
               onKeyDown={(e) => {
                 if (e.key === "Escape") setQuery("");
               }}
-              placeholder="Search — e.g. awareness, purchase intention, NPS, SUS…"
+              placeholder={
+                vadim
+                  ? "Caută, nu te codi — ex. notorietate, preț, NPS, SUS…"
+                  : "Search — e.g. awareness, purchase intention, NPS, SUS…"
+              }
               className="h-10 w-full rounded-lg border border-input bg-background pl-9 pr-9 text-base shadow-sm outline-none transition-colors focus:border-ring focus:ring-2 focus:ring-ring/30"
               autoFocus
             />
@@ -191,7 +274,7 @@ function IndicatoriContent() {
             <Popover.Trigger asChild>
               <button className="inline-flex h-10 shrink-0 items-center gap-2 rounded-lg border border-input bg-background px-3.5 text-sm font-medium shadow-sm transition-colors hover:bg-slate-2 data-[state=open]:bg-slate-2">
                 <SlidersHorizontal aria-hidden className="h-4 w-4 text-slate-10" />
-                Filters
+                {vadim ? "Filtre" : "Filters"}
                 {selectedCats.size > 0 && (
                   <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-indigo-9 px-1.5 text-xs font-semibold tabular-nums text-white">
                     {selectedCats.size}
@@ -207,14 +290,14 @@ function IndicatoriContent() {
               >
                 <div className="flex items-center justify-between px-2.5 pb-1.5 pt-2">
                   <span className="text-xs font-semibold uppercase tracking-wide text-slate-10">
-                    Category
+                    {vadim ? "Rubrica" : "Category"}
                   </span>
                   {selectedCats.size > 0 && (
                     <button
                       onClick={clearCats}
                       className="text-xs font-medium text-indigo-11 transition-colors hover:text-indigo-12"
                     >
-                      Reset
+                      {vadim ? "Resetează" : "Reset"}
                     </button>
                   )}
                 </div>
@@ -246,7 +329,9 @@ function IndicatoriContent() {
                   );
                 })}
                 <div className="mt-1 border-t border-border px-2.5 py-2 text-sm text-slate-10">
-                  Showing {shownCount} of {INDICATORS.length} indicators
+                  {vadim
+                    ? `La vedere: ${shownCount} din ${INDICATORS.length} indicatori`
+                    : `Showing ${shownCount} of ${INDICATORS.length} indicators`}
                 </div>
               </Popover.Content>
             </Popover.Portal>
@@ -275,7 +360,7 @@ function IndicatoriContent() {
               onClick={clearAll}
               className="ml-1 text-sm font-medium text-muted-foreground underline-offset-2 transition-colors hover:text-foreground hover:underline"
             >
-              Clear all
+              {vadim ? "Șterge tot" : "Clear all"}
             </button>
           </div>
         )}
@@ -290,32 +375,59 @@ function IndicatoriContent() {
       {grouped.length === 0 ? (
         <div className="flex flex-col items-center gap-3 py-20 text-center">
           <p className="text-base text-muted-foreground">
-            No indicators match{query ? <> “{query}”</> : " these filters"}.
+            {vadim ? (
+              <>
+                Niciun indicator nu se potrivește
+                {query ? <> cu „{query}”</> : " cu filtrele astea"} — mai
+                căutați, nu vă lăsați!
+              </>
+            ) : (
+              <>No indicators match{query ? <> “{query}”</> : " these filters"}.</>
+            )}
           </p>
           <button
             onClick={clearAll}
             className="rounded-md border border-border px-3 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:border-ring hover:text-foreground"
           >
-            Clear filters
+            {vadim ? "Șterge filtrele" : "Clear filters"}
           </button>
         </div>
       ) : (
         <div className="flex flex-col gap-10 pt-8">
           {hasActiveFilters && (
             <p className="-mb-6 text-sm text-muted-foreground">
-              Showing {shownCount} of {INDICATORS.length} indicators
+              {vadim
+                ? `La vedere: ${shownCount} din ${INDICATORS.length} indicatori`
+                : `Showing ${shownCount} of ${INDICATORS.length} indicators`}
             </p>
           )}
           {grouped.map((group) => (
             <section key={group.category}>
-              <div className="mb-3 flex items-baseline gap-2">
+              <div className="mb-3 flex flex-wrap items-baseline gap-x-2 gap-y-1">
+                {vadim && (
+                  <span className="rounded-full bg-indigo-9 px-2.5 py-0.5 text-xs font-bold uppercase tracking-wide text-primary-foreground">
+                    {VADIM_RUBRICI[group.category].numar}
+                  </span>
+                )}
                 <h2 className="text-base font-semibold tracking-tight">
-                  {group.category}
+                  {vadim
+                    ? VADIM_RUBRICI[group.category].titlu
+                    : group.category}
                 </h2>
                 <span className="rounded-full bg-slate-3 px-2 py-0.5 text-xs font-medium text-slate-11">
                   {group.indicators.length}
                 </span>
+                {vadim && (
+                  <span className="ml-auto text-xs font-medium uppercase tracking-widest text-indigo-11">
+                    {group.category}
+                  </span>
+                )}
               </div>
+              {vadim && (
+                <p className="-mt-1 mb-3 text-sm italic text-muted-foreground">
+                  {VADIM_RUBRICI[group.category].motto}
+                </p>
+              )}
               <ul className="grid grid-cols-1 gap-3 lg:grid-cols-2">
                 {group.indicators.map((ind) => {
                   const qualCount = ind.qualQuestions?.length ?? 0;
@@ -342,20 +454,35 @@ function IndicatoriContent() {
                           </div>
                         )}
                         <p className="mt-2 text-[0.9375rem] leading-relaxed text-muted-foreground">
-                          <Highlight text={ind.description} terms={terms} />
+                          <Highlight
+                            text={
+                              vadim
+                                ? `„${VADIM_INDICATOR_RO[ind.id]}”`
+                                : ind.description
+                            }
+                            terms={terms}
+                          />
                         </p>
                         <div className="mt-3 flex items-center gap-2 border-t border-border pt-2.5 text-xs font-medium text-slate-10">
-                          <span>{qualCount} qual questions</span>
+                          <span>
+                            {vadim
+                              ? `${qualCount} întrebări calitative`
+                              : `${qualCount} qual questions`}
+                          </span>
                           <span aria-hidden className="text-slate-7">
                             ·
                           </span>
                           <span>
-                            {quantCount > 0
-                              ? `${quantCount} survey item${quantCount > 1 ? "s" : ""}`
-                              : "survey spec"}
+                            {vadim
+                              ? quantCount > 0
+                                ? `${quantCount} ${quantCount > 1 ? "itemi" : "item"} de chestionar`
+                                : "specificație de chestionar"
+                              : quantCount > 0
+                                ? `${quantCount} survey item${quantCount > 1 ? "s" : ""}`
+                                : "survey spec"}
                           </span>
                           <span className="ml-auto font-semibold text-indigo-11">
-                            View →
+                            {vadim ? "La dosar →" : "View →"}
                           </span>
                         </div>
                       </button>
@@ -370,6 +497,7 @@ function IndicatoriContent() {
 
       <IndicatorDrawer
         indicator={selected}
+        vadim={vadim}
         onClose={() => setSelected(null)}
       />
     </main>
@@ -388,10 +516,19 @@ function SectionLabel({ children }: { children: ReactNode }) {
  * The qual interview guide inside the drawer, with puzzle-style
  * add-to-guide: per-question toggle + add-all, targeting the active guide.
  */
-function QualSection({ indicator }: { indicator: Indicator }) {
+function QualSection({
+  indicator,
+  vadim,
+}: {
+  indicator: Indicator;
+  vadim: boolean;
+}) {
   const store = useGuideStore();
   const activeGuide = getActiveGuide(store);
+  // În ghid intră mereu textul-sursă englez (traducerea se rezolvă la
+  // export prin indicatorId + sourceIndex); doar afișarea comută pe RO.
   const questions = indicator.qualQuestions ?? [];
+  const qualRo = vadim ? INDICATOR_QUAL_RO[indicator.id] : undefined;
 
   const inGuide = (index: number) =>
     activeGuide?.items.some(
@@ -427,7 +564,9 @@ function QualSection({ indicator }: { indicator: Indicator }) {
   return (
     <section className="mt-7">
       <div className="flex items-center justify-between gap-2">
-        <SectionLabel>Qualitative — interview guide</SectionLabel>
+        <SectionLabel>
+          {vadim ? "Calitativ — ghid de interviu" : "Qualitative — interview guide"}
+        </SectionLabel>
         <button
           onClick={toggleAll}
           aria-pressed={allAdded}
@@ -452,8 +591,8 @@ function QualSection({ indicator }: { indicator: Indicator }) {
       </div>
       {indicator.qualIntent && (
         <p className="mt-2 rounded-lg bg-indigo-2 px-3 py-2 text-sm leading-relaxed text-indigo-11">
-          <span className="font-semibold">Intent: </span>
-          {indicator.qualIntent}
+          <span className="font-semibold">{vadim ? "Intenția: " : "Intent: "}</span>
+          {(vadim && qualRo?.qualIntent) || indicator.qualIntent}
         </p>
       )}
       <ol className="mt-3 flex flex-col gap-2.5">
@@ -467,7 +606,9 @@ function QualSection({ indicator }: { indicator: Indicator }) {
               >
                 {i + 1}
               </span>
-              <span className="flex-1">{q}</span>
+              <span className="flex-1">
+                {(vadim && qualRo?.qualQuestions[i]) || q}
+              </span>
               <button
                 onClick={() => toggle(i)}
                 aria-pressed={added}
@@ -522,13 +663,22 @@ function DetailRow({ label, children }: { label: string; children: ReactNode }) 
 
 function SurveyItemView({
   item,
+  ro,
+  vadim,
   added,
   onToggle,
 }: {
   item: SurveyItem;
+  /** Traducerea RO paralelă (după poziție), dacă există. */
+  ro?: SurveyItemRo;
+  vadim: boolean;
   added: boolean;
   onToggle: () => void;
 }) {
+  const subStems = (vadim && ro?.subStems) || item.subStems;
+  const scalePoints = (vadim && ro?.scalePoints) || item.scalePoints;
+  const options = (vadim && ro?.options) || item.options;
+  const attributes = (vadim && ro?.attributes) || item.attributes;
   return (
     <div className="rounded-lg border border-border bg-card p-3.5 pt-7">
       <div className="flex items-center justify-between gap-2">
@@ -556,11 +706,13 @@ function SurveyItemView({
           )}
         </button>
       </div>
-      <p className="mt-2 text-base font-medium leading-snug">{item.stem}</p>
+      <p className="mt-2 text-base font-medium leading-snug">
+        {(vadim && ro?.stem) || item.stem}
+      </p>
 
-      {item.subStems && (
+      {subStems && (
         <ul className="ml-1 mt-1.5 flex flex-col gap-1 text-sm text-muted-foreground">
-          {item.subStems.map((s, i) => (
+          {subStems.map((s, i) => (
             <li key={i} className="flex gap-1.5">
               <span aria-hidden className="text-slate-9">
                 •
@@ -571,9 +723,9 @@ function SurveyItemView({
         </ul>
       )}
 
-      {item.scalePoints && (
+      {scalePoints && (
         <div className="mt-2 flex flex-wrap gap-1">
-          {item.scalePoints.map((p, i) => (
+          {scalePoints.map((p, i) => (
             <span
               key={i}
               className="rounded border border-border bg-slate-2 px-1.5 py-0.5 text-xs text-slate-11"
@@ -584,9 +736,9 @@ function SurveyItemView({
         </div>
       )}
 
-      {item.options && (
+      {options && (
         <div className="mt-2 flex flex-wrap gap-1">
-          {item.options.map((p, i) => (
+          {options.map((p, i) => (
             <span
               key={i}
               className="rounded border border-border bg-slate-2 px-1.5 py-0.5 text-xs text-slate-11"
@@ -597,13 +749,13 @@ function SurveyItemView({
         </div>
       )}
 
-      {item.attributes && (
+      {attributes && (
         <div className="mt-2">
           <p className="text-xs font-medium uppercase tracking-wide text-slate-10">
-            Battery items
+            {vadim ? "Itemii bateriei" : "Battery items"}
           </p>
           <ul className="ml-1 mt-1 flex flex-col gap-1 text-sm text-muted-foreground">
-            {item.attributes.map((a, i) => (
+            {attributes.map((a, i) => (
               <li key={i} className="flex gap-1.5">
                 <span aria-hidden className="text-slate-9">
                   •
@@ -616,11 +768,23 @@ function SurveyItemView({
       )}
 
       <dl className="mt-3 grid grid-cols-1 gap-1.5 text-sm">
-        <DetailRow label="Base">{item.base}</DetailRow>
-        {item.randomize && <DetailRow label="Randomize">Yes</DetailRow>}
-        <DetailRow label="Analysis">{item.analysis}</DetailRow>
-        <DetailRow label="Placement">{item.placement}</DetailRow>
-        {item.notes && <DetailRow label="Notes">{item.notes}</DetailRow>}
+        <DetailRow label={vadim ? "Baza" : "Base"}>
+          {(vadim && ro?.base) || item.base}
+        </DetailRow>
+        {item.randomize && (
+          <DetailRow label={vadim ? "Randomizare" : "Randomize"}>
+            {vadim ? "Da" : "Yes"}
+          </DetailRow>
+        )}
+        <DetailRow label={vadim ? "Analiza" : "Analysis"}>
+          {item.analysis}
+        </DetailRow>
+        <DetailRow label={vadim ? "Plasare" : "Placement"}>
+          {item.placement}
+        </DetailRow>
+        {item.notes && (
+          <DetailRow label={vadim ? "Note" : "Notes"}>{item.notes}</DetailRow>
+        )}
       </dl>
     </div>
   );
@@ -631,10 +795,17 @@ function SurveyItemView({
  * add-to-questionnaire: per-item toggle + add-all, targeting the
  * active questionnaire.
  */
-function QuantSection({ indicator }: { indicator: Indicator }) {
+function QuantSection({
+  indicator,
+  vadim,
+}: {
+  indicator: Indicator;
+  vadim: boolean;
+}) {
   const store = useSurveyStore();
   const activeSurvey = getActiveSurvey(store);
   const items = indicator.surveyItems ?? [];
+  const itemsRo = vadim ? INDICATOR_SURVEY_RO[indicator.id] : undefined;
 
   const inSurvey = (index: number) =>
     activeSurvey?.items.some(
@@ -674,7 +845,9 @@ function QuantSection({ indicator }: { indicator: Indicator }) {
   return (
     <section className="mt-7">
       <div className="flex items-center justify-between gap-2">
-        <SectionLabel>Quantitative — survey</SectionLabel>
+        <SectionLabel>
+          {vadim ? "Cantitativ — chestionar" : "Quantitative — survey"}
+        </SectionLabel>
         {items.length > 0 && (
           <button
             onClick={toggleAll}
@@ -705,7 +878,9 @@ function QuantSection({ indicator }: { indicator: Indicator }) {
           className="mt-0.5 h-3.5 w-3.5 shrink-0 text-slate-9"
         />
         <p className="text-sm leading-relaxed text-slate-11">
-          <span className="font-medium text-foreground/70">Measurement: </span>
+          <span className="font-medium text-foreground/70">
+            {vadim ? "Măsurarea: " : "Measurement: "}
+          </span>
           {indicator.measurement}
         </p>
       </div>
@@ -715,6 +890,8 @@ function QuantSection({ indicator }: { indicator: Indicator }) {
             <SurveyItemView
               key={i}
               item={item}
+              ro={itemsRo?.[i]}
+              vadim={vadim}
               added={inSurvey(i)}
               onToggle={() => toggle(i)}
             />
@@ -722,8 +899,9 @@ function QuantSection({ indicator }: { indicator: Indicator }) {
         </div>
       ) : (
         <p className="mt-3 text-sm italic text-slate-10">
-          Structured survey item not authored yet — the measurement note above
-          is the spec.
+          {vadim
+            ? "Itemul structurat nu e încă scris — nota de măsurare de mai sus ține loc de specificație."
+            : "Structured survey item not authored yet — the measurement note above is the spec."}
         </p>
       )}
       {addedCount > 0 && activeSurvey && (
@@ -747,9 +925,11 @@ function QuantSection({ indicator }: { indicator: Indicator }) {
 
 function IndicatorDrawer({
   indicator,
+  vadim,
   onClose,
 }: {
   indicator: Indicator | null;
+  vadim: boolean;
   onClose: () => void;
 }) {
   return (
@@ -762,7 +942,9 @@ function IndicatorDrawer({
               <div className="flex items-start justify-between gap-4 border-b border-border px-6 py-5">
                 <div className="min-w-0">
                   <p className="text-xs font-medium uppercase tracking-wide text-slate-10">
-                    {indicator.category}
+                    {vadim
+                      ? `${VADIM_RUBRICI[indicator.category].numar} · ${VADIM_RUBRICI[indicator.category].titlu}`
+                      : indicator.category}
                   </p>
                   <Dialog.Title className="mt-1 text-xl font-semibold leading-snug">
                     {indicator.name}
@@ -790,15 +972,17 @@ function IndicatorDrawer({
 
               <div tabIndex={0} className="flex-1 overflow-y-auto px-6 py-5">
                 <Dialog.Description className="text-base leading-relaxed text-muted-foreground">
-                  {indicator.description}
+                  {vadim
+                    ? `„${VADIM_INDICATOR_RO[indicator.id]}”`
+                    : indicator.description}
                 </Dialog.Description>
 
                 {indicator.qualQuestions &&
                   indicator.qualQuestions.length > 0 && (
-                    <QualSection indicator={indicator} />
+                    <QualSection indicator={indicator} vadim={vadim} />
                   )}
 
-                <QuantSection indicator={indicator} />
+                <QuantSection indicator={indicator} vadim={vadim} />
               </div>
             </>
           )}
