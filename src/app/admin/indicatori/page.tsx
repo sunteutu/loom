@@ -173,7 +173,7 @@ function IndicatoriContent() {
         <figure className="vadim-ochelari" aria-hidden>
           <span className="vadim-replica sus vo-replica">
             Ochelarii negri văd tot — prin ei se vede direct în sufletul
-            studiului.
+            studiului. Ai grijă cum îl faci.
           </span>
           <svg
             className="lv-doodle contur lv-boil"
